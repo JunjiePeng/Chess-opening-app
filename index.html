@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debut — Chess Opening Trainer</title>
+<style>
+:root {
+  --bg: #1a1714; --panel: #262019; --panel2: #2f2820; --line: #3d342a;
+  --text: #ece4d8; --dim: #a6988a; --accent: #d4a24e; --accent2: #8fb573;
+  --bad: #c96a5b; --light-sq: #ebecd0; --dark-sq: #739552;
+  --hl: rgba(255,255,51,.55); --hl-last: rgba(255,255,51,.38);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
+header { padding:18px 24px 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+header h1 { font-size:1.5rem; letter-spacing:.5px; cursor:pointer; user-select:none; transition:opacity .15s; }
+header h1:hover { opacity:.8; }
+header h1 span { color:var(--accent); }
+header p { color:var(--dim); font-size:.9rem; }
+.layout { display:flex; gap:20px; padding:10px 24px 30px; flex-wrap:wrap; align-items:flex-start; justify-content:center; }
+
+/* ---- menu ---- */
+#menu { max-width:1000px; width:100%; }
+.op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+.group-head { grid-column:1 / -1; font-size:.85rem; font-weight:600; letter-spacing:.5px;
+  color:var(--dim); text-transform:uppercase; margin:10px 0 -4px; padding-left:2px; }
+.group-head:first-child { margin-top:0; }
+.op-card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; }
+.op-card.clickable { cursor:pointer; transition:border-color .15s, transform .15s; }
+.op-card.clickable:hover { border-color:var(--accent); transform:translateY(-2px); }
+.card-foot { font-size:.78rem; color:var(--dim); margin-top:4px; }
+.op-card h2 { font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+.op-card h2 .ico { font-size:1.4rem; color:var(--accent); }
+.op-card .desc { color:var(--dim); font-size:.82rem; margin:6px 0 10px; line-height:1.45; }
+.line-btn { display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left;
+  background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:8px;
+  padding:9px 12px; margin-top:6px; cursor:pointer; font-size:.88rem; transition:border-color .15s; }
+.line-btn:hover { border-color:var(--accent); }
+.line-btn .stat { font-size:.75rem; color:var(--dim); white-space:nowrap; margin-left:8px; }
+.line-btn .stat.mastered { color:var(--accent2); }
+.side-tag { font-size:.7rem; padding:2px 7px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+.side-w { background:#e8e2d6; color:#2b2620; } .side-b { background:#3a332b; color:#d6cdc0; border:1px solid var(--line); }
+.summary-bar { display:flex; gap:18px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--line);
+  border-radius:12px; padding:12px 18px; margin-bottom:16px; font-size:.85rem; color:var(--dim); }
+.summary-bar b { color:var(--text); font-size:1.05rem; display:block; }
+
+/* ---- drill ---- */
+#drill { display:none; }
+.board-wrap { position:relative; --bsize:min(92vw, calc(100vh - 170px), 660px); }
+#board {
+  display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr);
+  width:var(--bsize); height:var(--bsize);
+  border:4px solid #15110d; border-radius:6px; overflow:hidden; user-select:none;
+  box-shadow:0 10px 30px rgba(0,0,0,.45); }
+.sq { position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  line-height:1; min-width:0; min-height:0; overflow:hidden; }
+.sq.light { background:var(--light-sq); } .sq.dark { background:var(--dark-sq); }
+.sq svg.pc { width:88%; height:88%; pointer-events:none; }
+.pc.pw * { fill:#ffffff; stroke:#3d3b38; stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.pc.pb * { fill:#3a3937; stroke:#262422; stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.pc .d  { fill:none !important; }
+.pc.pw .d { stroke:#3d3b38 !important; }
+.pc.pb .d { stroke:#c9c7c3 !important; }
+.pc.pw .d2 { fill:#3d3b38 !important; stroke:none !important; }
+.pc.pb .d2 { fill:#c9c7c3 !important; stroke:none !important; }
+.sq.sel::after, .sq.hint::after, .sq.last::after { content:''; position:absolute; inset:0; }
+.sq.sel::after { background:var(--hl); }
+.sq.last::after { background:var(--hl-last); }
+.sq.hint::after { box-shadow:inset 0 0 0 4px var(--accent); }
+.sq.mv::before { content:''; position:absolute; inset:35%; border-radius:50%;
+  background:rgba(0,0,0,.17); z-index:2; pointer-events:none; }
+.sq.cp::before { content:''; position:absolute; inset:4%; border-radius:50%;
+  border:calc(var(--bsize)*.011) solid rgba(0,0,0,.17); z-index:2; pointer-events:none; }
+.sq .coord { position:absolute; font-size:calc(var(--bsize)/8*.17); font-weight:700; opacity:.7; pointer-events:none; }
+.sq .coord.file { right:3px; bottom:2px; } .sq .coord.rank { left:3px; top:2px; }
+.sq.light .coord { color:var(--dark-sq); } .sq.dark .coord { color:var(--light-sq); }
+#board.shake { animation:shake .35s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+.flash-bad { animation:flashbad .4s; }
+@keyframes flashbad { 0%{background:var(--bad)} 100%{} }
+
+.side-panel { width:330px; max-width:92vw; display:flex; flex-direction:column; gap:12px; }
+.panel-box { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+#lineTitle { font-size:1rem; } #lineTitle small { color:var(--dim); display:block; font-size:.78rem; margin-top:2px; }
+#prompt { font-size:.95rem; min-height:46px; display:flex; align-items:center; gap:8px; }
+#prompt.good { color:var(--accent2); } #prompt.bad { color:var(--bad); }
+#comment { color:var(--dim); font-size:.85rem; line-height:1.5; min-height:60px; }
+#comment b { color:var(--accent); }
+#movelist { font-size:.88rem; line-height:1.9; color:var(--dim); max-height:140px; overflow-y:auto; }
+#movelist .mv { color:var(--text); margin-right:2px; }
+#movelist .num { color:var(--dim); margin:0 4px 0 8px; }
+#movelist .cur { background:var(--hl); border-radius:4px; padding:1px 4px; color:#fff; }
+.progressbar { height:6px; background:var(--panel2); border-radius:3px; overflow:hidden; margin-top:10px; }
+.progressbar div { height:100%; background:var(--accent); transition:width .25s; }
+.btn-row { display:flex; gap:8px; flex-wrap:wrap; }
+button.act { background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:8px;
+  padding:9px 14px; cursor:pointer; font-size:.86rem; transition:border-color .15s; }
+button.act:hover { border-color:var(--accent); }
+button.act.primary { background:var(--accent); color:#241c10; border-color:var(--accent); font-weight:600; }
+.streak { font-size:.8rem; color:var(--dim); }
+.streak b { color:var(--accent2); }
+#doneBox { display:none; text-align:center; }
+#doneBox .big { font-size:2rem; margin-bottom:6px; }
+#doneBox p { color:var(--dim); font-size:.88rem; margin-bottom:12px; }
+.toggle { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.toggle button { background:var(--panel2); color:var(--dim); border:none; padding:7px 13px; cursor:pointer; font-size:.82rem; }
+.toggle button.on { background:var(--accent); color:#241c10; font-weight:600; }
+#overlay { position:absolute; left:4px; top:4px; width:calc(var(--bsize) - 8px); height:calc(var(--bsize) - 8px);
+  pointer-events:none; z-index:5; }
+#overlay line { stroke:rgba(212,162,78,.8); stroke-width:.14; }
+#overlay circle { fill:none; stroke:rgba(143,181,115,.85); stroke-width:.07; }
+.line-row { display:flex; align-items:center; gap:8px; width:100%; background:var(--panel2);
+  border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px; font-size:.88rem; }
+.line-row .nm { flex:1; }
+.line-row .stat { font-size:.75rem; color:var(--dim); white-space:nowrap; }
+.line-row .stat.mastered { color:var(--accent2); }
+button.mini { background:none; border:1px solid var(--line); color:var(--dim); border-radius:6px;
+  padding:4px 10px; cursor:pointer; font-size:.78rem; transition:all .15s; }
+button.mini:hover { border-color:var(--accent); color:var(--text); }
+#lineSel { flex:1; min-width:0; background:var(--panel2); color:var(--text); border:1px solid var(--line);
+  border-radius:6px; padding:6px 8px; font-size:.82rem; cursor:pointer; }
+#lineSel:hover { border-color:var(--accent); }
+#donePlan { text-align:left; color:var(--dim); font-size:.85rem; line-height:1.5; margin-bottom:12px; }
+#donePlan b { color:var(--accent); }
+.eng-badge { font-size:.74rem; color:var(--dim); padding:3px 8px; border-radius:10px; }
+.eng-badge.ready { color:var(--accent2); }
+.eng-badge.loading { color:var(--accent); }
+.eng-badge.unavailable { color:var(--bad); cursor:pointer; }
+.eng-badge.unavailable:hover { text-decoration:underline; }
+#muteBtn { margin-left:0; background:none; border:none; cursor:pointer; padding:4px;
+  color:var(--dim); opacity:.6; transition:opacity .15s; line-height:1; }
+#muteBtn:hover { opacity:1; }
+#muteBtn svg { width:20px; height:20px; display:block; stroke:currentColor; fill:none;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+@media (max-width:900px){ .layout{padding:10px 12px 24px} .side-panel{width:min(82vw,520px)} }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="logo" onclick="showMenu()" title="Back to main menu">♞ De<span>but</span></h1>
+  <p>Chess opening trainer — learn the lines, then drill them from memory.</p>
+  <span id="engineBadge" class="eng-badge" onclick="retryEngine()" title="Engine status — click to retry"></span>
+  <button id="muteBtn" onclick="toggleMute()" title="Toggle sound"></button>
+</header>
+
+<div class="layout">
+  <!-- ============ MENU ============ -->
+  <div id="menu">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="op-grid" id="opGrid"></div>
+  </div>
+
+  <!-- ============ DRILL ============ -->
+  <div id="drill" class="layout" style="padding:0;">
+    <div class="board-wrap"><div id="board"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
+    <div class="side-panel">
+      <div class="panel-box">
+        <div id="lineTitle"></div>
+        <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <select id="lineSel" onchange="onLineSel(this.value)"></select>
+          <button class="mini" id="annotBtn" onclick="toggleAnnots()" title="Show or hide arrows and key-square markers"></button>
+          <button class="mini" id="aimBtn" onclick="toggleAims()" title="Show or hide legal-move dots when you select a piece"></button>
+        </div>
+        <div id="strengthRow" style="display:none;margin-top:10px">
+          <label style="font-size:.78rem;color:var(--dim);display:flex;justify-content:space-between">
+            <span>Engine strength</span><span id="eloLabel"></span>
+          </label>
+          <input type="range" id="eloSlider" min="0" max="20" value="6" oninput="onEloInput(this.value)" style="width:100%">
+          <div id="evalBar" style="font-size:.78rem;color:var(--dim);margin-top:4px"></div>
+        </div>
+      </div>
+      <div class="panel-box" id="promptBox">
+        <div id="prompt"></div>
+        <div id="comment"></div>
+      </div>
+      <div class="panel-box" id="doneBox">
+        <div class="big">🎉</div>
+        <div id="doneMsg"></div>
+        <p id="doneStats"></p>
+        <div id="donePlan"></div>
+        <div class="btn-row" style="justify-content:center">
+          <button class="act primary" onclick="startDrill(curOp,curLine,playerSide)">Drill Again</button>
+          <button class="act" onclick="startPlay(curOp,curLine,playerSide)">♟ Play vs Engine</button>
+          <button class="act" onclick="nextLine()">Next Line →</button>
+          <button class="act" onclick="backToLines()">← Lines</button>
+        </div>
+      </div>
+      <div class="panel-box">
+        <div id="movelist">&nbsp;</div>
+      </div>
+      <div class="btn-row" id="drillNav">
+        <button class="act" id="hintBtn" onclick="giveHint()">💡 Hint</button>
+        <button class="act" onclick="startDrill(curOp,curLine,playerSide)">↻ Restart</button>
+        <span class="toggle" id="sideToggle">
+          <button id="sideW" onclick="switchSide('w')">Play White</button>
+          <button id="sideB" onclick="switchSide('b')">Play Black</button>
+        </span>
+        <button class="act" onclick="backToLines()">← Lines</button>
+      </div>
+      <div class="btn-row" id="learnNav" style="display:none">
+        <button class="act" onclick="prevStep()">◀ Back</button>
+        <button class="act primary" onclick="nextStep()">Next ▶</button>
+        <button class="act" onclick="startDrill(curOp,curLine,playerSide)">🎯 Drill This Line</button>
+        <button class="act" onclick="backToLines()">← Lines</button>
+      </div>
+      <div class="btn-row" id="playNav" style="display:none">
+        <button class="act" id="engMoveBtn" onclick="engineMoveNow()" title="Let the engine move for you">↻ Engine move</button>
+        <button class="act" onclick="startPlay(curOp,curLine,playerSide)">↺ Restart game</button>
+        <button class="act" onclick="startDrill(curOp,curLine,playerSide)">🎯 Back to Drill</button>
+        <button class="act" onclick="backToLines()">← Lines</button>
+      </div>
+      <div class="streak" id="streakInfo"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DATA (validated move sequences) ================= */
+const DATA = {"openings":[{"name":"Italian Game","side":"w","icon":"♗","desc":"One of the oldest openings. White develops quickly and aims the bishop at f7, Black's weakest square.","lines":[{"name":"Giuoco Piano (Main Line)","intro":"The 'quiet game' is the perfect first opening: every move follows the golden rules — fight for the center, develop a new piece each move, castle early. Both sides build sound positions before any fighting starts.","plan":"After both sides castle, White's classic plan is the slow build-up: Re1, Nbd2, then reroute the knight Nf1–g3 toward the kingside, and eventually push d4 in one go. Black mirrors with ...Re8 and ...a6, ...Ba7 keeping the bishop. The key battleground squares are d5 and f5 — whoever plants a knight there first usually gets the better middlegame. Avoid trading your good bishop on c4/c5 without getting something for it.","moves":[{"u":"e2e4","san":"e4","c":"Grab a share of the center and open lines for both the queen and the f1-bishop. The center pawns control the key squares d5 and f5.","k":["d5","f5"]},{"u":"e7e5","san":"e5","c":"Black stakes an equal claim. Symmetry means a fair fight over the same central squares."},{"u":"g1f3","san":"Nf3","c":"Develop with a threat — the knight attacks e5, so Black must respond. Developing 'with tempo' means your opponent can't ignore you.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"The most natural reply: defend e5 while developing a piece. Defending with a piece beats defending with a pawn move like ...d6, which blocks the bishop.","a":["c6e5"]},{"u":"f1c4","san":"Bc4","c":"The Italian bishop takes its best diagonal, aiming straight at f7 — the only square defended solely by Black's king. Many beginner attacks (and traps) revolve around f7.","a":["c4f7"],"k":["f7"]},{"u":"f8c5","san":"Bc5","c":"Black mirrors, eyeing f2 in return. The bishop also controls d4, discouraging White's central expansion.","a":["c5f2"],"k":["f2","d4"]},{"u":"c2c3","san":"c3","c":"A pawn move with a plan: prepare d4, building a broad center. Note White delays this until the key pieces are out. A common beginner mistake is pushing pawns before developing.","k":["d4"]},{"u":"g8f6","san":"Nf6","c":"Black develops the last minor piece needed for castling and counterattacks e4. If White gets careless, ...Nxe4 wins a pawn.","a":["f6e4"]},{"u":"d2d3","san":"d3","c":"Defend e4 modestly. The immediate 5.d4 leads to sharp play; d3 keeps the center stable — White will prepare d4 properly later. Slow but safe.","k":["e4"]},{"u":"d7d6","san":"d6","c":"Black solidifies e5 the same way. Both sides have completed the opening's first goal: a stable center and pieces ready to castle.","k":["e5"]},{"u":"e1g1","san":"O-O","c":"Castle! King safety always comes before launching attacks. The rook also steps toward the center files where it belongs.","k":["g1","f1"]},{"u":"e8g8","san":"O-O","c":"Both kings are tucked away. The opening is complete: now the real game begins — see the strategy notes when you finish this line."}]},{"name":"Two Knights Defense (Quiet)","intro":"When Black plays 3...Nf6 instead of 3...Bc5, they counterattack e4 immediately. White's calmest answer is d3, sidestepping the wild Fried Liver complications while keeping a healthy, flexible position.","plan":"White's setup is identical to the Giuoco Piano: c3, Re1, Nbd2–f1–g3, then the d4 break. Black's most active plan is ...d5 in one move if White is slow, or the standard ...a6, ...Ba7 regroup. Watch for the moment Black plays ...d5: after exd5 Nxd5 you should hit the center quickly before Black consolidates.","moves":[{"u":"e2e4","san":"e4","c":"Take the center and free the bishop and queen.","k":["d5","f5"]},{"u":"e7e5","san":"e5","c":"Black claims an equal share."},{"u":"g1f3","san":"Nf3","c":"Develop and attack e5 — forcing Black to deal with the threat.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece."},{"u":"f1c4","san":"Bc4","c":"Aim at f7 — the Italian setup.","a":["c4f7"],"k":["f7"]},{"u":"g8f6","san":"Nf6","c":"The Two Knights: instead of mirroring, Black counterattacks e4 at once. This is more combative — it invites White to grab material with Ng5, leading to chaos.","a":["f6e4"]},{"u":"d2d3","san":"d3","c":"The mature choice. 4.Ng5 attacks f7 and wins material by force, but the resulting positions are razor-sharp. d3 simply defends e4 and keeps a comfortable game.","k":["e4"]},{"u":"f8e7","san":"Be7","c":"Black develops modestly. Note ...Bc5 was also possible, transposing toward Giuoco Piano waters. Be7 is the most solid — it never becomes a target.","k":["e7"]},{"u":"e1g1","san":"O-O","c":"Castle before anything else. White's position plays itself: every piece has an obvious good square."},{"u":"e8g8","san":"O-O","c":"Black completes the kingside development."},{"u":"f1e1","san":"Re1","c":"The rook takes the e-file before it even opens. When the center eventually breaks open with d4xe5 or ...d5, this rook will already be perfectly placed.","a":["e1e4"],"k":["e4"]},{"u":"d7d6","san":"d6","c":"Black shores up e5. From here both sides maneuver: White eyes d4 and the kingside, Black looks for ...d5 or ...Be6 to trade the strong Italian bishop.","k":["d5"]}]},{"name":"Evans Gambit","intro":"A pawn sacrifice with a clear purpose: b4! deflects Black's bishop, then c3 and d4 build a massive center while Black wastes time with the same bishop. Beloved by attacking players from Morphy to Kasparov.","plan":"White's compensation is concrete: a big center, open lines, and a 2-3 move lead in development. Typical follow-ups are Qb3 (hitting f7), Ba3 (preventing castling!), and e5 kicking the f6-knight. The golden rule of gambit play: never trade queens, keep making threats, and open the position before Black untangles. If Black survives to an endgame, the extra pawn wins — so play with energy.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black claims a share."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo on e5.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1c4","san":"Bc4","c":"The Italian bishop, aiming at f7.","a":["c4f7"],"k":["f7"]},{"u":"f8c5","san":"Bc5","c":"Black plays the classical square."},{"u":"b2b4","san":"b4","c":"The Evans Gambit! White offers a wing pawn to drag Black's bishop off its good diagonal and gain time. The pawn matters less than the tempo and the center White gets in return.","a":["b4c5"]},{"u":"c5b4","san":"Bxb4","c":"Black accepts — the critical test. Declining with ...Bb6 is safer but lets White claim space for free."},{"u":"c2c3","san":"c3","c":"The point: attack the bishop AGAIN, gaining another tempo, and prepare the d4 thrust. Black's bishop has now moved three times while White develops with every move.","a":["c3b4"],"k":["d4"]},{"u":"b4a5","san":"Ba5","c":"The main retreat, keeping the pin idea on c3 alive. ...Be7 and ...Bc5 are alternatives, each with drawbacks White can exploit."},{"u":"d2d4","san":"d4","c":"The big center arrives with another threat. White's pawns and pieces all work together; Black has one developed piece — and it's been chased around the board.","a":["d4e5"],"k":["d4","e5"]},{"u":"e5d4","san":"exd4","c":"Black grabs a second pawn, falling further behind. Greed is the engine of White's attack in the Evans."},{"u":"e1g1","san":"O-O","c":"Calm amid the storm: castle, connect the rooks, and prepare cxd4 or Qb3. White is two pawns down but effectively four tempi up — that's a winning trade in open positions.","k":["f7","a3"]}]}]},{"name":"Ruy Lopez","side":"w","icon":"♘","desc":"The 'Spanish Game'. White pressures the knight that defends e5 — perhaps the most classical of all openings.","lines":[{"name":"Main Line (Closed)","intro":"The Ruy Lopez asks Black a long-term question: the b5-bishop pressures the c6-knight, the only defender of e5. White isn't threatening to win a pawn immediately — it's positional pressure that can last 30 moves.","plan":"The closed Spanish is a slow maneuvering battle. White's standard plan: h3 (stopping ...Bg4), d4, and the famous knight tour Nb1–d2–f1–g3 heading for f5. Black counters with ...Na5 hitting the bishop, ...c5 and ...Qc7 claiming queenside space. Don't rush — improve your worst piece each move. The e4/e5 pawn tension defines everything: whoever resolves it carelessly hands the other side the center.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black responds classically."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish move. Unlike the Italian's direct attack on f7, this targets the DEFENDER of e5. The latent threat: Bxc6 followed by Nxe5. It doesn't work yet — but Black must always account for it.","a":["b5c6"],"k":["c6","e5"]},{"u":"a7a6","san":"a6","c":"The Morphy Defense — pose the question immediately. If the bishop takes, Black gets the bishop pair; if it retreats, ...b5 can chase it again later. The world's most played position arises after this move."},{"u":"b5a4","san":"Ba4","c":"Keep the tension. The bishop still eyes c6 through the a4–e8 diagonal, and ...b5 would loosen Black's queenside — a target for a later a4 break.","a":["a4c6"]},{"u":"g8f6","san":"Nf6","c":"Develop and attack e4. Now White faces the same question Black did: defend the pawn or ignore the threat?","a":["f6e4"]},{"u":"e1g1","san":"O-O","c":"Ignore it! If Black grabs e4 (the 'Open Spanish'), White regains the pawn with d4 and Re1 — the e-file pin is deadly. Castling 'into' the threat is a famous lesson: calculate, don't just react.","k":["e4"]},{"u":"f8e7","san":"Be7","c":"Black declines the pawn and prepares to castle. The solid main road."},{"u":"f1e1","san":"Re1","c":"NOW e4 is genuinely defended, renewing the positional threat of Bxc6 and Nxe5. Black's next move is practically forced — can you see why?","a":["e1e4"],"k":["e4"]},{"u":"b7b5","san":"b5","c":"Because of the renewed threat, Black finally breaks the a4–e8 pin idea for good. The cost: the queenside pawns are slightly loosened, which White may target with a4 much later.","a":["b5a4"]},{"u":"a4b3","san":"Bb3","c":"The bishop lands on its permanent home, still glaring at f7 down the a2–g8 diagonal. In many lines it becomes the most dangerous piece on the board.","a":["b3f7"],"k":["f7"]},{"u":"d7d6","san":"d6","c":"Black cements e5 and opens the c8-bishop's path. Quiet consolidation."},{"u":"c2c3","san":"c3","c":"Two ideas in one: prepare the d4 advance, and create an escape square on c2 so ...Na5 never wins the bishop pair. Prophylaxis — preventing the opponent's plan before it happens.","k":["d4","c2"]},{"u":"e8g8","san":"O-O","c":"The main-line tabiya. White will continue h3 then d4; Black chooses between ...Na5, ...Bb7, or ...Re8 setups. A lifetime of chess lives in this position."}]},{"name":"Exchange Variation","intro":"White trades the prized bishop for a clear, simple asset: Black's doubled c-pawns. The deep idea — in a pure pawn endgame White's healthy kingside majority creates a passed pawn, while Black's crippled queenside majority cannot. Bobby Fischer's favorite shortcut.","plan":"White's strategy is brutally clear: trade pieces (not pawns!), play d4, and aim for any endgame. Every exchange increases the value of the superior pawn structure. Black's compensation is the bishop pair — so Black should keep the position rich, avoid trades, and use the half-open d-file. As White: knight to the kingside, f4-f5 majority advance. Count to the endgame: 4 healthy pawns vs 3 beats 4 vs a doubled 4.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black answers classically, claiming an equal share of the center."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish bishop pressures the defender.","a":["b5c6"]},{"u":"a7a6","san":"a6","c":"The Morphy Defense — immediately ask the bishop its intentions."},{"u":"b5c6","san":"Bxc6","c":"The Exchange: White gives up the bishop pair voluntarily — for permanent structural damage. This trade only makes sense because Black must recapture with a pawn, doubling the c-pawns.","k":["c6"]},{"u":"d7c6","san":"dxc6","c":"Recapturing toward the center and freeing the c8-bishop. (...bxc6 would leave the bishop buried and the pawns even weaker.) Black banks on the two bishops for dynamic play.","k":["c6","c7"]},{"u":"e1g1","san":"O-O","c":"Castle first — 5.Nxe5? immediately fails to ...Qd4!, forking knight and e4-pawn, regaining the pawn with a good game. A famous trap; check it yourself!","k":["d4"]},{"u":"f7f6","san":"f6","c":"Black reinforces e5 in ugly-but-solid fashion. The doubled pawns do offer one gift: they control great central squares.","k":["e5"]},{"u":"d2d4","san":"d4","c":"Strike while ahead in development. White wants to liquidate the center and steer toward the favorable endgame.","a":["d4e5"]},{"u":"e5d4","san":"exd4","c":"Black trades — holding the center with ...exd4 declined would drop a pawn eventually."},{"u":"f3d4","san":"Nxd4","c":"Stock-taking: White has the healthy 4-v-3 kingside majority and a lead in development; Black has two bishops and the half-open d-file. Every piece trade from here favors White — remember that as you play on.","k":["d4"]}]},{"name":"Berlin Defense","intro":"The 'Berlin Wall' — Black's most solid answer to the Spanish, famously used by Kramnik to dethrone Kasparov in 2000. Black accepts a slightly worse structure and loses castling rights, but gets the bishop pair and a fortress-like endgame with no weaknesses.","plan":"This IS the endgame — the queens come off by move 8. White's assets: the kingside pawn majority and Black's misplaced king. Black's assets: the bishop pair and a rock-solid structure. White should advance the kingside pawns (h3, g4, e5–e6 ideas) and activate rooks before Black coordinates. Black plays ...Ke8–c8, ...b6, ...Bb7 and simply outlasts. Patience wins here; haste loses.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black answers classically, claiming an equal share of the center."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish bishop takes aim at the knight that defends e5.","a":["b5c6"]},{"u":"g8f6","san":"Nf6","c":"The Berlin: develop and counterattack e4 immediately, skipping ...a6. Black offers to enter deep, technical waters.","a":["f6e4"]},{"u":"e1g1","san":"O-O","c":"The principled reply — defend e4 with tactics, not pawns. White invites Nxe4, having seen further ahead.","k":["e4"]},{"u":"f6e4","san":"Nxe4","c":"Black takes the bait — except it's not quite a bait. This is theory: Black knows the pawn comes back, but believes the resulting endgame is holdable. Watch how White regains it.","k":["e4"]},{"u":"d2d4","san":"d4","c":"The key move: counterattack in the center BEFORE recapturing. Threatens d5 forking, and opens the queen's path to d8. Black cannot keep the extra pawn.","a":["d4e5"],"k":["d5"]},{"u":"e4d6","san":"Nd6","c":"Best — the knight retreats with tempo by attacking the b5-bishop. Every Berlin move has this dual-purpose quality; that's why it's so hard to crack.","a":["d6b5"]},{"u":"b5c6","san":"Bxc6","c":"In-between move: take the knight first, damaging Black's pawns before recapturing on e5.","k":["c6"]},{"u":"d7c6","san":"dxc6","c":"Black accepts doubled pawns to free the bishop — same structural story as the Exchange Variation."},{"u":"d4e5","san":"dxe5","c":"Regain the pawn and kick the d6-knight at the same time. Notice the d-file is now fully open — with both queens standing on it.","a":["e5d6"]},{"u":"d6f5","san":"Nf5","c":"The knight finds its one good square, eyeing the d4 and e3 holes.","k":["d4","e3"]},{"u":"d1d8","san":"Qxd8+","c":"Into the famous Berlin endgame. White trades queens precisely because Black's king must recapture — losing castling rights forever.","a":["d1d8"]},{"u":"e8d8","san":"Kxd8","c":"The Berlin Wall stands: Black's king is stuck in the center, the h8-rook is hard to activate — but the position has no weaknesses to attack. Technical chess from here; see the strategy notes."}]}]},{"name":"Sicilian Defense","side":"b","icon":"♟","desc":"Black's most popular and combative reply to 1.e4. Fight for the center asymmetrically with the c-pawn.","lines":[{"name":"Najdorf Setup","intro":"The Najdorf is the Rolls-Royce of Sicilians — the choice of Fischer and Kasparov. The little move ...a6 prepares everything: ...e5 without allowing Nb5, and queenside expansion with ...b5. Black plays for a win from move one.","plan":"Black's typical scheme: ...e5 (or ...e6), ...Be7, ...O-O, then the thematic ...b5–b4 pawn storm against White's queenside — often racing White's own kingside attack. The d5-square is Black's eternal concern: never let a White knight live there. Remember the Sicilian golden rule: Black's counterplay runs down the half-open c-file (...Rc8, ...Qc7, pressure on c2/c3). If White castles long, the race is on — push those queenside pawns!","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c5","san":"c5","c":"The Sicilian! Instead of mirroring, Black fights for d4 from the wing. The deep point: when White eventually plays d4 and Black trades, Black has swapped a FLANK pawn for a CENTER pawn — a long-term structural profit.","k":["d4"]},{"u":"g1f3","san":"Nf3","c":"White prepares d4 — the Open Sicilian, the most testing approach."},{"u":"d7d6","san":"d6","c":"Control e5 (stopping e4-e5 advances) and open the c8-bishop's diagonal. The flexible Najdorf move order.","k":["e5"]},{"u":"d2d4","san":"d4","c":"White opens the center, accepting the structural trade for piece activity and a development lead."},{"u":"c5d4","san":"cxd4","c":"The cornerstone trade: flank pawn for center pawn. Black now owns the half-open c-file — the highway for all future counterplay.","k":["c2"]},{"u":"f3d4","san":"Nxd4","c":"White recaptures, centralizing the knight."},{"u":"g8f6","san":"Nf6","c":"Develop with tempo — e4 needs defending now.","a":["f6e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with the natural developing move."},{"u":"a7a6","san":"a6","c":"The Najdorf move. It looks passive — it's anything but. It takes b5 away from both White knights and the bishop, preparing ...e5 (which Nb5 would otherwise punish) and the ...b5 expansion. A move that prepares the entire middlegame.","k":["b5","e5"]}]},{"name":"Open Sicilian (Classical)","intro":"The Classical Sicilian: Black develops both knights to their best squares before committing any more pawns. Sound, flexible, and a great way to learn Open Sicilian structures without memorizing forcing lines.","plan":"Black's standard development: ...e6 (or ...g6), ...Be7, ...O-O, ...Qc7 and rooks to c8/d8. The recurring themes of every Open Sicilian apply: pressure down the c-file, a timely ...d5 break to free the position, and vigilance over the d5-square. White usually attacks with f3/Be3/Qd2 and a kingside pawn storm, or Bc4 pressure — meet wing attacks with the central ...d5 counterstrike.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c5","san":"c5","c":"The Sicilian — asymmetric fight for d4.","k":["d4"]},{"u":"g1f3","san":"Nf3","c":"White prepares the d4 break — heading for the Open Sicilian."},{"u":"b8c6","san":"Nc6","c":"Develop the knight to its most natural square, adding control over d4 and e5.","k":["d4","e5"]},{"u":"d2d4","san":"d4","c":"The Open Sicilian — White opens the center, the most testing approach."},{"u":"c5d4","san":"cxd4","c":"Flank pawn for center pawn — Black's structural profit, plus the half-open c-file.","k":["c2"]},{"u":"f3d4","san":"Nxd4","c":"White recaptures, placing the knight powerfully in the center."},{"u":"g8f6","san":"Nf6","c":"Develop with tempo on e4.","a":["f6e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with the most natural developing move."},{"u":"d7d6","san":"d6","c":"The Classical setup complete: e5 is controlled, the bishop diagonal is open, and Black hasn't committed to a plan yet — ...e6, ...g6, or ...e5 are all still possible. Flexibility is strength."}]},{"name":"Alapin (2.c3) — White's view","intro":"Tired of facing twenty Sicilian systems? The Alapin cuts through: White simply prepares d4 and builds the center with pawns. Black's sharpest weapons don't work here — the game becomes positional, on White's terms.","plan":"White typically gets pawns on d4 and e5 with free development — a space advantage that cramps Black all game. The plans: develop with Bc4 or Be2, castle, and use the extra space to maneuver (Re1, Bf4/Bg5, Nbd2). Black will chip with ...d6 and pressure d4; hold the center calmly with Be3/Nbd2 rather than grabbing more space. If the center pawns get traded, aim for active piece play against Black's isolated d-pawn positions.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"c7c5","san":"c5","c":"The Sicilian — Black fights for d4 from the flank, unbalancing the game."},{"u":"c2c3","san":"c3","c":"The Alapin's honest plan: support d4 with a pawn, so that after d4 cxd4, cxd4 White keeps the full pawn center. The drawback — the b1-knight loses its best square — is exactly what Black tries to exploit.","k":["d4"]},{"u":"g8f6","san":"Nf6","c":"Black's best: attack e4 immediately, exploiting that Nc3 is unavailable (the pawn took the square!). White must push the pawn, which Black will undermine.","a":["f6e4"]},{"u":"e4e5","san":"e5","c":"Gain space and kick the knight — the only good way to defend.","a":["e5f6"]},{"u":"f6d5","san":"Nd5","c":"The knight sits beautifully on d5, un-evictable by pawns (c4? would weaken d4 forever). Black's whole setup works around this knight.","k":["d5"]},{"u":"d2d4","san":"d4","c":"Build the intended center."},{"u":"c5d4","san":"cxd4","c":"Black trades before White gets everything set up."},{"u":"g1f3","san":"Nf3","c":"The professional touch: develop first and recapture with the c-pawn next, keeping the d4+e5 duo intact. Rushing cxd4 first invites an early ...d6 strike.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"Black develops with pressure on d4 and e5.","a":["c6d4"]},{"u":"c3d4","san":"cxd4","c":"The dream structure: pawns on d4 and e5 grant White space and attacking chances. This duo is the whole point of the Alapin.","k":["d4","e5"]},{"u":"d7d6","san":"d6","c":"Black strikes back immediately — correct play. The center must be challenged before it becomes overwhelming. A fair, instructive middlegame follows.","a":["d6e5"]}]}]},{"name":"Queen's Gambit","side":"w","icon":"♕","desc":"White's classical 1.d4 weapon: offer the c-pawn to deflect Black's d-pawn and dominate the center.","lines":[{"name":"QGD Main Line","intro":"The Queen's Gambit Declined is chess's aristocrat — over a century of world championship pedigree. Black calmly protects d5 and accepts a slightly cramped but extraordinarily solid position. White gets enduring pressure; Black waits for the right moment to free the position.","plan":"White's two classic plans: (1) the minority attack — b4–b5 creating a weak Black queenside pawn to besiege all game, or (2) central play with Qc2, Rd1 and a timely e4. Black's freedom plan is always the same: trade pieces (a cramped position loves trades), then break with ...c5 or ...e5 at the right moment. The c8-bishop is Black's problem child — getting it to f5 or g4 (often after ...dxc4 and ...b5) means Black has equalized.","moves":[{"u":"d2d4","san":"d4","c":"Claim the center with built-in protection — unlike e4, this pawn is guarded by the queen. 1.d4 openings are slower burns: structure and squeezing replace quick strikes.","k":["d4"]},{"u":"d7d5","san":"d5","c":"Black claims an equal share and blocks the center."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit — not really a gambit! If Black takes, White regains the pawn comfortably. The real idea: pressure d5 sideways to either remove it (gaining central control) or force Black into passive defense.","a":["c4d5"],"k":["d5"]},{"u":"e7e6","san":"e6","c":"Declined — Black keeps a pawn on d5 at the small cost of boxing in the c8-bishop. That bishop becomes the defining piece of the whole opening: Black spends the next ten moves trying to free it.","k":["c8"]},{"u":"b1c3","san":"Nc3","c":"Develop with more pressure on d5.","a":["c3d5"]},{"u":"g8f6","san":"Nf6","c":"Defend d5 and develop — move for move, the same battle."},{"u":"c1g5","san":"Bg5","c":"The classical pin: the f6-knight is d5's key defender, so White ties it down. Indirect pressure on d5 through the pin — a lesson in attacking a strongpoint via its defenders.","a":["g5f6"],"k":["d5"]},{"u":"f8e7","san":"Be7","c":"Calmly break the pin. No weaknesses, no drama — the QGD way."},{"u":"e2e3","san":"e3","c":"Solidify d4 and open the f1-bishop's diagonal. Note White's restraint: the position stays compact, every piece protected.","k":["d4"]},{"u":"e8g8","san":"O-O","c":"Black castles into safety."},{"u":"g1f3","san":"Nf3","c":"Complete the kingside development. Bd3, O-O and Rc1 come next — then White chooses between the minority attack and central expansion."},{"u":"b8d7","san":"Nbd7","c":"The classical QGD tabiya. The knight supports both ...c5 and ...e5 breaks and can reroute via b6 or f8. Cramped but unbreakable — Capablanca won countless games from here with both colors."}]},{"name":"Queen's Gambit Accepted","intro":"Black takes the pawn — not to keep it, but to trade central tension for quick, free development. Black gives back the pawn at the right moment and strikes at d4 with ...c5, aiming for full equality in an open game.","plan":"White gets the freer game and a central majority; the question is whether it becomes an attack or a target. White's ideal: build with Qe2, Rd1, e4 and roll the center forward. Black's standard equalizing sequence: ...c5xd4 creating an isolated queen's pawn (IQP) for White, then blockade d5 with knights and trade pieces — an IQP grows weaker with every exchange. As White, attack before the simplification: Bd3, Qe2, and watch for Bxh7+ Greek-gift sacrifices when Black castles early.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"d7d5","san":"d5","c":"Black claims a share."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit offer: pressure d5 from the side to win the center.","a":["c4d5"]},{"u":"d5c4","san":"dxc4","c":"Accepted! Black surrenders the center temporarily. The plan is NOT to keep the pawn (tries like ...b5 lose time badly) — it's to develop fast while White spends a move recapturing.","k":["c4"]},{"u":"g1f3","san":"Nf3","c":"Develop first and prevent ...e5, which would free Black's game instantly. Stopping the opponent's best move is as valuable as making your own.","k":["e5"]},{"u":"g8f6","san":"Nf6","c":"Black develops naturally, also controlling e4."},{"u":"e2e3","san":"e3","c":"Open the bishop's path to reclaim c4."},{"u":"e7e6","san":"e6","c":"Black mirrors, preparing ...c5 — the key strike. Note Black's c8-bishop is blocked for now, just like in the QGD; ...b6 and ...Bb7 will solve it later."},{"u":"f1c4","san":"Bxc4","c":"Pawn regained with a developing move — the gambit's accounting always balances. The bishop sits actively on the a2–g8 diagonal.","a":["c4e6"],"k":["e6"]},{"u":"c7c5","san":"c5","c":"The thematic counter-strike at d4. Black challenges the center before White consolidates with Qe2 and Rd1. Without this move, Black would slowly suffocate.","a":["c5d4"],"k":["d4"]},{"u":"e1g1","san":"O-O","c":"Castle and keep the small pull: better development and a central majority. The middlegame question: will d4 become a passed pawn or a weakness?"},{"u":"a7a6","san":"a6","c":"Preparing ...b5 and ...Bb7 — finally activating the problem bishop, with queenside space as a bonus. A rich, balanced middlegame; see the strategy notes."}]},{"name":"Slav Defense Main Line","intro":"The Slav fixes the QGD's one flaw: by defending d5 with ...c6 instead of ...e6, the c8-bishop keeps its freedom and develops to f5 — actively placed before the pawn chain closes. Solid as granite, but with more dynamic potential than the QGD.","plan":"Black's setup completes with ...e6, ...Bb4 or ...Be7, and ...O-O — every piece on a sensible square, no weaknesses. White's space advantage is real but hard to convert: the standard plans are e4 (after Bg5/e3 preparation) or queenside pressure with Qb3. Black counters with ...e5 or ...c5 breaks once developed. The a4-pawn White played has a cost — the b4-square belongs to Black forever; a knight or bishop landing there is the Slav player's reward.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"d7d5","san":"d5","c":"Black claims a share."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit offer: pressure d5 from the side to win the center.","a":["c4d5"]},{"u":"c7c6","san":"c6","c":"The Slav point: defend d5 while leaving the c8–h3 diagonal open. Compare with the QGD's ...e6 — same solidity, but the bishop thanks you. The small cost: c6 takes the best square from the b8-knight.","k":["c8"]},{"u":"g1f3","san":"Nf3","c":"Natural development, watching e5."},{"u":"g8f6","san":"Nf6","c":"Black develops a piece toward the center."},{"u":"b1c3","san":"Nc3","c":"More pressure on d5. White's setup is identical to the QGD — the difference is all in Black's camp.","a":["c3d5"]},{"u":"d5c4","san":"dxc4","c":"Now Black takes! The timing is the point: with ...c6 played, Black threatens to HOLD the pawn with ...b5. White must spend a move preventing it — and that move has a price.","k":["b5"]},{"u":"a2a4","san":"a4","c":"Stop ...b5, intending to regain c4. The cost: b4 is now a permanent hole in White's queenside — Black's pieces will use it for the rest of the game. Every pawn move creates a weakness somewhere.","k":["b4"]},{"u":"c8f5","san":"Bf5","c":"The Slav's payoff move: the bishop reaches its dream square BEFORE ...e6 closes the diagonal. Compare this bishop with its sad QGD cousin on c8. Black completes development smoothly next: ...e6, ...Bb4, ...O-O.","k":["f5","b4"]}]}]},{"name":"London System","side":"w","icon":"♖","desc":"A sturdy, low-theory system: d4, Bf4, e3, and the same solid setup against almost anything.","lines":[{"name":"Main Line vs ...d5","intro":"The London is a system, not a sequence — the same sound setup (d4, Bf4, e3, Bd3, Nbd2, c3) against nearly anything Black does. Perfect when you'd rather understand one structure deeply than memorize twenty variations. The f4-bishop, developed OUTSIDE the pawn chain, is the system's soul.","plan":"The London pyramid (c3–d4–e3) is nearly impregnable. White's main plans: (1) the Ne5 outpost — plant the knight, support with f4 if needed, and attack f7/h7; (2) the slow kingside attack with Bd3, Ne5, Qf3–h3; (3) in the endgame, the queenside majority after dxc5. Black's counterplay comes down the c-file with ...Qb6 hitting b2 — know the response Qb3 (or Rb1). Don't rush: the London wins by improving pieces while Black runs out of useful moves.","moves":[{"u":"d2d4","san":"d4","c":"Take the center, queen-protected."},{"u":"d7d5","san":"d5","c":"Black mirrors, claiming an equal share of the center."},{"u":"c1f4","san":"Bf4","c":"The London move, and the key idea of the whole system: develop the bishop OUTSIDE the pawn chain BEFORE playing e3. The QGD showed what happens to a bishop locked behind its own pawns — White makes sure it never happens here.","k":["f4"]},{"u":"g8f6","san":"Nf6","c":"Black develops the knight to its most natural square."},{"u":"e2e3","san":"e3","c":"Now build the pyramid behind the bishop. The structure c3–d4–e3 (c3 comes soon) defends itself — that's why the London needs so little memorization.","k":["d4"]},{"u":"e7e6","san":"e6","c":"Black builds symmetrically — accepting the same bad-bishop problem White just avoided."},{"u":"g1f3","san":"Nf3","c":"Develop, control e5 — the square White's whole middlegame revolves around.","k":["e5"]},{"u":"f8d6","san":"Bd6","c":"Black sensibly challenges the London bishop — it's White's best piece, so trading it is good business for Black."},{"u":"f4g3","san":"Bg3","c":"Refuse the trade! If Black captures on g3, White recaptures with the h-pawn — opening the h-file for the rook, a free attacking road. Black usually regrets that trade; meanwhile the bishop keeps living on the b8–h2 diagonal.","k":["g3","h2"]},{"u":"e8g8","san":"O-O","c":"Black castles — king safety before the middlegame begins."},{"u":"f1d3","san":"Bd3","c":"The attacking diagonal, pointed at h7. Together with a future Ne5, this creates real mating threats — the London is quiet, not toothless.","a":["d3h7"],"k":["h7"]},{"u":"c7c5","san":"c5","c":"Black's correct counterplay: hit d4 and open the c-file. Expect ...Qb6 next, targeting the b2-pawn the London bishop left behind — the system's one tender spot.","a":["c5d4"],"k":["b2"]},{"u":"c2c3","san":"c3","c":"Complete the pyramid. d4 is now defended three times; the structure absorbs the pressure effortlessly.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"A standard London middlegame: White will castle, reroute with Nbd2 and aim for the Ne5 outpost. Solid for White, flexible for Black — see the strategy notes."}]},{"name":"vs King's Indian Setup","intro":"Against the fianchetto, the London keeps its shape but shifts its concern: Black's g7-bishop bears down on d4, and the ...e5 break is coming. White's setup stays solid, controls e5 by piece-count, and relies on h3 to preserve the key dark-squared bishop.","plan":"Black wants ...Nbd7 and ...e5 — you usually can't prevent it forever, so prepare to meet it well: keep d4 firmly guarded (c3, Nbd2), and when ...e5 comes, choose between dxe5 (then occupy the d-file and c4/e4 squares) or letting the tension stand. The h3–Bh2 resource keeps your best piece alive. Long-term: queenside space with c4 and b4 is White's healthiest plan, since Black owns the kingside dark squares. Respect the g7-bishop — never open the long diagonal carelessly.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"g8f6","san":"Nf6","c":"Black stays flexible, hinting at Indian setups."},{"u":"c1f4","san":"Bf4","c":"London regardless — the system's promise: one setup against everything.","k":["f4"]},{"u":"g7g6","san":"g6","c":"Black announces the King's Indian plan: fianchetto, castle, then strike with ...e5 or ...c5. A completely different animal from ...d5 setups — the center stays fluid."},{"u":"e2e3","san":"e3","c":"The usual London structure: e3 supports d4 from behind the bishop."},{"u":"f8g7","san":"Bg7","c":"The KID bishop takes the long diagonal, staring at d4 and beyond toward b2. This piece is the heart of every Black plan — track what it sees at all times.","a":["g7d4"],"k":["d4","b2"]},{"u":"g1f3","san":"Nf3","c":"Develop while adding a defender to d4 and controlling e5 — the square Black most wants to claim.","k":["e5","d4"]},{"u":"e8g8","san":"O-O","c":"Black castles quickly, completing the standard KID sequence."},{"u":"f1e2","san":"Be2","c":"Modest on purpose: on d3 the bishop would block White's own queen from defending d4, and ...Nh5 tricks gain strength. Be2 keeps everything coordinated. Sometimes the humble square is the right square.","k":["d4"]},{"u":"d7d6","san":"d6","c":"Black prepares the thematic ...Nbd7 and ...e5 break — the KID's core plan against every White setup."},{"u":"h2h3","san":"h3","c":"A small move with a big job: when Black plays ...Nh5 hunting the bishop, it now slips back to h2, staying on its diagonal. Preserving your best piece is worth a tempo. White castles next and meets ...e5 with confidence.","k":["h2","g4"]}]}]},{"name":"French Defense","side":"b","icon":"♛","desc":"Solid and counterattacking: Black lets White build a center, then strikes it with ...c5 and ...f6.","lines":[{"name":"Advance Variation","intro":"When White locks the center with e5, the position becomes a textbook pawn-chain battle: White owns the kingside, Black owns the queenside, and the whole game revolves around the base of White's chain — d4. Black's plan is beautifully clear: pile everything onto that square.","plan":"Black's pressure scheme is a machine: ...Qb6, ...Nh6–f5 (yes, via the rim!), ...cxd4 and sometimes ...f6 to attack the chain's head too. White must defend d4 with everything and seek kingside space. Two big ideas to remember: Black often delays or even skips castling (the locked center makes the king safe in the middle), and the 'bad' c8-bishop seeks life via ...Bd7–b5, trading itself for White's good pieces. If d4 falls, Black wins the strategic battle outright.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French: prepare ...d5 with full support. Black volunteers to block the c8-bishop — the famous 'French bishop' problem — in exchange for an unbreakable pawn duo and rich counterattacking plans.","k":["d5","c8"]},{"u":"d2d4","san":"d4","c":"White builds the dream center — temporarily."},{"u":"d7d5","san":"d5","c":"Challenge it immediately. White must now choose the variation: push (e5), trade (exd5), or defend (Nc3/Nd2). Each leads to a different world.","a":["d5e4"]},{"u":"e4e5","san":"e5","c":"The Advance: White grabs kingside space and fixes the structure. The pawn chain d4–e5 points where White will attack — the kingside. But every chain has a base...","k":["d4","e5"]},{"u":"c7c5","san":"c5","c":"...and Black attacks it instantly. THE strategic lesson of the French: strike a pawn chain at its base (d4), not its head. Everything Black does for the next ten moves serves this square.","a":["c5d4"],"k":["d4"]},{"u":"c2c3","san":"c3","c":"White reinforces the base."},{"u":"b8c6","san":"Nc6","c":"Second attacker on d4. Black develops every piece toward the same target — concentration of force on one weak point.","a":["c6d4"]},{"u":"g1f3","san":"Nf3","c":"A second defender arrives for d4 — development with a defensive job."},{"u":"d8b6","san":"Qb6","c":"Third attacker — and the queen also eyes b2, tying White's c1-bishop to its defense. This is the Advance French tabiya: the siege of d4 is fully set. Next comes ...Nh6–f5 or ...cxd4 and ...Nge7–f5, adding the final attacker.","a":["b6d4","b6b2"],"k":["d4","b2"]}]},{"name":"Exchange Variation","intro":"White trades on d5 and the French's famous tension evaporates: symmetrical pawns, open lines, free development for both sides. Black's 'bad bishop' problem is solved instantly. Often chosen hoping for a quiet draw — but symmetry rewards whoever plays with more purpose.","plan":"Don't let symmetry lull you to sleep — it breaks the moment someone gains a tempo. The e-file is the whole game early on: both sides race rooks to e1/e8. Black equalizes comfortably with natural moves (...Bd6, ...O-O, ...Bg4, ...Nc6 or ...c6 with ...Re8), then plays for more: ideas include ...Ne4, ...Qf6 pointing at the kingside, or a minority-style ...b5–b4 if White commits to c3. The first player to run out of useful moves loses the symmetry battle.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French — solid, counterattacking, preparing ...d5 with support."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4d5","san":"exd5","c":"The Exchange — White releases the tension immediately. Objectively harmless, but it carries one lesson: without central tension, piece activity decides everything.","k":["d5"]},{"u":"e6d5","san":"exd5","c":"And just like that, Black's eternal problem piece — the c8-bishop — is free. Black has zero structural worries; the only question is who uses the open lines better.","k":["c8"]},{"u":"g1f3","san":"Nf3","c":"White continues developing toward a quick castle."},{"u":"g8f6","san":"Nf6","c":"Develop naturally, controlling e4. In symmetric positions, develop toward the center and grab the open file first."},{"u":"f1d3","san":"Bd3","c":"White takes the best diagonal."},{"u":"f8d6","san":"Bd6","c":"Mirror it — this bishop placement guards e5 and supports a later kingside initiative. Symmetry is fine for Black: White must prove something, and there's nothing to prove.","k":["e5"]},{"u":"e1g1","san":"O-O","c":"White castles, completing the opening's first duty."},{"u":"e8g8","san":"O-O","c":"Castled and equal. Now the real contest: rooks to the e-file, then ...Bg4 or ...Nc6. Whoever finds more active squares wins this 'drawish' position — see the strategy notes."}]},{"name":"Tarrasch Variation","intro":"White's Nd2 defends e4 while dodging the annoying ...Bb4 pin — at the cost of blocking the c1-bishop. Black's sharpest answer is an immediate ...c5, accepting an isolated d-pawn in return for free, active piece play. A classic structure-versus-activity bargain.","plan":"Black's game plan flows from the isolated d5-pawn: use the piece activity it provides BEFORE it becomes an endgame weakness. Develop fast (...Nc6, ...Bd6, ...Nge7 or ...Nf6, ...O-O), occupy e4 with a knight, and generate kingside threats — the IQP grants the e4 and c4 squares as outposts. Avoid piece trades (each one magnifies the pawn's weakness) and never drift into a pure endgame. If White blockades d4 and trades pieces, sit tight: the d-pawn is defensible, and ...d4 breaks can liquidate it at the right moment.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French — solid, counterattacking, preparing ...d5 with support."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"b1d2","san":"Nd2","c":"The Tarrasch: defend e4 while keeping c3 free for a pawn — and crucially, ...Bb4+ no longer pins anything. The price: the knight blocks its own bishop. Every square choice is a trade-off.","k":["e4","c3"]},{"u":"c7c5","san":"c5","c":"Black's most ambitious reply: strike the center NOW, while the d2-knight is awkward. Black accepts isolated-pawn positions in exchange for the freest development the French ever offers.","a":["c5d4"],"k":["d4"]},{"u":"e4d5","san":"exd5","c":"White opens the center to fix Black with the isolated pawn."},{"u":"e6d5","san":"exd5","c":"There it is: Black's d5-pawn has no pawn neighbors — isolated. Weak in the endgame, but it grants open lines and the e4/c4 outposts. Black chose this on purpose: activity now, accountability later.","k":["d5","e4","c4"]},{"u":"g1f3","san":"Ngf3","c":"White develops, already eyeing the d4 blockade square in front of the isolani — the standard anti-IQP strategy: blockade, then besiege.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"Black develops with maximum activity, fighting for d4."},{"u":"f1b5","san":"Bb5","c":"White pins, intending to castle and increase the grip on d4."},{"u":"f8d6","san":"Bd6","c":"Active development, pointing at the kingside. Black's pieces flow to natural squares — the IQP's gift. Next: ...Nge7, ...O-O, and piece play before White's blockade settles. See the strategy notes for the full IQP battle plan.","k":["e4"]}]}]},{"name":"Caro-Kann Defense","side":"b","icon":"♜","desc":"Solid like the French, but the light-squared bishop gets out before ...e6. A favorite for beginners and world champions alike.","lines":[{"name":"Classical Variation","intro":"The Caro-Kann's main line showcases its whole philosophy: build the same solid ...d5 structure as the French, but develop the light-squared bishop FIRST. Black gets a position with no weaknesses and a clear piece plan — at the cost of a small concession in space.","plan":"Black's development scheme is almost automatic: ...e6, ...Ngf6 (or ...Bd6), ...O-O (or sometimes ...Qc7 and ...O-O-O), and the central break ...c5 at the right moment — the same base-strike idea as the French, but with the good bishop already traded or tucked safely on h7. White's space means Black shouldn't rush: trade a pair of minor pieces, keep the structure intact, and the endgame will smile on you — Caro-Kann endgames are famously pleasant. Watch White's h-pawn advance: it gained kingside space, which becomes a target for a later ...g5 or endgame counterplay.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann: prepare ...d5 while keeping the c8–h3 diagonal open. Compare the French ...e6 — same plan, but THIS pawn doesn't bury the bishop. The cost: c6 takes the knight's best square, and Black concedes a little time.","k":["d5","c8"]},{"u":"d2d4","san":"d4","c":"White builds the full pawn center — Black will challenge it at once."},{"u":"d7d5","san":"d5","c":"Challenge e4 with full support.","a":["d5e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with a piece, keeping all options."},{"u":"d5e4","san":"dxe4","c":"Black releases the tension at the right moment — before White gets e5 in under better circumstances. Trading the d-pawn for the e-pawn leaves a small but lasting structural plus: 3 pawns vs 2 on the queenside."},{"u":"c3e4","san":"Nxe4","c":"White recaptures with a beautifully centralized knight — temporarily."},{"u":"c8f5","san":"Bf5","c":"The Caro-Kann's signature move and its whole reason for existing: the bishop develops to its best diagonal WITH TEMPO on the knight, before ...e6 would lock it in. This one move justifies 1...c6.","a":["f5e4"],"k":["f5"]},{"u":"e4g3","san":"Ng3","c":"White saves the knight by attacking the bishop — gaining time back.","a":["g3f5"]},{"u":"f5g6","san":"Bg6","c":"The bishop's safe haven. It looks passive on g6 but watch: it controls the b1–h7 diagonal, and after the coming trade on d3 or h7, Black's position has zero bad pieces."},{"u":"h2h4","san":"h4","c":"Aggressive: White threatens h5 trapping the bishop! Black must create an escape hatch immediately. White banks space; the h-pawn may later become weak — a real investment, not a free move.","a":["h4h5"],"k":["h5"]},{"u":"h7h6","san":"h6","c":"The essential response — NEVER forget this move. It gives the bishop a retreat on h7 and stops White's h5–h6 ideas. Skipping it loses a piece to h5. Drill it into memory.","k":["h7"]},{"u":"g1f3","san":"Nf3","c":"White continues developing toward a quick castle."},{"u":"b8d7","san":"Nd7","c":"The careful move order: prepare ...Ngf6 so that after Nxf6+, Black recaptures with the KNIGHT (...Nxf6), keeping the pawn structure pristine. Structure first — that's the Caro-Kann creed. Development continues ...e6, ...Bd6, ...O-O."}]},{"name":"Advance Variation","intro":"Against the space-grabbing e5, the Caro-Kann shows its superiority over the French in one move: ...Bf5, developing the bishop OUTSIDE the chain before ...e6. Black gets the French's solid structure with none of its bad-bishop sorrow.","plan":"Black has two healthy plans, often combined: the ...c5 base-strike (the French recipe, but more comfortable here), and piece pressure with ...Ne7–f5 plus ...Nd7 against d4. The thematic maneuver ...Ne7–g6 (or ...f5!?) also fights for the e5/f4 squares. White's extra space wants a kingside expansion (g4!? chasing your bishop) — meet flank aggression with the central ...c5 break, the universal answer. Endgames favor Black's healthier structure; trade into them happily.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann — prepare ...d5 while keeping the bishop's diagonal free."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4e5","san":"e5","c":"The Advance. Same chain as the French Advance (d4–e5) — but watch what Black does with the move the French never gets.","k":["d4","e5"]},{"u":"c8f5","san":"Bf5","c":"THE move that makes the Caro-Kann: the bishop escapes to its perfect diagonal BEFORE ...e6 closes the door. The whole opening exists for this tempo. Black now has the French's solidity without its one structural sorrow.","k":["f5"]},{"u":"g1f3","san":"Nf3","c":"White develops sensibly. (The aggressive tries g4!? and h4 exist — meet them calmly with ...e6/...h5; your bishop always finds safety on g6/h7.)"},{"u":"e7e6","san":"e6","c":"NOW close the chain — the bishop is already outside. Black's structure is the French Advance with a perfect light-squared bishop: strictly better version.","k":["d5","e6"]},{"u":"f1e2","san":"Be2","c":"White prepares to castle."},{"u":"b8d7","san":"Nd7","c":"Flexible development: the knight supports the coming ...c5 strike at d4's base. The other knight will choose e7, heading for f5 or g6."},{"u":"e1g1","san":"O-O","c":"White castles, completing the opening's first duty."},{"u":"g8e7","san":"Ne7","c":"The signature Caro maneuver: this knight reroutes to f5 (hitting d4) or g6 (hitting e5 and f4). From here: ...c5, ...Be7/...Nb6, castle either side. Black's position plays itself — see the strategy notes.","k":["f5","g6"]}]},{"name":"Exchange Variation","intro":"White trades on d5 hoping for an easy, symmetric game — but unlike the French Exchange, there's a real fight here: White takes the d3-square first with the bishop, trying to deny Black's c8-bishop its dream development. Black equalizes with precise, natural moves.","plan":"This is the 'Carlsbad' structure (mirrored): expect White to try the minority-attack idea in reverse or simple piece play. Black's plan: complete development (...e6, ...Bd6 or ...Be7, ...O-O), place the rooks on c8/e8, and use the half-open c-file — ...Qb6 and ...Rc8 pressure b2/c3. The g4-bishop pin on f3 is Black's active resource; retreating it to h5/g6 keeps long-term pressure. Endgames are level or better for Black: the structure is symmetric and weakness-free. Just don't fall for early Qb3 tricks against b7 — ...Qd7 or ...Qc8 holds everything.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann — prepare ...d5 while keeping the bishop's diagonal free."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4d5","san":"exd5","c":"The Exchange — White avoids theory and aims for a small, clean edge.","k":["d5"]},{"u":"c6d5","san":"cxd5","c":"Black recaptures with the c-pawn (the only legal pawn capture — and a good one): the structure stays symmetric and the c-file is half-open for Black's rooks.","k":["c6"]},{"u":"f1d3","san":"Bd3","c":"The point of White's move order: occupy the b1–h7 diagonal FIRST, denying Black's bishop the f5-square it lives for. A small battle for one diagonal — these things decide openings.","a":["d3f5"],"k":["f5"]},{"u":"b8c6","san":"Nc6","c":"Black develops actively, pressuring d4."},{"u":"c2c3","san":"c3","c":"White solidifies d4 and opens the queen's path to b3 — watch for tricks against b7 now that the c8-bishop wanders.","k":["b7"]},{"u":"g8f6","san":"Nf6","c":"Natural development toward e4."},{"u":"c1f4","san":"Bf4","c":"White grabs the good diagonal — a London-style setup with colors telling a different story."},{"u":"c8g4","san":"Bg4","c":"Denied f5, the bishop finds activity anyway: pinning pressure against f3/d4 ideas (after ...e6, White's d4 always needs watching). Black follows with ...e6, ...Bd6 or ...Be7, ...O-O and full equality. See the strategy notes for the middlegame plans.","a":["g4d1"],"k":["d4"]}]}]}]};
+
+/* ================= STATE ================= */
+/* Original flat piece set (drawn for this app, 45x45 viewBox) */
+const PIECE_ART = {
+  P:'<circle cx="22.5" cy="12.5" r="5"/><path d="M22.5 16.5c-3.2 0-4.8 2.8-4.8 5.5 0 2.3-.9 5.4-2.4 7.5h14.4c-1.5-2.1-2.4-5.2-2.4-7.5 0-2.7-1.6-5.5-4.8-5.5z"/><path d="M13.5 36.5v-2.2c0-2.4 2-4.3 4.4-4.3h9.2c2.4 0 4.4 1.9 4.4 4.3v2.2z"/>',
+  R:'<path d="M13 14.5V8h4.5v3h3V8h4v3h3V8H32v6.5l-2.3 2.3v12.4l2.3 3.3H13l2.3-3.3V16.8z"/><path d="M11.5 36.5v-4h22v4z"/>',
+  N:'<path d="M11.5 36.5c.5-6.5 1.5-11 5-14l-3.5-1.5c-2-.9-3.5-2.3-4-4 -.3-1 .3-1.8 1.2-1.7l4.3.5c.3-2.5 1.2-5 2.5-6.8l2 3 2.5-5 2 4.5c5.5 1 9.5 5.8 10.5 13.5.5 4 .5 8-.5 11.5z"/><circle class="d2" cx="17" cy="17.5" r="1.2"/>',
+  B:'<circle cx="22.5" cy="9" r="2.3"/><path d="M22.5 13.2c4.2 2.6 6.8 6.3 6.8 10.2 0 2.9-1.4 5-3.2 6.1h-7.2c-1.8-1.1-3.2-3.2-3.2-6.1 0-3.9 2.6-7.6 6.8-10.2z"/><path class="d" d="M22.5 18.5v6.5M19.5 21.8h6"/><path d="M13.5 36.5v-1.7c0-2.4 2-4.3 4.4-4.3h9.2c2.4 0 4.4 1.9 4.4 4.3v1.7z"/>',
+  Q:'<circle cx="9.5" cy="12" r="1.9"/><circle cx="16" cy="9.3" r="1.9"/><circle cx="22.5" cy="8.5" r="1.9"/><circle cx="29" cy="9.3" r="1.9"/><circle cx="35.5" cy="12" r="1.9"/><path d="M10.5 14.5L14 27.5h17l3.5-13-5.8 5.2-2.7-6.5-3.5 6-3.5-6-2.7 6.5z"/><path d="M14 27.5h17l1.6 5H12.4z"/><path d="M12.5 36.5v-1c0-1.7 1.4-3 3-3h14c1.6 0 3 1.3 3 3v1z"/>',
+  K:'<path d="M21 5.5h3v3.2h3.2v3h-3.2v3.2h-3v-3.2h-3.2v-3H21z"/><path d="M22.5 17.8c-1.8-3.2-6.3-4.1-8.6-1.7-2.2 2.3-1.4 6 1.7 8.1l-1.4 8.8h16.6l-1.4-8.8c3.1-2.1 3.9-5.8 1.7-8.1-2.3-2.4-6.8-1.5-8.6 1.7z"/><path d="M12.5 36.5v-1c0-1.7 1.4-3 3-3h14c1.6 0 3 1.3 3 3v1z"/>'
+};
+function pieceSVG(p){
+  const w = p===p.toUpperCase();
+  return `<svg class="pc ${w?'pw':'pb'}" viewBox="0 0 45 45">${PIECE_ART[p.toUpperCase()]}</svg>`;
+}
+let board, curOp=null, curLine=null, playerSide='w', ply=0, selSq=null, misses=0, mistakesThisRun=0, locked=false;
+let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
+let showAims = (typeof localStorage!=='undefined' && localStorage.getItem('otAims')==='0') ? false : true;
+function toggleAims(){
+  showAims=!showAims; localStorage.setItem('otAims',showAims?'1':'0');
+  renderAimBtn();
+  if(!showAims) aimSet=null;
+  else if(selSq) aimSet=new Set(legalTargetNames(selSq));
+  if(curOp!==null) render(curLastU());
+}
+function renderAimBtn(){
+  const b=document.getElementById('aimBtn'); if(b) b.textContent='Dots: '+(showAims?'On':'Off');
+}
+
+const store = {
+  load(){ try { return JSON.parse(localStorage.getItem('openingTrainer')||'{}'); } catch(e){ return {}; } },
+  save(o){ localStorage.setItem('openingTrainer', JSON.stringify(o)); },
+  key(oi,li){ return oi+':'+li; },
+  get(oi,li){ const s=this.load(); return s[this.key(oi,li)] || {runs:0,perfect:0,streak:0}; },
+  record(oi,li,perfect){ const s=this.load(); const k=this.key(oi,li);
+    const v=s[k]||{runs:0,perfect:0,streak:0};
+    v.runs++; if(perfect){ v.perfect++; v.streak++; } else v.streak=0;
+    s[k]=v; this.save(s); return v; }
+};
+
+/* ================= SOUND (Web Audio, fully synthesized) ================= */
+const SFX = {
+  ctx:null,
+  muted: (typeof localStorage!=='undefined' && localStorage.getItem('otMuted')==='1'),
+  ac(){
+    if(typeof AudioContext==='undefined' && typeof webkitAudioContext==='undefined') return null;
+    if(!this.ctx) this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+    if(this.ctx.state==='suspended') this.ctx.resume();
+    return this.ctx;
+  },
+  tone(f,dur,{type='sine',vol=.22,delay=0,slide}={}){
+    if(this.muted) return; const c=this.ac(); if(!c) return;
+    const t=c.currentTime+delay, o=c.createOscillator(), g=c.createGain();
+    o.type=type; o.frequency.setValueAtTime(f,t);
+    if(slide) o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+dur+.05);
+  },
+  noise(dur,{vol=.18,delay=0,freq=900}={}){
+    if(this.muted) return; const c=this.ac(); if(!c) return;
+    const t=c.currentTime+delay, n=Math.floor(c.sampleRate*dur);
+    const buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=(Math.random()*2-1)*(1-i/n);
+    const s=c.createBufferSource(); s.buffer=buf;
+    const flt=c.createBiquadFilter(); flt.type='lowpass'; flt.frequency.value=freq;
+    const g=c.createGain(); g.gain.value=vol;
+    s.connect(flt); flt.connect(g); g.connect(c.destination); s.start(t);
+  },
+  knock(f,vol,delay=0){ // short dry "wooden" tap — the familiar online-chess move sound
+    this.tone(f,.06,{slide:f*.55,vol:vol*.95,delay});
+    this.noise(.03,{vol:vol*.45,delay,freq:1000});
+  },
+  move(){ this.knock(210,.5); },
+  capture(){ this.knock(130,.62); this.noise(.07,{vol:.26,freq:520,delay:.005}); },                 // deeper, fuller thud
+  castle(){ this.knock(205,.45); this.knock(170,.45,.13); },                                        // double knock
+  check(){ this.knock(210,.38); this.tone(1047,.11,{vol:.13,delay:.04}); this.tone(1319,.16,{vol:.11,delay:.13}); },
+  mate(){ this.knock(130,.6); [523,659,784,1047].forEach((f,i)=>this.tone(f,.22,{vol:.16,delay:.12+i*.09})); },
+  error(){ this.tone(110,.14,{type:'square',vol:.12}); this.tone(88,.18,{type:'square',vol:.1,delay:.07}); },
+  success(){ [523,659,784].forEach((f,i)=>this.tone(f,.18,{vol:.18,delay:i*.09})); },
+  perfect(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.2,{vol:.18,delay:i*.09})); this.tone(1047,.5,{vol:.1,delay:.42}); }
+};
+const ICON_ON = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
+const ICON_OFF = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><line x1="16" y1="9" x2="21" y2="15"/><line x1="21" y1="9" x2="16" y2="15"/></svg>';
+function renderMuteBtn(){ document.getElementById('muteBtn').innerHTML = SFX.muted?ICON_OFF:ICON_ON; }
+function toggleMute(){
+  SFX.muted=!SFX.muted; localStorage.setItem('otMuted',SFX.muted?'1':'0');
+  renderMuteBtn();
+  if(!SFX.muted) SFX.move();
+}
+function isCapture(u){
+  const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
+  if(board[r2][f2]) return true;
+  return board[r1][f1].toUpperCase()==='P' && f1!==f2; // en passant
+}
+function playMoveSound(mv,cap){
+  if(mv.san.includes('#')) SFX.mate();
+  else if(mv.san.includes('+')) SFX.check();
+  else if(mv.san.startsWith('O-O')) SFX.castle();
+  else if(cap) SFX.capture();
+  else SFX.move();
+}
+
+/* ================= BOARD LOGIC ================= */
+let epT=null, castleRights={K:true,Q:true,k:true,q:true};
+function initBoard(){
+  const b=[]; const back='RNBQKBNR';
+  for(let r=0;r<8;r++){ b.push(new Array(8).fill('')); }
+  for(let f=0;f<8;f++){ b[0][f]=back[f]; b[1][f]='P'; b[6][f]='p'; b[7][f]=back[f].toLowerCase(); }
+  epT=null; castleRights={K:true,Q:true,k:true,q:true};
+  return b;
+}
+function sqRC(s){ return [parseInt(s[1])-1, s.charCodeAt(0)-97]; } // [rank,file]
+function applyMove(u){
+  const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
+  const p=board[r1][f1];
+  // en passant: pawn moves diagonally to empty square
+  if(p.toUpperCase()==='P' && f1!==f2 && !board[r2][f2]) board[r1][f2]='';
+  board[r2][f2] = u.length===5 ? (p==='P'?u[4].toUpperCase():u[4]) : p;
+  board[r1][f1]='';
+  // castling: king moves two files
+  if(p.toUpperCase()==='K' && Math.abs(f2-f1)===2){
+    const rank=r1;
+    if(f2===6){ board[rank][5]=board[rank][7]; board[rank][7]=''; }
+    else { board[rank][3]=board[rank][0]; board[rank][0]=''; }
+  }
+  // state tracking for legal-move hints
+  epT = (p.toUpperCase()==='P' && Math.abs(r2-r1)===2) ? [(r1+r2)/2, f1] : null;
+  if(p==='K') castleRights.K=castleRights.Q=false;
+  if(p==='k') castleRights.k=castleRights.q=false;
+  for(const [r,f,k] of [[0,0,'Q'],[0,7,'K'],[7,0,'q'],[7,7,'k']])
+    if((r1===r&&f1===f)||(r2===r&&f2===f)) castleRights[k]=false;
+}
+
+/* ---- legal move generation (for selection hints) ---- */
+function attackedBy(b,r,f,byWhite){
+  const pn = byWhite?'P':'p', dr=byWhite?-1:1;
+  for(const df of [-1,1]){ const rr=r+dr, ff=f+df;
+    if(rr>=0&&rr<8&&ff>=0&&ff<8&&b[rr][ff]===pn) return true; }
+  const kn = byWhite?'N':'n';
+  for(const [a,c] of [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]]){
+    const rr=r+a, ff=f+c;
+    if(rr>=0&&rr<8&&ff>=0&&ff<8&&b[rr][ff]===kn) return true; }
+  const kg = byWhite?'K':'k';
+  for(let a=-1;a<=1;a++) for(let c=-1;c<=1;c++){
+    if(!a&&!c) continue; const rr=r+a, ff=f+c;
+    if(rr>=0&&rr<8&&ff>=0&&ff<8&&b[rr][ff]===kg) return true; }
+  for(const [dirs,ps] of [[[[1,0],[-1,0],[0,1],[0,-1]], byWhite?'RQ':'rq'], [[[1,1],[1,-1],[-1,1],[-1,-1]], byWhite?'BQ':'bq']]){
+    for(const [a,c] of dirs){
+      let rr=r+a, ff=f+c;
+      while(rr>=0&&rr<8&&ff>=0&&ff<8){
+        const q=b[rr][ff];
+        if(q){ if(ps.includes(q)) return true; break; }
+        rr+=a; ff+=c;
+      }
+    }
+  }
+  return false;
+}
+function findKing(b,white){
+  const k=white?'K':'k';
+  for(let r=0;r<8;r++) for(let f=0;f<8;f++) if(b[r][f]===k) return [r,f];
+  return null;
+}
+function legalTargetNames(sqName){
+  const [r1,f1]=sqRC(sqName); const p=board[r1][f1];
+  if(!p) return [];
+  const white = p===p.toUpperCase(), pt=p.toUpperCase();
+  const enemy = q=>q && (q===q.toUpperCase())!==white;
+  const pseudo=[];
+  if(pt==='P'){
+    const fwd=white?1:-1, start=white?1:6;
+    if(r1+fwd>=0&&r1+fwd<8&&!board[r1+fwd][f1]){
+      pseudo.push([r1+fwd,f1]);
+      if(r1===start&&!board[r1+2*fwd][f1]) pseudo.push([r1+2*fwd,f1]);
+    }
+    for(const df of [-1,1]){
+      const rr=r1+fwd, ff=f1+df;
+      if(rr<0||rr>7||ff<0||ff>7) continue;
+      if(enemy(board[rr][ff])) pseudo.push([rr,ff]);
+      else if(epT && epT[0]===rr && epT[1]===ff) pseudo.push([rr,ff]);
+    }
+  } else if(pt==='N'){
+    for(const [a,c] of [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]]){
+      const rr=r1+a, ff=f1+c;
+      if(rr>=0&&rr<8&&ff>=0&&ff<8&&(!board[rr][ff]||enemy(board[rr][ff]))) pseudo.push([rr,ff]);
+    }
+  } else if(pt==='K'){
+    for(let a=-1;a<=1;a++) for(let c=-1;c<=1;c++){
+      if(!a&&!c) continue; const rr=r1+a, ff=f1+c;
+      if(rr>=0&&rr<8&&ff>=0&&ff<8&&(!board[rr][ff]||enemy(board[rr][ff]))) pseudo.push([rr,ff]);
+    }
+    // castling
+    const rank=white?0:7;
+    if(r1===rank&&f1===4&&!attackedBy(board,rank,4,!white)){
+      if(castleRights[white?'K':'k']&&board[rank][7]===(white?'R':'r')&&!board[rank][5]&&!board[rank][6]
+        &&!attackedBy(board,rank,5,!white)&&!attackedBy(board,rank,6,!white)) pseudo.push([rank,6]);
+      if(castleRights[white?'Q':'q']&&board[rank][0]===(white?'R':'r')&&!board[rank][1]&&!board[rank][2]&&!board[rank][3]
+        &&!attackedBy(board,rank,3,!white)&&!attackedBy(board,rank,2,!white)) pseudo.push([rank,2]);
+    }
+  } else {
+    const dirs = pt==='R' ? [[1,0],[-1,0],[0,1],[0,-1]]
+               : pt==='B' ? [[1,1],[1,-1],[-1,1],[-1,-1]]
+               : [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+    for(const [a,c] of dirs){
+      let rr=r1+a, ff=f1+c;
+      while(rr>=0&&rr<8&&ff>=0&&ff<8){
+        if(!board[rr][ff]) pseudo.push([rr,ff]);
+        else { if(enemy(board[rr][ff])) pseudo.push([rr,ff]); break; }
+        rr+=a; ff+=c;
+      }
+    }
+  }
+  // filter: own king may not be left in check
+  const out=[];
+  for(const [r2,f2] of pseudo){
+    const b2=board.map(row=>row.slice());
+    if(pt==='P'&&f1!==f2&&!b2[r2][f2]) b2[r1][f2]=''; // ep capture
+    b2[r2][f2]=p; b2[r1][f1]='';
+    const [kr,kf]=findKing(b2,white);
+    if(!attackedBy(b2,kr,kf,!white)) out.push(String.fromCharCode(97+f2)+(r2+1));
+  }
+  return out;
+}
+
+/* ---- FEN, full move list, SAN, game status (for the engine) ---- */
+function toFEN(whiteToMove){
+  const rows=[];
+  for(let r=7;r>=0;r--){
+    let row='', empty=0;
+    for(let f=0;f<8;f++){
+      const p=board[r][f];
+      if(!p) empty++;
+      else { if(empty){ row+=empty; empty=0; } row+=p; }
+    }
+    if(empty) row+=empty;
+    rows.push(row);
+  }
+  let cr=(castleRights.K?'K':'')+(castleRights.Q?'Q':'')+(castleRights.k?'k':'')+(castleRights.q?'q':'');
+  if(!cr) cr='-';
+  const ep = epT ? String.fromCharCode(97+epT[1])+(epT[0]+1) : '-';
+  return `${rows.join('/')} ${whiteToMove?'w':'b'} ${cr} ${ep} 0 1`;
+}
+function allLegalMoves(white){
+  const out=[];
+  for(let r=0;r<8;r++) for(let f=0;f<8;f++){
+    const p=board[r][f];
+    if(!p || (p===p.toUpperCase())!==white) continue;
+    const from=String.fromCharCode(97+f)+(r+1);
+    for(const to of legalTargetNames(from)){
+      const promo = (p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')) ? 'q' : '';
+      out.push(from+to+promo);
+    }
+  }
+  return out;
+}
+function anyLegalMovesOn(b, white, ep, cr){
+  const sB=board, sE=epT, sC=castleRights;
+  board=b; epT=ep; castleRights=cr;
+  let found=false;
+  for(let r=0;r<8&&!found;r++) for(let f=0;f<8;f++){
+    const p=b[r][f];
+    if(p && (p===p.toUpperCase())===white && legalTargetNames(String.fromCharCode(97+f)+(r+1)).length){ found=true; break; }
+  }
+  board=sB; epT=sE; castleRights=sC;
+  return found;
+}
+function applyTo(b, u){ // apply uci to a board copy in place (no global state)
+  const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
+  const p=b[r1][f1];
+  if(p.toUpperCase()==='P'&&f1!==f2&&!b[r2][f2]) b[r1][f2]='';
+  b[r2][f2]= u.length===5 ? (p===p.toUpperCase()?u[4].toUpperCase():u[4]) : p;
+  b[r1][f1]='';
+  if(p.toUpperCase()==='K'&&Math.abs(f2-f1)===2){
+    if(f2===6){ b[r1][5]=b[r1][7]; b[r1][7]=''; } else { b[r1][3]=b[r1][0]; b[r1][0]=''; }
+  }
+}
+function uciToSan(u){
+  const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
+  const p=board[r1][f1]; if(!p) return u;
+  const pt=p.toUpperCase(), white=p===p.toUpperCase(), dest=u.slice(2,4);
+  const isCap = !!board[r2][f2] || (pt==='P'&&f1!==f2);
+  let san;
+  if(pt==='K'&&Math.abs(f2-f1)===2){ san = f2===6?'O-O':'O-O-O'; }
+  else if(pt==='P'){
+    san = (isCap?String.fromCharCode(97+f1)+'x':'') + dest + (u.length===5?'='+u[4].toUpperCase():'');
+  } else {
+    let amb=[];
+    for(let r=0;r<8;r++) for(let f=0;f<8;f++){
+      if(r===r1&&f===f1) continue;
+      if(board[r][f]===p && legalTargetNames(String.fromCharCode(97+f)+(r+1)).includes(dest)) amb.push([r,f]);
+    }
+    let dis='';
+    if(amb.length){
+      if(!amb.some(([r,f])=>f===f1)) dis=String.fromCharCode(97+f1);
+      else if(!amb.some(([r,f])=>r===r1)) dis=String(r1+1);
+      else dis=String.fromCharCode(97+f1)+(r1+1);
+    }
+    san = pt + dis + (isCap?'x':'') + dest;
+  }
+  const b2=board.map(row=>row.slice()); applyTo(b2,u);
+  const ok=findKing(b2,!white);
+  if(ok && attackedBy(b2,ok[0],ok[1],white)){
+    san += anyLegalMovesOn(b2,!white,null,{K:false,Q:false,k:false,q:false}) ? '+' : '#';
+  }
+  return san;
+}
+function gameStatus(whiteToMove){
+  const moves=allLegalMoves(whiteToMove);
+  if(moves.length) return 'ongoing';
+  const k=findKing(board,whiteToMove);
+  return (k && attackedBy(board,k[0],k[1],!whiteToMove)) ? 'checkmate' : 'stalemate';
+}
+
+/* ================= STOCKFISH ENGINE (CDN, graceful) ================= */
+const Engine = {
+  worker:null, ready:false, tried:false, _buf:[], _onLine:null, _seq:0,
+  STATUS:'idle',
+  async load(){
+    if(this.tried) return this.ready;
+    this.tried=true; this.STATUS='loading'; updateEngineBadge();
+    // A worker is allowed to importScripts() cross-origin (no CORS preflight needed),
+    // unlike fetch(). We try several single-file (asm.js) Stockfish builds in order.
+    const urls=[
+      'https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js',
+      'https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js',
+      'https://unpkg.com/stockfish.js@10.0.2/stockfish.js',
+      'https://cdn.jsdelivr.net/npm/stockfish@11.0.0/src/stockfish.js'
+    ];
+    const bootstrap =
+      'var URLS=' + JSON.stringify(urls) + ';' +
+      'var loaded=false;' +
+      'for(var i=0;i<URLS.length;i++){try{importScripts(URLS[i]);loaded=true;break;}catch(e){}}' +
+      'if(!loaded){postMessage("__noengine__");}';
+    try{
+      const blobUrl=URL.createObjectURL(new Blob([bootstrap],{type:'application/javascript'}));
+      const w=new Worker(blobUrl);
+      let failed=false;
+      w.onmessage=e=>{
+        const line=typeof e.data==='string'?e.data:(e.data&&e.data.data)||'';
+        if(line==='__noengine__'){ failed=true; return; }
+        this._onMessage(line);
+      };
+      w.onerror=()=>{ failed=true; };
+      this.worker=w;
+      // give importScripts a moment, then handshake
+      await new Promise(r=>setTimeout(r,150));
+      if(failed) throw new Error('importScripts failed');
+      this.send('uci');
+      await this._await(l=>/uciok/.test(l), 15000);
+      this.send('isready');
+      await this._await(l=>/readyok/.test(l), 8000);
+      this.ready=true; this.STATUS='ready'; updateEngineBadge();
+      return true;
+    }catch(e){
+      if(this.worker){ try{ this.worker.terminate(); }catch(_){} this.worker=null; }
+      this.STATUS='unavailable'; updateEngineBadge();
+      return false;
+    }
+  },
+  send(cmd){ if(this.worker) this.worker.postMessage(cmd); },
+  _onMessage(line){ if(this._onLine) this._onLine(line); },
+  _await(pred, ms){
+    return new Promise((resolve,reject)=>{
+      const to=setTimeout(()=>{ this._onLine=null; reject(new Error('engine timeout')); }, ms);
+      this._onLine=line=>{ if(pred(line)){ clearTimeout(to); this._onLine=null; resolve(line); } };
+    });
+  },
+  // strength: skill 0..20, plus a movetime cap
+  setStrength(skill){
+    this.send('setoption name Skill Level value '+Math.max(0,Math.min(20,skill|0)));
+  },
+  async bestMove(fen, {skill=20, movetime=400}={}){
+    if(!this.ready) return null;
+    this.setStrength(skill);
+    this.send('ucinewgame'); this.send('position fen '+fen);
+    const p=this._await(l=>l.startsWith('bestmove'), movetime+6000);
+    this.send('go movetime '+movetime);
+    const line=await p;
+    const m=line.match(/^bestmove\s+(\S+)/);
+    return m && m[1]!=='(none)' ? m[1] : null;
+  },
+  // analyze a position to fixed movetime; returns {bestmove, cp} where cp is from side-to-move POV
+  async analyse(fen, {movetime=500}={}){
+    if(!this.ready) return null;
+    this.send('setoption name Skill Level value 20');
+    this.send('ucinewgame'); this.send('position fen '+fen);
+    let lastCp=0, mate=null;
+    const done=new Promise(resolve=>{
+      const to=setTimeout(()=>{ this._onLine=null; resolve(); }, movetime+6000);
+      this._onLine=line=>{
+        const cp=line.match(/score cp (-?\d+)/); if(cp) { lastCp=+cp[1]; mate=null; }
+        const mt=line.match(/score mate (-?\d+)/); if(mt) { mate=+mt[1]; }
+        if(line.startsWith('bestmove')){ clearTimeout(to); this._onLine=null;
+          const m=line.match(/^bestmove\s+(\S+)/); resolve(m?m[1]:null); }
+      };
+    });
+    this.send('go movetime '+movetime);
+    const best=await done;
+    let cp = mate!==null ? (mate>0?100000-mate:-100000-mate) : lastCp;
+    return {bestmove:best, cp};
+  }
+};
+function updateEngineBadge(){
+  const el=document.getElementById('engineBadge'); if(!el) return;
+  const map={idle:'',loading:'⏳ loading engine…',ready:'⚙ engine on',unavailable:'engine off — click to retry'};
+  el.textContent=map[Engine.STATUS]||'';
+  el.className='eng-badge '+Engine.STATUS;
+}
+function retryEngine(){
+  if(Engine.STATUS==='loading') return;
+  Engine.tried=false; Engine.ready=false;
+  Engine.load();
+}
+
+/* ================= RENDER ================= */
+const boardEl = document.getElementById('board');
+function render(lastU){
+  boardEl.innerHTML='';
+  const flip = playerSide==='b';
+  for(let i=0;i<64;i++){
+    const vr = Math.floor(i/8), vf = i%8;
+    const r = flip ? vr : 7-vr;           // board rank shown in this visual row
+    const f = flip ? 7-vf : vf;
+    const sq = document.createElement('div');
+    const name = String.fromCharCode(97+f)+(r+1);
+    sq.className = 'sq ' + (((r+f)%2===0)?'dark':'light');
+    sq.dataset.sq = name;
+    const p = board[r][f];
+    if(p) sq.innerHTML = pieceSVG(p);
+    if(vf===0) sq.innerHTML += `<span class="coord rank">${r+1}</span>`;
+    if(vr===7) sq.innerHTML += `<span class="coord file">${String.fromCharCode(97+f)}</span>`;
+    if(lastU && (name===lastU.slice(0,2)||name===lastU.slice(2,4))) sq.classList.add('last');
+    if(selSq===name) sq.classList.add('sel');
+    if(aimSet && aimSet.has(name)) sq.classList.add(board[r][f] ? 'cp' : 'mv');
+    sq.onclick = ()=>onSquare(name);
+    boardEl.appendChild(sq);
+  }
+  drawAnnots();
+}
+
+/* ---- annotation overlay (arrows + key squares) ---- */
+let showAnnots = (typeof localStorage!=='undefined' && localStorage.getItem('otArrows')==='0') ? false : true;
+function toggleAnnots(){
+  showAnnots=!showAnnots; localStorage.setItem('otArrows',showAnnots?'1':'0');
+  renderAnnotBtn(); drawAnnots();
+}
+function renderAnnotBtn(){
+  const b=document.getElementById('annotBtn'); if(b) b.textContent='Arrows: '+(showAnnots?'On':'Off');
+}
+function drawAnnots(){
+  const ov=document.getElementById('overlay'); if(!ov) return;
+  if(!curAnnot || !showAnnots){ ov.innerHTML=''; return; }
+  const flip = playerSide==='b';
+  const ctr = n=>{
+    const f=n.charCodeAt(0)-97, r=parseInt(n[1])-1;
+    return [(flip?7-f:f)+.5, (flip?r:7-r)+.5];
+  };
+  let s='<defs><marker id="ah" viewBox="0 0 10 10" refX="6.5" refY="5" markerWidth="3.4" markerHeight="3.4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="rgba(212,162,78,.85)"/></marker></defs>';
+  (curAnnot.k||[]).forEach(q=>{ const [x,y]=ctr(q); s+=`<circle cx="${x}" cy="${y}" r="0.42"/>`; });
+  (curAnnot.a||[]).forEach(ar=>{
+    const [x1,y1]=ctr(ar.slice(0,2)), [x2,y2]=ctr(ar.slice(2,4));
+    const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy)||1;
+    s+=`<line x1="${x1+dx/len*.3}" y1="${y1+dy/len*.3}" x2="${x2-dx/len*.25}" y2="${y2-dy/len*.25}" marker-end="url(#ah)"/>`;
+  });
+  ov.innerHTML=s;
+}
+
+/* ================= MENU ================= */
+function showMenu(){
+  document.getElementById('drill').style.display='none';
+  document.getElementById('menu').style.display='block';
+  const grid=document.getElementById('opGrid'); grid.innerHTML='';
+  let mastered=0, totalLines=0, totalRuns=0;
+  // group: side + first move (e2e4 / d2d4)
+  const groups=[
+    {label:'⚪ Play as White — 1.e4 openings', test:op=>op.side==='w'&&op.lines[0].moves[0].u==='e2e4'},
+    {label:'⚪ Play as White — 1.d4 openings', test:op=>op.side==='w'&&op.lines[0].moves[0].u==='d2d4'},
+    {label:'⚫ Play as Black — answering 1.e4', test:op=>op.side==='b'&&op.lines[0].moves[0].u==='e2e4'},
+    {label:'⚫ Play as Black — answering 1.d4', test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'}
+  ];
+  const order=[];
+  groups.forEach(g=>{
+    const members=DATA.openings.map((op,oi)=>({op,oi})).filter(x=>g.test(x.op));
+    if(members.length) order.push({label:g.label, members});
+  });
+  order.forEach(group=>{
+    const h=document.createElement('div'); h.className='group-head'; h.textContent=group.label;
+    grid.appendChild(h);
+    group.members.forEach(({op,oi})=>{ grid.appendChild(buildOpCard(op,oi)); });
+  });
+  function buildOpCard(op,oi){
+    const card=document.createElement('div'); card.className='op-card clickable';
+    const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?'White':'Black'}</span>`;
+    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${op.name}${tag}</h2><div class="desc">${op.desc}</div>`;
+    card.onclick=()=>quickStart(oi);
+    card.title='Click to jump straight in — or pick a specific line below';
+    op.lines.forEach((line,li)=>{
+      totalLines++;
+      const st=store.get(oi,li); totalRuns+=st.runs;
+      const isMastered = st.streak>=3; if(isMastered) mastered++;
+      const stat = isMastered ? '★ mastered' : st.runs? `${st.perfect}/${st.runs} perfect` : 'new';
+      const row=document.createElement('div'); row.className='line-row';
+      row.innerHTML=`<span class="nm">${line.name}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span>`;
+      const lb=document.createElement('button'); lb.className='mini'; lb.textContent='Learn';
+      lb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startLearn(oi,li,op.side); };
+      const db=document.createElement('button'); db.className='mini'; db.textContent='Drill';
+      db.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startDrill(oi,li,op.side); };
+      const pb=document.createElement('button'); pb.className='mini'; pb.textContent='Play';
+      pb.title='Play this opening out against the engine';
+      pb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startPlay(oi,li,op.side); };
+      row.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); };
+      row.appendChild(lb); row.appendChild(db); row.appendChild(pb);
+      card.appendChild(row);
+    });
+    return card;
+  }
+  document.getElementById('summaryBar').innerHTML=
+    `<div><b>${totalLines}</b>lines</div><div><b>${mastered}</b>mastered (3 perfect in a row)</div><div><b>${totalRuns}</b>total drills</div>
+     <div style="margin-left:auto;align-self:center">Learn a line first, then drill it from memory.</div>`;
+}
+function backToLines(){ showMenu(); }
+
+/* Click an opening card: jump straight into a sensible line —
+   first unmastered line; Learn mode if it's never been practiced, otherwise Drill. */
+function quickStart(oi){
+  const op=DATA.openings[oi];
+  let li=op.lines.findIndex((l,i)=>store.get(oi,i).streak<3);
+  if(li<0) li=0;
+  if(store.get(oi,li).runs===0) startLearn(oi,li,op.side);
+  else startDrill(oi,li,op.side);
+}
+
+/* ================= DRILL ================= */
+function startDrill(oi,li,side){
+  curOp=oi; curLine=li; playerSide=side; mode='drill';
+  board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('drill').style.display='flex';
+  document.getElementById('doneBox').style.display='none';
+  document.getElementById('promptBox').style.display='block';
+  document.getElementById('drillNav').style.display='flex';
+  document.getElementById('learnNav').style.display='none';
+  document.getElementById('playNav').style.display='none';
+  document.getElementById('strengthRow').style.display='none';
+  document.getElementById('sideW').classList.toggle('on',side==='w');
+  document.getElementById('sideB').classList.toggle('on',side==='b');
+  const op=DATA.openings[oi], line=op.lines[li];
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — you play ${side==='w'?'White':'Black'}</small>`;
+  const st=store.get(oi,li);
+  document.getElementById('streakInfo').innerHTML = st.streak?`Perfect streak: <b>${st.streak}</b>${st.streak>=3?' ★ mastered':''}`:'';
+  document.getElementById('comment').innerHTML = `📖 ${line.intro}`;
+  syncLineSel();
+  updateMoveList(); updateProgress(); render();
+  Engine.load(); // warm up engine in the background for explanations
+  tick();
+}
+function switchSide(s){
+  if(s===playerSide) return;
+  if(mode==='learn') startLearn(curOp,curLine,s); else startDrill(curOp,curLine,s);
+}
+
+/* ---- in-board line switcher ---- */
+function buildLineSel(){
+  const sel=document.getElementById('lineSel'); if(!sel) return;
+  let html='';
+  DATA.openings.forEach((op,oi)=>{
+    html+=`<optgroup label="${op.icon} ${op.name}">`;
+    op.lines.forEach((l,li)=>{ html+=`<option value="${oi}:${li}">${l.name}</option>`; });
+    html+='</optgroup>';
+  });
+  sel.innerHTML=html;
+}
+function onLineSel(v){
+  const [oi,li]=v.split(':').map(Number);
+  const side = oi===curOp ? playerSide : DATA.openings[oi].side;
+  if(mode==='learn') startLearn(oi,li,side);
+  else if(mode==='play') startPlay(oi,li,side);
+  else startDrill(oi,li,side);
+}
+function syncLineSel(){
+  const sel=document.getElementById('lineSel'); if(sel) sel.value=curOp+':'+curLine;
+}
+function curLastU(){
+  if(mode==='play') return playHist.length?playHist[playHist.length-1].u:null;
+  if(mode==='learn') return learnPly>0?lineMoves()[learnPly-1].u:null;
+  return plyLastU();
+}
+
+/* ================= PLAY vs ENGINE ================= */
+let playHist=[], playWhite=true, playSkill=6, playOver=false;
+function skillToElo(s){ return Math.round(800 + s*70); }
+function onEloInput(v){
+  playSkill=+v;
+  const el=document.getElementById('eloLabel'); if(el) el.textContent='~'+skillToElo(playSkill)+' Elo';
+  if(Engine.ready) Engine.setStrength(playSkill);
+}
+function startPlay(oi,li,side){
+  curOp=oi; curLine=li; playerSide=side; mode='play';
+  board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
+  playHist=[]; playWhite=true; playOver=false;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('drill').style.display='flex';
+  document.getElementById('doneBox').style.display='none';
+  document.getElementById('promptBox').style.display='block';
+  document.getElementById('drillNav').style.display='none';
+  document.getElementById('learnNav').style.display='none';
+  document.getElementById('playNav').style.display='flex';
+  document.getElementById('strengthRow').style.display='block';
+  document.getElementById('sideW').classList.remove('on'); document.getElementById('sideB').classList.remove('on');
+  document.getElementById('streakInfo').innerHTML='';
+  onEloInput(playSkill);
+  const op=DATA.openings[oi], line=op.lines[li];
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — play vs engine as ${side==='w'?'White':'Black'}</small>`;
+  // play the book line to reach the opening position
+  for(const mv of line.moves){ applyMove(mv.u); playHist.push({u:mv.u,san:mv.san}); playWhite=!playWhite; }
+  syncLineSel(); updatePlayList(); updateEval();
+  render(curLastU());
+  document.getElementById('comment').innerHTML =
+    `You're now in the <b>${line.name}</b> position. From here it's a real game against Stockfish — play your own moves. Use the strength slider to set the engine's level.`;
+  // ensure engine is loading
+  Engine.load();
+  resumePlay();
+}
+function userTurnInPlay(){ return playWhite === (playerSide==='w'); }
+function resumePlay(){
+  if(playOver) return;
+  const status=gameStatus(playWhite);
+  if(status!=='ongoing'){ finishPlay(status); return; }
+  if(userTurnInPlay()){
+    locked=false;
+    setPrompt('Your move.','');
+  } else {
+    engineMove();
+  }
+}
+function makePlayMove(u){
+  const san=uciToSan(u);
+  const cap=isCapture(u);
+  applyMove(u);
+  playHist.push({u,san}); playWhite=!playWhite;
+  playMoveSound({san,u},cap);
+  selSq=null; aimSet=null;
+  render(u); updatePlayList(); updateEval();
+}
+function playUserMove(u){
+  const from=u.slice(0,2);
+  let targets=legalTargetNames(from);
+  const to=u.slice(2,4);
+  if(!targets.includes(to)){ // illegal — ignore quietly, reselect handled by caller
+    return false;
+  }
+  // auto-queen promotion
+  const [r1,f1]=sqRC(from); const p=board[r1][f1];
+  if(p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')) u=from+to+'q';
+  locked=true;
+  makePlayMove(u);
+  const status=gameStatus(playWhite);
+  if(status!=='ongoing'){ finishPlay(status); return true; }
+  setPrompt('Engine is thinking…','');
+  setTimeout(engineMove, 180);
+  return true;
+}
+function pickFallbackMove(white){ // used only if engine unavailable
+  const moves=allLegalMoves(white);
+  if(!moves.length) return null;
+  // prefer captures, then center-ish; otherwise random
+  const caps=moves.filter(m=>{ const [r,f]=sqRC(m.slice(2,4)); return board[r][f] && (board[r][f]===board[r][f].toUpperCase())!==white; });
+  const pool=caps.length?caps:moves;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+async function engineMove(){
+  if(playOver) return;
+  locked=true;
+  const white=playWhite;
+  const fen=toFEN(white);
+  const movetime=200+playSkill*25;
+  let u=null;
+  if(await Engine.load()) u=await Engine.bestMove(fen,{skill:playSkill,movetime});
+  if(!u) u=pickFallbackMove(white); // graceful fallback
+  if(!u){ finishPlay(gameStatus(white)); return; }
+  makePlayMove(u);
+  const status=gameStatus(playWhite);
+  if(status!=='ongoing'){ finishPlay(status); return; }
+  locked=false;
+  setPrompt('Your move.','');
+}
+function engineMoveNow(){ // "Engine move" button: play the user's move for them (full strength)
+  if(playOver || !userTurnInPlay() || locked) return;
+  (async()=>{
+    locked=true; setPrompt('Engine is choosing your move…','');
+    const white=playWhite; const fen=toFEN(white);
+    let u = await Engine.load() ? await Engine.bestMove(fen,{skill:20,movetime:600}) : pickFallbackMove(white);
+    if(!u){ locked=false; return; }
+    makePlayMove(u);
+    const status=gameStatus(playWhite);
+    if(status!=='ongoing'){ finishPlay(status); return; }
+    setPrompt('Engine is thinking…','');
+    setTimeout(engineMove,180);
+  })();
+}
+function updatePlayList(){
+  let html='';
+  for(let i=0;i<playHist.length;i++){
+    if(i%2===0) html+=`<span class="num">${i/2+1}.</span>`;
+    html+=`<span class="mv ${i===playHist.length-1?'cur':''}">${playHist[i].san}</span> `;
+  }
+  const ml=document.getElementById('movelist');
+  ml.innerHTML=html||'&nbsp;'; ml.scrollTop=ml.scrollHeight;
+}
+function updateEval(){
+  const val={P:1,N:3,B:3,R:5,Q:9,K:0};
+  let s=0;
+  for(let r=0;r<8;r++) for(let f=0;f<8;f++){ const p=board[r][f]; if(p) s+= (p===p.toUpperCase()?1:-1)*val[p.toUpperCase()]; }
+  const bar=document.getElementById('evalBar'); if(!bar) return;
+  const who = s>0?'White':'Black', amt=Math.abs(s);
+  bar.textContent = amt===0 ? 'Material: even' : `Material: ${who} +${amt}`;
+}
+function finishPlay(status){
+  playOver=true; locked=true;
+  let msg;
+  if(status==='checkmate'){
+    const loserWhite=playWhite; const userLost = (loserWhite===(playerSide==='w'));
+    SFX.mate();
+    msg = userLost ? '♚ Checkmate — the engine won this one. Review the moves and try again!'
+                   : '🏆 Checkmate — you beat the engine! Well played.';
+  } else {
+    SFX.success();
+    msg = '½–½ Stalemate — no legal moves, but no check. The game is a draw.';
+  }
+  setPrompt(status==='checkmate'?'Game over — checkmate':'Game over — stalemate', status==='checkmate'?'bad':'');
+  document.getElementById('comment').innerHTML = msg + ' <br><br>Use <b>↺ Restart game</b> to replay from the opening, or pick another line.';
+}
+function lineMoves(){ return DATA.openings[curOp].lines[curLine].moves; }
+function isPlayerTurn(){ return (ply%2===0?'w':'b')===playerSide; }
+
+function tick(){
+  const moves=lineMoves();
+  if(ply>=moves.length){ finishLine(); return; }
+  if(isPlayerTurn()){
+    setPrompt(`Your move — what does ${playerSide==='w'?'White':'Black'} play here?`,'');
+    locked=false;
+  } else {
+    locked=true;
+    setPrompt('Opponent is replying…','');
+    setTimeout(()=>{
+      const mv=moves[ply];
+      const cap=isCapture(mv.u);
+      applyMove(mv.u); ply++;
+      playMoveSound(mv,cap);
+      selSq=null; render(mv.u);
+      showComment(mv);
+      updateMoveList(); updateProgress();
+      tick();
+    }, ply===0?500:700);
+  }
+}
+
+function onSquare(name){
+  if(locked) return;
+  const [r,f]=sqRC(name); const p=board[r][f];
+  const myColorWhite = mode==='play' ? playWhite===(playerSide==='w') && (board[r][f] && (board[r][f]===board[r][f].toUpperCase())===playWhite) : null;
+  const mine = mode==='play'
+    ? (p && (p===p.toUpperCase())===playWhite && userTurnInPlay())
+    : (p && ((p===p.toUpperCase()) === (playerSide==='w')));
+  const select = sq=>{ selSq=sq; aimSet = (sq&&showAims) ? new Set(legalTargetNames(sq)) : null; render(curLastU()); };
+  if(selSq===null){
+    if(mine) select(name);
+    return;
+  }
+  if(name===selSq){ select(null); return; }
+  if(mine){ select(name); return; } // reselect own piece
+  if(mode==='play'){
+    if(!playUserMove(selSq+name)){ select(null); } // illegal target: deselect
+    return;
+  }
+  attemptMove(selSq+name);
+}
+function plyLastU(){ return ply>0 ? lineMoves()[ply-1].u : null; }
+
+function attemptMove(u){
+  const expected = lineMoves()[ply];
+  if(u===expected.u.slice(0,4)){
+    misses=0; selSq=null; aimSet=null;
+    const cap=isCapture(expected.u);
+    applyMove(expected.u); ply++;
+    playMoveSound(expected,cap);
+    render(expected.u);
+    setPrompt(`✓ ${expected.san} — correct!`,'good');
+    showComment(expected);
+    updateMoveList(); updateProgress();
+    setTimeout(tick, 650);
+  } else {
+    misses++; mistakesThisRun++; selSq=null; aimSet=null;
+    SFX.error();
+    boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
+    render(plyLastU());
+    const reveal = misses>=2;
+    setPrompt(reveal ? 'Not quite — here’s the idea:' : '✗ Not the line — try again.','bad');
+    document.getElementById('comment').innerHTML = explainWrong(u, expected, reveal);
+    if(reveal) highlightSq(expected.u.slice(0,2));
+    engineExplain(u, expected, reveal, ply); // async upgrade if engine is available
+  }
+}
+
+/* If the engine is loaded, replace the rule-based note with a real evaluation.
+   Guarded by token (ply + comment snapshot) so a late result can't overwrite a newer state. */
+async function engineExplain(wrongU, expected, reveal, atPly){
+  if(!(await Engine.load())) return;        // no engine → keep rule-based note
+  if(mode!=='drill' || ply!==atPly) return; // position moved on
+  const white = playerSide==='w';
+  const fenBefore = toFEN(white);
+  // best line from current position (engine's top choice + eval, from mover's POV)
+  const before = await Engine.analyse(fenBefore, {movetime:500});
+  if(!before || mode!=='drill' || ply!==atPly) return;
+  // evaluate the position AFTER the user's wrong move (from opponent POV → negate)
+  const wrong = wrongU.length>=4 ? wrongU.slice(0,4) : wrongU;
+  let promo = '';
+  const [r1,f1]=sqRC(wrong.slice(0,2));
+  if(board[r1][f1].toUpperCase()==='P' && (wrong[3]==='8'||wrong[3]==='1')) promo='q';
+  const b2=board.map(row=>row.slice()); applyTo(b2, wrong+promo);
+  const sB=board; board=b2;
+  const fenAfter=toFEN(!white);
+  board=sB;
+  const after = await Engine.analyse(fenAfter, {movetime:500});
+  if(!after || mode!=='drill' || ply!==atPly) return;
+  const playedCp = -after.cp;                 // back to our POV
+  const bestCp = before.cp;
+  const loss = bestCp - playedCp;             // centipawns thrown away
+  const bestSan = before.bestmove ? uciToSan(before.bestmove) : null;
+  const fmt = cp => (cp>=0?'+':'') + (cp/100).toFixed(1);
+  let verdict;
+  if(loss < 30) verdict = `Interesting — the engine rates your move about as good (eval ${fmt(playedCp)}). It just isn't the main theoretical line.`;
+  else if(loss < 90) verdict = `A small inaccuracy: it costs about ${(loss/100).toFixed(1)} pawns of advantage (your move ${fmt(playedCp)} vs best ${fmt(bestCp)}).`;
+  else if(loss < 250) verdict = `That's a real mistake — about ${(loss/100).toFixed(1)} pawns worse than best (your move ${fmt(playedCp)} vs ${fmt(bestCp)}).`;
+  else verdict = `A serious blunder — roughly ${(loss/100).toFixed(1)} pawns (your move ${fmt(playedCp)} vs ${fmt(bestCp)}). In a real game this usually decides the result.`;
+  const enginePick = bestSan ? ` The engine's top move here is <b>${bestSan}</b>.` : '';
+  const want = reveal
+    ? `<br><br><b>The line plays ${expected.san}.</b> ${expected.c}`
+    : `<br><br><span style="color:var(--dim)">Try again, or use 💡 Hint. (Full answer after another try.)</span>`;
+  document.getElementById('comment').innerHTML =
+    `<span style="color:var(--accent2)">⚙ Engine:</span> ${verdict}${enginePick}${want}`;
+}
+
+/* Analyze a wrong move and explain why, plus what the line wants. */
+function explainWrong(wrongU, expected, reveal){
+  const [r1,f1]=sqRC(wrongU.slice(0,2)), [r2,f2]=sqRC(wrongU.slice(2,4));
+  const p=board[r1][f1];
+  const dest=wrongU.slice(2,4);
+  const pname={P:'pawn',N:'knight',B:'bishop',R:'rook',Q:'queen',K:'king'}[p.toUpperCase()];
+  const white = playerSide==='w';
+  // simulate the wrong move on a copy
+  const b2=board.map(row=>row.slice());
+  if(p.toUpperCase()==='P'&&f1!==f2&&!b2[r2][f2]) b2[r1][f2]='';
+  b2[r2][f2]=p; b2[r1][f1]='';
+  let note;
+  const attacked = attackedBy(b2, r2, f2, !white);
+  const defended = attackedBy(b2, r2, f2, white);
+  const captured = board[r2][f2] && (board[r2][f2]===board[r2][f2].toUpperCase())!==white;
+  const val={P:1,N:3,B:3,R:5,Q:9,K:99};
+  if(p.toUpperCase()!=='K' && attacked && !defended){
+    note = `Careful — your ${pname} on ${dest} would be <b style="color:var(--bad)">hanging</b> (attacked and undefended). In the opening, losing a piece for nothing is usually game-over.`;
+  } else if(p.toUpperCase()!=='K' && attacked && defended && val[p.toUpperCase()]>=5){
+    note = `Your ${pname} on ${dest} can be attacked there — bringing the queen or rooks out early often just loses time when they get chased.`;
+  } else if(captured){
+    note = `That capture isn’t how the line continues here — grabbing material in the opening often means falling behind in development.`;
+  } else if(p.toUpperCase()==='P' && Math.abs(f2-f1)===0){
+    note = `A reasonable-looking pawn move, but it isn’t the theory here.`;
+  } else {
+    note = `That’s a legal move, just not what theory plays in this position.`;
+  }
+  const want = reveal
+    ? `<br><br><b>The line plays ${expected.san}.</b> ${expected.c}`
+    : `<br><br><span style="color:var(--dim)">Try again — or use the 💡 Hint button. (The full answer shows after another try.)</span>`;
+  return note + want;
+}
+
+function giveHint(){
+  if(locked || ply>=lineMoves().length || !isPlayerTurn()) return;
+  mistakesThisRun++; // hints cost the perfect run
+  const exp=lineMoves()[ply];
+  highlightSq(exp.u.slice(0,2));
+  setPrompt(`Hint: the piece on ${exp.u.slice(0,2)} moves.`,'');
+}
+function highlightSq(name){
+  const el=[...boardEl.children].find(s=>s.dataset.sq===name);
+  if(el) el.classList.add('hint');
+}
+
+function finishLine(){
+  locked=true;
+  const perfect = mistakesThisRun===0;
+  if(perfect) SFX.perfect(); else SFX.success();
+  const st=store.record(curOp,curLine,perfect);
+  document.getElementById('promptBox').style.display='none';
+  const box=document.getElementById('doneBox'); box.style.display='block';
+  document.getElementById('doneMsg').innerHTML = perfect
+    ? `<b style="color:var(--accent2)">Perfect run!</b> Line complete.`
+    : `Line complete — <b>${mistakesThisRun}</b> slip${mistakesThisRun>1?'s':''} this time.`;
+  document.getElementById('doneStats').textContent =
+    `Perfect streak: ${st.streak}${st.streak>=3?' ★ mastered':''} · ${st.perfect}/${st.runs} runs perfect`;
+  document.getElementById('donePlan').innerHTML =
+    `<b>What happens after the opening:</b> ${DATA.openings[curOp].lines[curLine].plan}`;
+  document.getElementById('streakInfo').innerHTML = st.streak?`Perfect streak: <b>${st.streak}</b>${st.streak>=3?' ★ mastered':''}`:'';
+}
+
+function nextLine(){
+  const op=DATA.openings[curOp];
+  if(curLine+1 < op.lines.length) startDrill(curOp,curLine+1,playerSide);
+  else if(curOp+1 < DATA.openings.length) startDrill(curOp+1,0,DATA.openings[curOp+1].side);
+  else showMenu();
+}
+
+/* ================= UI helpers ================= */
+function setPrompt(t,cls){ const p=document.getElementById('prompt'); p.textContent=t; p.className=cls; }
+function showComment(mv){
+  document.getElementById('comment').innerHTML=`<b>${mv.san}</b> — ${mv.c}`;
+  curAnnot = (mv.a||mv.k) ? {a:mv.a||[], k:mv.k||[]} : null;
+  drawAnnots();
+}
+function shownPly(){ return mode==='learn' ? learnPly : ply; }
+function updateMoveList(){
+  const moves=lineMoves(); const n=shownPly(); let html='';
+  for(let i=0;i<n;i++){
+    if(i%2===0) html+=`<span class="num">${i/2+1}.</span>`;
+    html+=`<span class="mv ${i===n-1?'cur':''}">${moves[i].san}</span> `;
+  }
+  document.getElementById('movelist').innerHTML = html || '<span style="color:var(--dim)">Moves will appear here.</span>';
+  const ml=document.getElementById('movelist'); ml.scrollTop=ml.scrollHeight;
+}
+function updateProgress(){
+  document.getElementById('progFill').style.width = (100*shownPly()/lineMoves().length)+'%';
+}
+
+/* ================= LEARN MODE ================= */
+function startLearn(oi,li,side){
+  curOp=oi; curLine=li; playerSide=side; mode='learn';
+  board=initBoard(); learnPly=0; selSq=null; locked=true; curAnnot=null;
+  document.getElementById('menu').style.display='none';
+  document.getElementById('drill').style.display='flex';
+  document.getElementById('doneBox').style.display='none';
+  document.getElementById('promptBox').style.display='block';
+  document.getElementById('drillNav').style.display='none';
+  document.getElementById('learnNav').style.display='flex';
+  document.getElementById('playNav').style.display='none';
+  document.getElementById('strengthRow').style.display='none';
+  document.getElementById('streakInfo').innerHTML='';
+  const op=DATA.openings[oi], line=op.lines[li];
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — Learn mode (step through with Next)</small>`;
+  syncLineSel();
+  learnShowStep();
+  render();
+}
+function learnShowStep(){
+  const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
+  if(learnPly===0){
+    setPrompt('📖 Overview — press Next to begin','');
+    document.getElementById('comment').innerHTML = line.intro;
+    curAnnot=null; drawAnnots();
+  } else {
+    const mv=moves[learnPly-1];
+    const num=Math.ceil(learnPly/2), isW=learnPly%2===1;
+    setPrompt(`Move ${learnPly}/${moves.length}: ${isW?'White':'Black'} plays ${num}${isW?'.':'...'}${mv.san}`,'');
+    showComment(mv);
+    if(learnPly===moves.length){
+      document.getElementById('comment').innerHTML += `<br><br><b>What happens next:</b> ${line.plan}<br><br>Ready? Hit <b>Drill This Line</b> to test your memory.`;
+    }
+  }
+  updateMoveList(); updateProgress();
+}
+function nextStep(){
+  const moves=lineMoves();
+  if(learnPly>=moves.length) return;
+  const mv=moves[learnPly];
+  const cap=isCapture(mv.u);
+  applyMove(mv.u); learnPly++;
+  playMoveSound(mv,cap);
+  learnShowStep();
+  render(mv.u);
+}
+function prevStep(){
+  if(learnPly===0) return;
+  learnPly--;
+  board=initBoard();
+  for(let i=0;i<learnPly;i++) applyMove(lineMoves()[i].u);
+  learnShowStep();
+  render(learnPly>0 ? lineMoves()[learnPly-1].u : null);
+}
+
+renderMuteBtn();
+buildLineSel();
+renderAnnotBtn();
+renderAimBtn();
+updateEngineBadge();
+showMenu();
+</script>
+</body>
+</html>
