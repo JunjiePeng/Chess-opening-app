@@ -143,6 +143,38 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 #muteBtn svg { width:20px; height:20px; display:block; stroke:currentColor; fill:none;
   stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 @media (max-width:900px){ .layout{padding:10px 12px 24px} .side-panel{width:min(82vw,520px)} }
+
+/* ---- phone layout: keep board + prompt + primary buttons on one screen ---- */
+@media (max-width:760px){
+  header { padding:10px 14px 4px; gap:8px; }
+  header h1 { font-size:1.2rem; }
+  header p { display:none; }              /* tagline not needed on small screens */
+  .layout { padding:6px 8px 16px; gap:10px; }
+  #drill { gap:8px; }
+  .board-wrap { --bsize:min(96vw, calc(100dvh - 250px)); }
+  .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; }
+  .panel-box { padding:10px 12px; }
+  /* reorder: prompt + active buttons sit right under the board */
+  #promptBox { order:1; max-height:30vh; overflow:auto; }
+  #doneBox   { order:1; }
+  #drillNav, #learnNav, #playNav { order:2; }
+  #streakInfo { order:3; }
+  #titleBox  { order:4; }
+  #moveBox   { order:5; }
+  #lineTitle { font-size:.92rem; }
+  #lineTitle small { font-size:.74rem; }
+  #prompt { font-size:.9rem; min-height:0; margin-bottom:4px; }
+  #comment { font-size:.82rem; min-height:0; }
+  #movelist { max-height:84px; }
+  button.act { padding:10px 12px; font-size:.82rem; flex:1 1 auto; }
+  .btn-row { gap:6px; }
+  .toggle { flex:1 1 100%; }
+  .toggle button { flex:1; }
+}
+@media (max-width:760px) and (max-height:680px){
+  .board-wrap { --bsize:min(86vw, calc(100dvh - 240px)); }  /* shorter phones: smaller board */
+  #promptBox { max-height:24vh; }
+}
 </style>
 </head>
 <body>
@@ -164,7 +196,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <div id="drill" class="layout" style="padding:0;">
     <div class="board-wrap"><div id="board"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
     <div class="side-panel">
-      <div class="panel-box">
+      <div class="panel-box" id="titleBox">
         <div id="lineTitle"></div>
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
         <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
@@ -196,7 +228,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
           <button class="act" onclick="backToLines()">← Lines</button>
         </div>
       </div>
-      <div class="panel-box">
+      <div class="panel-box" id="moveBox">
         <div id="movelist">&nbsp;</div>
       </div>
       <div class="btn-row" id="drillNav">
@@ -988,10 +1020,16 @@ function tick(){
 function onSquare(name){
   if(locked) return;
   const [r,f]=sqRC(name); const p=board[r][f];
-  const myColorWhite = mode==='play' ? playWhite===(playerSide==='w') && (board[r][f] && (board[r][f]===board[r][f].toUpperCase())===playWhite) : null;
-  const mine = mode==='play'
-    ? (p && (p===p.toUpperCase())===playWhite && userTurnInPlay())
-    : (p && ((p===p.toUpperCase()) === (playerSide==='w')));
+  let mine;
+  if(mode==='play'){
+    mine = p && (p===p.toUpperCase())===playWhite && userTurnInPlay();
+  } else if(mode==='learn'){
+    if(learnPly>=lineMoves().length) return;          // line finished: nothing to play
+    const moverWhite = learnPly%2===0;                // whose move is next in the line
+    mine = p && (p===p.toUpperCase())===moverWhite;
+  } else {
+    mine = p && ((p===p.toUpperCase()) === (playerSide==='w'));
+  }
   const select = sq=>{ selSq=sq; aimSet = (sq&&showAims) ? new Set(legalTargetNames(sq)) : null; render(curLastU()); };
   if(selSq===null){
     if(mine) select(name);
@@ -1003,6 +1041,7 @@ function onSquare(name){
     if(!playUserMove(selSq+name)){ select(null); } // illegal target: deselect
     return;
   }
+  if(mode==='learn'){ learnTryMove(selSq+name); return; }
   attemptMove(selSq+name);
 }
 function plyLastU(){ return ply>0 ? lineMoves()[ply-1].u : null; }
@@ -1164,7 +1203,7 @@ function updateProgress(){
 /* ================= LEARN MODE ================= */
 function startLearn(oi,li,side){
   curOp=oi; curLine=li; playerSide=side; mode='learn';
-  board=initBoard(); learnPly=0; selSq=null; locked=true; curAnnot=null;
+  board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
   document.getElementById('drill').style.display='flex';
   document.getElementById('doneBox').style.display='none';
@@ -1175,24 +1214,36 @@ function startLearn(oi,li,side){
   document.getElementById('strengthRow').style.display='none';
   document.getElementById('streakInfo').innerHTML='';
   const op=DATA.openings[oi], line=op.lines[li];
-  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — Learn mode (step through with Next)</small>`;
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — Learn: play each move or tap Next</small>`;
   syncLineSel();
   learnShowStep();
   render();
 }
+function learnNextHint(){
+  // tell the user whose move is next and invite them to play it
+  const moves=lineMoves();
+  if(learnPly>=moves.length) return '';
+  const nextWhite = learnPly%2===0;
+  return ` <span style="color:var(--dim)">— ${nextWhite?'White':'Black'} to move: play it on the board or tap Next.</span>`;
+}
 function learnShowStep(){
   const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
   if(learnPly===0){
-    setPrompt('📖 Overview — press Next to begin','');
+    document.getElementById('prompt').innerHTML = '📖 Overview' + learnNextHint();
+    document.getElementById('prompt').className='';
     document.getElementById('comment').innerHTML = line.intro;
     curAnnot=null; drawAnnots();
   } else {
     const mv=moves[learnPly-1];
     const num=Math.ceil(learnPly/2), isW=learnPly%2===1;
-    setPrompt(`Move ${learnPly}/${moves.length}: ${isW?'White':'Black'} plays ${num}${isW?'.':'...'}${mv.san}`,'');
     showComment(mv);
     if(learnPly===moves.length){
+      setPrompt(`✓ ${mv.san} — line complete!`,'good');
       document.getElementById('comment').innerHTML += `<br><br><b>What happens next:</b> ${line.plan}<br><br>Ready? Hit <b>Drill This Line</b> to test your memory.`;
+    } else {
+      const p=document.getElementById('prompt');
+      p.innerHTML = `✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint();
+      p.className='good';
     }
   }
   updateMoveList(); updateProgress();
@@ -1202,6 +1253,7 @@ function nextStep(){
   if(learnPly>=moves.length) return;
   const mv=moves[learnPly];
   const cap=isCapture(mv.u);
+  selSq=null; aimSet=null;
   applyMove(mv.u); learnPly++;
   playMoveSound(mv,cap);
   learnShowStep();
@@ -1209,11 +1261,28 @@ function nextStep(){
 }
 function prevStep(){
   if(learnPly===0) return;
+  selSq=null; aimSet=null;
   learnPly--;
   board=initBoard();
   for(let i=0;i<learnPly;i++) applyMove(lineMoves()[i].u);
   learnShowStep();
   render(learnPly>0 ? lineMoves()[learnPly-1].u : null);
+}
+// User plays a move on the board in Learn mode.
+function learnTryMove(u){
+  const expected=lineMoves()[learnPly];
+  selSq=null; aimSet=null;
+  if(u===expected.u.slice(0,4)){
+    nextStep();   // correct → advance with the explanation
+  } else {
+    boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
+    SFX.error();
+    render(curLastU());
+    highlightSq(expected.u.slice(0,2));
+    const p=document.getElementById('prompt');
+    p.innerHTML = `Not that one — the line plays <b>${expected.san}</b>. Try it, or tap Next.`;
+    p.className='bad';
+  }
 }
 
 renderMuteBtn();
