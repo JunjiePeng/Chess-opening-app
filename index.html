@@ -22,7 +22,7 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
-header { padding:18px 24px 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+header { padding:max(18px, env(safe-area-inset-top, 0px)) 24px 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
 header h1 { font-size:1.5rem; letter-spacing:.5px; cursor:pointer; user-select:none; transition:opacity .15s; }
 header h1:hover { opacity:.8; }
 header h1 span { color:var(--accent); }
@@ -146,12 +146,12 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 
 /* ---- phone layout: keep board + prompt + primary buttons on one screen ---- */
 @media (max-width:760px){
-  header { padding:10px 14px 4px; gap:8px; }
+  header { padding:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 14px 6px; gap:8px; }
   header h1 { font-size:1.2rem; }
   header p { display:none; }              /* tagline not needed on small screens */
   .layout { padding:6px 8px 16px; gap:10px; }
   #drill { gap:8px; }
-  .board-wrap { --bsize:min(96vw, calc(100dvh - 250px)); }
+  .board-wrap { --bsize:min(96vw, calc(100dvh - 260px - env(safe-area-inset-top, 0px))); }
   .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; }
   .panel-box { padding:10px 12px; }
   /* reorder: prompt + active buttons sit right under the board */
@@ -172,7 +172,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .toggle button { flex:1; }
 }
 @media (max-width:760px) and (max-height:680px){
-  .board-wrap { --bsize:min(86vw, calc(100dvh - 240px)); }  /* shorter phones: smaller board */
+  .board-wrap { --bsize:min(86vw, calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }  /* shorter phones: smaller board */
   #promptBox { max-height:24vh; }
 }
 </style>
@@ -1290,7 +1290,31 @@ buildLineSel();
 renderAnnotBtn();
 renderAimBtn();
 updateEngineBadge();
+setupSwipeBack();
 showMenu();
+
+/* Swipe right anywhere on the board screen → go back to the menu (one level up).
+   Ignores gestures that start on interactive controls (slider, buttons, move list). */
+function setupSwipeBack(){
+  if(typeof document==='undefined' || !document.addEventListener) return;
+  let s=null;
+  document.addEventListener('touchstart', e=>{
+    if(e.touches.length!==1){ s=null; return; }
+    const el=e.target;
+    if(el && el.closest && el.closest('input,select,button,#movelist,#lineSel')){ s=null; return; }
+    s={x:e.touches[0].clientX, y:e.touches[0].clientY};
+  }, {passive:true});
+  document.addEventListener('touchend', e=>{
+    if(!s) return;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-s.x, dy=t.clientY-s.y;
+    s=null;
+    // clearly rightward, mostly horizontal, decent distance
+    if(dx>70 && Math.abs(dy)<60 && dx>Math.abs(dy)*1.8){
+      if(document.getElementById('drill').style.display!=='none') showMenu();
+    }
+  }, {passive:true});
+}
 </script>
 </body>
 </html>
