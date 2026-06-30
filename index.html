@@ -214,7 +214,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     </div>
     <div class="summary-bar" id="summaryBar"></div>
     <div class="op-grid" id="opGrid"></div>
-    <div id="buildTag">Debut · build <b>G3</b></div>
+    <div id="buildTag">Debut · build <b>G4</b></div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -240,7 +240,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
           <label style="font-size:.78rem;color:var(--dim);display:flex;justify-content:space-between">
             <span>Engine strength</span><span id="eloLabel"></span>
           </label>
-          <input type="range" id="eloSlider" min="0" max="20" value="6" oninput="onEloInput(this.value)" style="width:100%">
+          <input type="range" id="eloSlider" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
         </div>
       </div>
@@ -913,12 +913,17 @@ function curLastU(){
 }
 
 /* ================= PLAY vs ENGINE ================= */
-let playHist=[], playWhite=true, playSkill=6, playOver=false, freeMode=false;
-function skillToElo(s){ return Math.round(800 + s*70); }
+let playHist=[], playWhite=true, playOver=false, freeMode=false;
+let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo')) || 1000;
+if(playElo<500) playElo=500; if(playElo>2400) playElo=2400;
+// Strength is chosen in Elo and remembered across sessions. Default for new users: 1000.
+function eloToSkill(elo){ return Math.max(0, Math.min(20, Math.round((elo-600)/90))); }   // 600→0 … 2400→20
+function eloToMovetime(elo){ return Math.max(120, Math.min(550, 120+eloToSkill(elo)*22)); }
 function onEloInput(v){
-  playSkill=+v;
-  const el=document.getElementById('eloLabel'); if(el) el.textContent='~'+skillToElo(playSkill)+' Elo';
-  if(Engine.ready) Engine.setStrength(playSkill);
+  playElo=Math.round(+v/50)*50;
+  if(typeof localStorage!=='undefined') localStorage.setItem('otElo', playElo);
+  const el=document.getElementById('eloLabel'); if(el) el.textContent=playElo+' Elo';
+  if(Engine.ready) Engine.setStrength(eloToSkill(playElo));
 }
 function playSetupUI(side){
   document.getElementById('menu').style.display='none';
@@ -932,7 +937,8 @@ function playSetupUI(side){
   showCapTrays(true);
   document.getElementById('sideW').classList.remove('on'); document.getElementById('sideB').classList.remove('on');
   document.getElementById('streakInfo').innerHTML='';
-  onEloInput(playSkill);
+  const slider=document.getElementById('eloSlider'); if(slider) slider.value=playElo;
+  onEloInput(playElo);
   Engine.load();
 }
 function startPlay(oi,li,side){
@@ -986,19 +992,19 @@ function toggleEvalBar(){
   if(typeof localStorage!=='undefined') localStorage.setItem('otEval', showEvalBar?'1':'0');
   renderEvalBtn(); updateEvalBar();
 }
-function setEvalBar(whiteCp){
+// cp is from YOUR perspective (board-oriented): positive = you're better, bar fills toward you (bottom).
+function setEvalBar(cp){
   const fill=document.getElementById('evalFill'), num=document.getElementById('evalNum');
   if(!fill||!num) return;
-  if(whiteCp===null){ fill.style.height='50%'; num.textContent='?'; return; }
+  if(cp===null){ fill.style.height='50%'; num.textContent='…'; return; }
   let pct;
-  if(Math.abs(whiteCp)>=99000) pct = whiteCp>0?100:0;
-  else pct = 100/(1+Math.pow(10, -whiteCp/400));   // win-probability mapping
+  if(Math.abs(cp)>=99000) pct = cp>0?100:0;
+  else pct = 100/(1+Math.pow(10, -cp/400));     // win-probability sigmoid, like chess.com/Lichess
   fill.style.height=Math.max(3,Math.min(97,pct))+'%';
-  const num2 = Math.abs(whiteCp)>=99000 ? ('M'+(100000-Math.abs(whiteCp))) : Math.abs(whiteCp/100).toFixed(1);
-  num.textContent = (whiteCp>=0?'+':'−')+num2;
+  const txt = Math.abs(cp)>=99000 ? ('M'+(100000-Math.abs(cp))) : Math.abs(cp/100).toFixed(1);
+  num.textContent = (cp>=0?'+':'−')+txt;
   num.style.top = pct>50 ? 'auto' : '3px';
   num.style.bottom = pct>50 ? '3px' : 'auto';
-  num.style.color = '#e8e2d6';
 }
 async function updateEvalBar(){
   const wrap=document.getElementById('evalBarWrap'); if(!wrap) return;
@@ -1009,7 +1015,10 @@ async function updateEvalBar(){
   const fen=toFEN(playWhite);
   const r=await Engine.analyse(fen,{movetime:600});
   if(myseq!==evalSeq || mode!=='play') return;   // a newer position superseded this
-  setEvalBar(r ? (playWhite ? r.cp : -r.cp) : null);
+  if(!r){ setEvalBar(null); return; }
+  const whiteCp = playWhite ? r.cp : -r.cp;                 // engine eval → White's perspective
+  const yourCp  = (playerSide==='w') ? whiteCp : -whiteCp;  // → your perspective (board-oriented)
+  setEvalBar(yourCp);
 }
 
 function userTurnInPlay(){ return playWhite === (playerSide==='w'); }
@@ -1065,9 +1074,9 @@ async function engineMove(){
   const white=playWhite;
   const fen=toFEN(white);
   const t0=Date.now();
-  const movetime=200+playSkill*25;       // search time scales with strength
+  const skill=eloToSkill(playElo), movetime=eloToMovetime(playElo);
   let u=null;
-  if(await Engine.load()) u=await Engine.bestMove(fen,{skill:playSkill,movetime});
+  if(await Engine.load()) u=await Engine.bestMove(fen,{skill,movetime});
   if(!u) u=pickFallbackMove(white); // graceful fallback
   if(!u){ finishPlay(gameStatus(white)); return; }
   if(playOver) return;
