@@ -154,6 +154,10 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .eng-badge.loading { color:var(--accent); }
 .eng-badge.unavailable { color:var(--bad); cursor:pointer; }
 .eng-badge.unavailable:hover { text-decoration:underline; }
+#langBar { display:inline-flex; gap:4px; }
+#langBar button { background:var(--panel2); color:var(--dim); border:1px solid var(--line); border-radius:7px;
+  padding:4px 10px; cursor:pointer; font-size:.78rem; line-height:1; }
+#langBar button.on { background:var(--accent); color:#241c10; font-weight:700; border-color:var(--accent); }
 #muteBtn { margin-left:0; background:none; border:none; cursor:pointer; padding:4px;
   color:var(--dim); opacity:.6; transition:opacity .15s; line-height:1; }
 #muteBtn:hover { opacity:1; }
@@ -197,8 +201,9 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <body>
 <header>
   <h1 id="logo" onclick="showMenu()" title="Back to main menu">♞ De<span>but</span></h1>
-  <p>Chess opening trainer — learn the lines, then drill them from memory.</p>
+  <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
   <span id="engineBadge" class="eng-badge" onclick="retryEngine()" title="Engine status — click to retry"></span>
+  <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
   <button id="muteBtn" onclick="toggleMute()" title="Toggle sound"></button>
 </header>
 
@@ -206,15 +211,15 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div id="freePlayCard">
-      <div class="fp-text"><span class="fp-emoji">🤖</span><span><b>Play a full game vs the Engine</b><br><span class="fp-sub">Start from move 1 — I'll name your opening as you go</span></span></div>
+      <div class="fp-text"><span class="fp-emoji">🤖</span><span><b data-i18n="freePlayTitle">Play a full game vs the Engine</b><br><span class="fp-sub" data-i18n="freePlaySub">Start from move 1 — I'll name your opening as you go</span></span></div>
       <div class="fp-btns">
-        <button class="act primary" onclick="startFreePlay('w')">Play as White</button>
-        <button class="act" onclick="startFreePlay('b')">Play as Black</button>
+        <button class="act primary" data-i18n="freePlayAsWhite" onclick="startFreePlay('w')">Play as White</button>
+        <button class="act" data-i18n="freePlayAsBlack" onclick="startFreePlay('b')">Play as Black</button>
       </div>
     </div>
     <div class="summary-bar" id="summaryBar"></div>
     <div class="op-grid" id="opGrid"></div>
-    <div id="buildTag">Debut · build <b>G4</b></div>
+    <div id="buildTag">Debut · build <b>G5</b> · 中文</div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -238,7 +243,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         </div>
         <div id="strengthRow" style="display:none;margin-top:10px">
           <label style="font-size:.78rem;color:var(--dim);display:flex;justify-content:space-between">
-            <span>Engine strength</span><span id="eloLabel"></span>
+            <span data-i18n="engineStrength">Engine strength</span><span id="eloLabel"></span>
           </label>
           <input type="range" id="eloSlider" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
@@ -254,35 +259,35 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <p id="doneStats"></p>
         <div id="donePlan"></div>
         <div class="btn-row" style="justify-content:center">
-          <button class="act primary" onclick="startDrill(curOp,curLine,playerSide)">Drill Again</button>
-          <button class="act" onclick="startPlay(curOp,curLine,playerSide)">♟ Play vs Engine</button>
-          <button class="act" onclick="nextLine()">Next Line →</button>
-          <button class="act" onclick="backToLines()">← Lines</button>
+          <button class="act primary" data-i18n="drillAgain" onclick="startDrill(curOp,curLine,playerSide)">Drill Again</button>
+          <button class="act" data-i18n="playVsEngine" onclick="startPlay(curOp,curLine,playerSide)">♟ Play vs Engine</button>
+          <button class="act" data-i18n="nextLine" onclick="nextLine()">Next Line →</button>
+          <button class="act" data-i18n="lines" onclick="backToLines()">← Lines</button>
         </div>
       </div>
       <div class="panel-box" id="moveBox">
         <div id="movelist">&nbsp;</div>
       </div>
       <div class="btn-row" id="drillNav">
-        <button class="act" id="hintBtn" onclick="giveHint()">💡 Hint</button>
-        <button class="act" onclick="startDrill(curOp,curLine,playerSide)">↻ Restart</button>
+        <button class="act" id="hintBtn" data-i18n="hint" onclick="giveHint()">💡 Hint</button>
+        <button class="act" data-i18n="restart" onclick="startDrill(curOp,curLine,playerSide)">↻ Restart</button>
         <span class="toggle" id="sideToggle">
-          <button id="sideW" onclick="switchSide('w')">Play White</button>
-          <button id="sideB" onclick="switchSide('b')">Play Black</button>
+          <button id="sideW" data-i18n="playWhite" onclick="switchSide('w')">Play White</button>
+          <button id="sideB" data-i18n="playBlack" onclick="switchSide('b')">Play Black</button>
         </span>
-        <button class="act" onclick="backToLines()">← Lines</button>
+        <button class="act" data-i18n="lines" onclick="backToLines()">← Lines</button>
       </div>
       <div class="btn-row" id="learnNav" style="display:none">
-        <button class="act" onclick="prevStep()">◀ Back</button>
-        <button class="act primary" onclick="nextStep()">Next ▶</button>
-        <button class="act" onclick="startDrill(curOp,curLine,playerSide)">🎯 Drill This Line</button>
-        <button class="act" onclick="backToLines()">← Lines</button>
+        <button class="act" data-i18n="back" onclick="prevStep()">◀ Back</button>
+        <button class="act primary" data-i18n="next" onclick="nextStep()">Next ▶</button>
+        <button class="act" data-i18n="drillThisLine" onclick="startDrill(curOp,curLine,playerSide)">🎯 Drill This Line</button>
+        <button class="act" data-i18n="lines" onclick="backToLines()">← Lines</button>
       </div>
       <div class="btn-row" id="playNav" style="display:none">
-        <button class="act" id="engMoveBtn" onclick="engineMoveNow()" title="Let the engine move for you">↻ Engine move</button>
-        <button class="act" id="playRestartBtn">↺ Restart game</button>
-        <button class="act" id="playDrillBtn" onclick="startDrill(curOp,curLine,playerSide)">🎯 Back to Drill</button>
-        <button class="act" onclick="showMenu()">← Menu</button>
+        <button class="act" id="engMoveBtn" data-i18n="engineMove" onclick="engineMoveNow()" title="Let the engine move for you">↻ Engine move</button>
+        <button class="act" id="playRestartBtn" data-i18n="restartGame">↺ Restart game</button>
+        <button class="act" id="playDrillBtn" data-i18n="backToDrill" onclick="startDrill(curOp,curLine,playerSide)">🎯 Back to Drill</button>
+        <button class="act" data-i18n="menu" onclick="showMenu()">← Menu</button>
       </div>
       <div class="streak" id="streakInfo"></div>
     </div>
@@ -292,6 +297,9 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <script>
 /* ================= DATA (validated move sequences) ================= */
 const DATA = {"openings":[{"name":"Italian Game","side":"w","icon":"♗","desc":"One of the oldest openings. White develops quickly and aims the bishop at f7, Black's weakest square.","lines":[{"name":"Giuoco Piano (Main Line)","intro":"The 'quiet game' is the perfect first opening: every move follows the golden rules — fight for the center, develop a new piece each move, castle early. Both sides build sound positions before any fighting starts.","plan":"After both sides castle, White's classic plan is the slow build-up: Re1, Nbd2, then reroute the knight Nf1–g3 toward the kingside, and eventually push d4 in one go. Black mirrors with ...Re8 and ...a6, ...Ba7 keeping the bishop. The key battleground squares are d5 and f5 — whoever plants a knight there first usually gets the better middlegame. Avoid trading your good bishop on c4/c5 without getting something for it.","moves":[{"u":"e2e4","san":"e4","c":"Grab a share of the center and open lines for both the queen and the f1-bishop. The center pawns control the key squares d5 and f5.","k":["d5","f5"]},{"u":"e7e5","san":"e5","c":"Black stakes an equal claim. Symmetry means a fair fight over the same central squares."},{"u":"g1f3","san":"Nf3","c":"Develop with a threat — the knight attacks e5, so Black must respond. Developing 'with tempo' means your opponent can't ignore you.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"The most natural reply: defend e5 while developing a piece. Defending with a piece beats defending with a pawn move like ...d6, which blocks the bishop.","a":["c6e5"]},{"u":"f1c4","san":"Bc4","c":"The Italian bishop takes its best diagonal, aiming straight at f7 — the only square defended solely by Black's king. Many beginner attacks (and traps) revolve around f7.","a":["c4f7"],"k":["f7"]},{"u":"f8c5","san":"Bc5","c":"Black mirrors, eyeing f2 in return. The bishop also controls d4, discouraging White's central expansion.","a":["c5f2"],"k":["f2","d4"]},{"u":"c2c3","san":"c3","c":"A pawn move with a plan: prepare d4, building a broad center. Note White delays this until the key pieces are out. A common beginner mistake is pushing pawns before developing.","k":["d4"]},{"u":"g8f6","san":"Nf6","c":"Black develops the last minor piece needed for castling and counterattacks e4. If White gets careless, ...Nxe4 wins a pawn.","a":["f6e4"]},{"u":"d2d3","san":"d3","c":"Defend e4 modestly. The immediate 5.d4 leads to sharp play; d3 keeps the center stable — White will prepare d4 properly later. Slow but safe.","k":["e4"]},{"u":"d7d6","san":"d6","c":"Black solidifies e5 the same way. Both sides have completed the opening's first goal: a stable center and pieces ready to castle.","k":["e5"]},{"u":"e1g1","san":"O-O","c":"Castle! King safety always comes before launching attacks. The rook also steps toward the center files where it belongs.","k":["g1","f1"]},{"u":"e8g8","san":"O-O","c":"Both kings are tucked away. The opening is complete: now the real game begins — see the strategy notes when you finish this line."}]},{"name":"Two Knights Defense (Quiet)","intro":"When Black plays 3...Nf6 instead of 3...Bc5, they counterattack e4 immediately. White's calmest answer is d3, sidestepping the wild Fried Liver complications while keeping a healthy, flexible position.","plan":"White's setup is identical to the Giuoco Piano: c3, Re1, Nbd2–f1–g3, then the d4 break. Black's most active plan is ...d5 in one move if White is slow, or the standard ...a6, ...Ba7 regroup. Watch for the moment Black plays ...d5: after exd5 Nxd5 you should hit the center quickly before Black consolidates.","moves":[{"u":"e2e4","san":"e4","c":"Take the center and free the bishop and queen.","k":["d5","f5"]},{"u":"e7e5","san":"e5","c":"Black claims an equal share."},{"u":"g1f3","san":"Nf3","c":"Develop and attack e5 — forcing Black to deal with the threat.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece."},{"u":"f1c4","san":"Bc4","c":"Aim at f7 — the Italian setup.","a":["c4f7"],"k":["f7"]},{"u":"g8f6","san":"Nf6","c":"The Two Knights: instead of mirroring, Black counterattacks e4 at once. This is more combative — it invites White to grab material with Ng5, leading to chaos.","a":["f6e4"]},{"u":"d2d3","san":"d3","c":"The mature choice. 4.Ng5 attacks f7 and wins material by force, but the resulting positions are razor-sharp. d3 simply defends e4 and keeps a comfortable game.","k":["e4"]},{"u":"f8e7","san":"Be7","c":"Black develops modestly. Note ...Bc5 was also possible, transposing toward Giuoco Piano waters. Be7 is the most solid — it never becomes a target.","k":["e7"]},{"u":"e1g1","san":"O-O","c":"Castle before anything else. White's position plays itself: every piece has an obvious good square."},{"u":"e8g8","san":"O-O","c":"Black completes the kingside development."},{"u":"f1e1","san":"Re1","c":"The rook takes the e-file before it even opens. When the center eventually breaks open with d4xe5 or ...d5, this rook will already be perfectly placed.","a":["e1e4"],"k":["e4"]},{"u":"d7d6","san":"d6","c":"Black shores up e5. From here both sides maneuver: White eyes d4 and the kingside, Black looks for ...d5 or ...Be6 to trade the strong Italian bishop.","k":["d5"]}]},{"name":"Evans Gambit","intro":"A pawn sacrifice with a clear purpose: b4! deflects Black's bishop, then c3 and d4 build a massive center while Black wastes time with the same bishop. Beloved by attacking players from Morphy to Kasparov.","plan":"White's compensation is concrete: a big center, open lines, and a 2-3 move lead in development. Typical follow-ups are Qb3 (hitting f7), Ba3 (preventing castling!), and e5 kicking the f6-knight. The golden rule of gambit play: never trade queens, keep making threats, and open the position before Black untangles. If Black survives to an endgame, the extra pawn wins — so play with energy.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black claims a share."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo on e5.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1c4","san":"Bc4","c":"The Italian bishop, aiming at f7.","a":["c4f7"],"k":["f7"]},{"u":"f8c5","san":"Bc5","c":"Black plays the classical square."},{"u":"b2b4","san":"b4","c":"The Evans Gambit! White offers a wing pawn to drag Black's bishop off its good diagonal and gain time. The pawn matters less than the tempo and the center White gets in return.","a":["b4c5"]},{"u":"c5b4","san":"Bxb4","c":"Black accepts — the critical test. Declining with ...Bb6 is safer but lets White claim space for free."},{"u":"c2c3","san":"c3","c":"The point: attack the bishop AGAIN, gaining another tempo, and prepare the d4 thrust. Black's bishop has now moved three times while White develops with every move.","a":["c3b4"],"k":["d4"]},{"u":"b4a5","san":"Ba5","c":"The main retreat, keeping the pin idea on c3 alive. ...Be7 and ...Bc5 are alternatives, each with drawbacks White can exploit."},{"u":"d2d4","san":"d4","c":"The big center arrives with another threat. White's pawns and pieces all work together; Black has one developed piece — and it's been chased around the board.","a":["d4e5"],"k":["d4","e5"]},{"u":"e5d4","san":"exd4","c":"Black grabs a second pawn, falling further behind. Greed is the engine of White's attack in the Evans."},{"u":"e1g1","san":"O-O","c":"Calm amid the storm: castle, connect the rooks, and prepare cxd4 or Qb3. White is two pawns down but effectively four tempi up — that's a winning trade in open positions.","k":["f7","a3"]}]}]},{"name":"Ruy Lopez","side":"w","icon":"♘","desc":"The 'Spanish Game'. White pressures the knight that defends e5 — perhaps the most classical of all openings.","lines":[{"name":"Main Line (Closed)","intro":"The Ruy Lopez asks Black a long-term question: the b5-bishop pressures the c6-knight, the only defender of e5. White isn't threatening to win a pawn immediately — it's positional pressure that can last 30 moves.","plan":"The closed Spanish is a slow maneuvering battle. White's standard plan: h3 (stopping ...Bg4), d4, and the famous knight tour Nb1–d2–f1–g3 heading for f5. Black counters with ...Na5 hitting the bishop, ...c5 and ...Qc7 claiming queenside space. Don't rush — improve your worst piece each move. The e4/e5 pawn tension defines everything: whoever resolves it carelessly hands the other side the center.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black responds classically."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish move. Unlike the Italian's direct attack on f7, this targets the DEFENDER of e5. The latent threat: Bxc6 followed by Nxe5. It doesn't work yet — but Black must always account for it.","a":["b5c6"],"k":["c6","e5"]},{"u":"a7a6","san":"a6","c":"The Morphy Defense — pose the question immediately. If the bishop takes, Black gets the bishop pair; if it retreats, ...b5 can chase it again later. The world's most played position arises after this move."},{"u":"b5a4","san":"Ba4","c":"Keep the tension. The bishop still eyes c6 through the a4–e8 diagonal, and ...b5 would loosen Black's queenside — a target for a later a4 break.","a":["a4c6"]},{"u":"g8f6","san":"Nf6","c":"Develop and attack e4. Now White faces the same question Black did: defend the pawn or ignore the threat?","a":["f6e4"]},{"u":"e1g1","san":"O-O","c":"Ignore it! If Black grabs e4 (the 'Open Spanish'), White regains the pawn with d4 and Re1 — the e-file pin is deadly. Castling 'into' the threat is a famous lesson: calculate, don't just react.","k":["e4"]},{"u":"f8e7","san":"Be7","c":"Black declines the pawn and prepares to castle. The solid main road."},{"u":"f1e1","san":"Re1","c":"NOW e4 is genuinely defended, renewing the positional threat of Bxc6 and Nxe5. Black's next move is practically forced — can you see why?","a":["e1e4"],"k":["e4"]},{"u":"b7b5","san":"b5","c":"Because of the renewed threat, Black finally breaks the a4–e8 pin idea for good. The cost: the queenside pawns are slightly loosened, which White may target with a4 much later.","a":["b5a4"]},{"u":"a4b3","san":"Bb3","c":"The bishop lands on its permanent home, still glaring at f7 down the a2–g8 diagonal. In many lines it becomes the most dangerous piece on the board.","a":["b3f7"],"k":["f7"]},{"u":"d7d6","san":"d6","c":"Black cements e5 and opens the c8-bishop's path. Quiet consolidation."},{"u":"c2c3","san":"c3","c":"Two ideas in one: prepare the d4 advance, and create an escape square on c2 so ...Na5 never wins the bishop pair. Prophylaxis — preventing the opponent's plan before it happens.","k":["d4","c2"]},{"u":"e8g8","san":"O-O","c":"The main-line tabiya. White will continue h3 then d4; Black chooses between ...Na5, ...Bb7, or ...Re8 setups. A lifetime of chess lives in this position."}]},{"name":"Exchange Variation","intro":"White trades the prized bishop for a clear, simple asset: Black's doubled c-pawns. The deep idea — in a pure pawn endgame White's healthy kingside majority creates a passed pawn, while Black's crippled queenside majority cannot. Bobby Fischer's favorite shortcut.","plan":"White's strategy is brutally clear: trade pieces (not pawns!), play d4, and aim for any endgame. Every exchange increases the value of the superior pawn structure. Black's compensation is the bishop pair — so Black should keep the position rich, avoid trades, and use the half-open d-file. As White: knight to the kingside, f4-f5 majority advance. Count to the endgame: 4 healthy pawns vs 3 beats 4 vs a doubled 4.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black answers classically, claiming an equal share of the center."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish bishop pressures the defender.","a":["b5c6"]},{"u":"a7a6","san":"a6","c":"The Morphy Defense — immediately ask the bishop its intentions."},{"u":"b5c6","san":"Bxc6","c":"The Exchange: White gives up the bishop pair voluntarily — for permanent structural damage. This trade only makes sense because Black must recapture with a pawn, doubling the c-pawns.","k":["c6"]},{"u":"d7c6","san":"dxc6","c":"Recapturing toward the center and freeing the c8-bishop. (...bxc6 would leave the bishop buried and the pawns even weaker.) Black banks on the two bishops for dynamic play.","k":["c6","c7"]},{"u":"e1g1","san":"O-O","c":"Castle first — 5.Nxe5? immediately fails to ...Qd4!, forking knight and e4-pawn, regaining the pawn with a good game. A famous trap; check it yourself!","k":["d4"]},{"u":"f7f6","san":"f6","c":"Black reinforces e5 in ugly-but-solid fashion. The doubled pawns do offer one gift: they control great central squares.","k":["e5"]},{"u":"d2d4","san":"d4","c":"Strike while ahead in development. White wants to liquidate the center and steer toward the favorable endgame.","a":["d4e5"]},{"u":"e5d4","san":"exd4","c":"Black trades — holding the center with ...exd4 declined would drop a pawn eventually."},{"u":"f3d4","san":"Nxd4","c":"Stock-taking: White has the healthy 4-v-3 kingside majority and a lead in development; Black has two bishops and the half-open d-file. Every piece trade from here favors White — remember that as you play on.","k":["d4"]}]},{"name":"Berlin Defense","intro":"The 'Berlin Wall' — Black's most solid answer to the Spanish, famously used by Kramnik to dethrone Kasparov in 2000. Black accepts a slightly worse structure and loses castling rights, but gets the bishop pair and a fortress-like endgame with no weaknesses.","plan":"This IS the endgame — the queens come off by move 8. White's assets: the kingside pawn majority and Black's misplaced king. Black's assets: the bishop pair and a rock-solid structure. White should advance the kingside pawns (h3, g4, e5–e6 ideas) and activate rooks before Black coordinates. Black plays ...Ke8–c8, ...b6, ...Bb7 and simply outlasts. Patience wins here; haste loses.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"e7e5","san":"e5","c":"Black answers classically, claiming an equal share of the center."},{"u":"g1f3","san":"Nf3","c":"Develop with tempo — the knight attacks e5, forcing a response.","a":["f3e5"]},{"u":"b8c6","san":"Nc6","c":"Defend e5 with a piece while developing toward the center."},{"u":"f1b5","san":"Bb5","c":"The Spanish bishop takes aim at the knight that defends e5.","a":["b5c6"]},{"u":"g8f6","san":"Nf6","c":"The Berlin: develop and counterattack e4 immediately, skipping ...a6. Black offers to enter deep, technical waters.","a":["f6e4"]},{"u":"e1g1","san":"O-O","c":"The principled reply — defend e4 with tactics, not pawns. White invites Nxe4, having seen further ahead.","k":["e4"]},{"u":"f6e4","san":"Nxe4","c":"Black takes the bait — except it's not quite a bait. This is theory: Black knows the pawn comes back, but believes the resulting endgame is holdable. Watch how White regains it.","k":["e4"]},{"u":"d2d4","san":"d4","c":"The key move: counterattack in the center BEFORE recapturing. Threatens d5 forking, and opens the queen's path to d8. Black cannot keep the extra pawn.","a":["d4e5"],"k":["d5"]},{"u":"e4d6","san":"Nd6","c":"Best — the knight retreats with tempo by attacking the b5-bishop. Every Berlin move has this dual-purpose quality; that's why it's so hard to crack.","a":["d6b5"]},{"u":"b5c6","san":"Bxc6","c":"In-between move: take the knight first, damaging Black's pawns before recapturing on e5.","k":["c6"]},{"u":"d7c6","san":"dxc6","c":"Black accepts doubled pawns to free the bishop — same structural story as the Exchange Variation."},{"u":"d4e5","san":"dxe5","c":"Regain the pawn and kick the d6-knight at the same time. Notice the d-file is now fully open — with both queens standing on it.","a":["e5d6"]},{"u":"d6f5","san":"Nf5","c":"The knight finds its one good square, eyeing the d4 and e3 holes.","k":["d4","e3"]},{"u":"d1d8","san":"Qxd8+","c":"Into the famous Berlin endgame. White trades queens precisely because Black's king must recapture — losing castling rights forever.","a":["d1d8"]},{"u":"e8d8","san":"Kxd8","c":"The Berlin Wall stands: Black's king is stuck in the center, the h8-rook is hard to activate — but the position has no weaknesses to attack. Technical chess from here; see the strategy notes."}]}]},{"name":"Sicilian Defense","side":"b","icon":"♟","desc":"Black's most popular and combative reply to 1.e4. Fight for the center asymmetrically with the c-pawn.","lines":[{"name":"Najdorf Setup","intro":"The Najdorf is the Rolls-Royce of Sicilians — the choice of Fischer and Kasparov. The little move ...a6 prepares everything: ...e5 without allowing Nb5, and queenside expansion with ...b5. Black plays for a win from move one.","plan":"Black's typical scheme: ...e5 (or ...e6), ...Be7, ...O-O, then the thematic ...b5–b4 pawn storm against White's queenside — often racing White's own kingside attack. The d5-square is Black's eternal concern: never let a White knight live there. Remember the Sicilian golden rule: Black's counterplay runs down the half-open c-file (...Rc8, ...Qc7, pressure on c2/c3). If White castles long, the race is on — push those queenside pawns!","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c5","san":"c5","c":"The Sicilian! Instead of mirroring, Black fights for d4 from the wing. The deep point: when White eventually plays d4 and Black trades, Black has swapped a FLANK pawn for a CENTER pawn — a long-term structural profit.","k":["d4"]},{"u":"g1f3","san":"Nf3","c":"White prepares d4 — the Open Sicilian, the most testing approach."},{"u":"d7d6","san":"d6","c":"Control e5 (stopping e4-e5 advances) and open the c8-bishop's diagonal. The flexible Najdorf move order.","k":["e5"]},{"u":"d2d4","san":"d4","c":"White opens the center, accepting the structural trade for piece activity and a development lead."},{"u":"c5d4","san":"cxd4","c":"The cornerstone trade: flank pawn for center pawn. Black now owns the half-open c-file — the highway for all future counterplay.","k":["c2"]},{"u":"f3d4","san":"Nxd4","c":"White recaptures, centralizing the knight."},{"u":"g8f6","san":"Nf6","c":"Develop with tempo — e4 needs defending now.","a":["f6e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with the natural developing move."},{"u":"a7a6","san":"a6","c":"The Najdorf move. It looks passive — it's anything but. It takes b5 away from both White knights and the bishop, preparing ...e5 (which Nb5 would otherwise punish) and the ...b5 expansion. A move that prepares the entire middlegame.","k":["b5","e5"]}]},{"name":"Open Sicilian (Classical)","intro":"The Classical Sicilian: Black develops both knights to their best squares before committing any more pawns. Sound, flexible, and a great way to learn Open Sicilian structures without memorizing forcing lines.","plan":"Black's standard development: ...e6 (or ...g6), ...Be7, ...O-O, ...Qc7 and rooks to c8/d8. The recurring themes of every Open Sicilian apply: pressure down the c-file, a timely ...d5 break to free the position, and vigilance over the d5-square. White usually attacks with f3/Be3/Qd2 and a kingside pawn storm, or Bc4 pressure — meet wing attacks with the central ...d5 counterstrike.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c5","san":"c5","c":"The Sicilian — asymmetric fight for d4.","k":["d4"]},{"u":"g1f3","san":"Nf3","c":"White prepares the d4 break — heading for the Open Sicilian."},{"u":"b8c6","san":"Nc6","c":"Develop the knight to its most natural square, adding control over d4 and e5.","k":["d4","e5"]},{"u":"d2d4","san":"d4","c":"The Open Sicilian — White opens the center, the most testing approach."},{"u":"c5d4","san":"cxd4","c":"Flank pawn for center pawn — Black's structural profit, plus the half-open c-file.","k":["c2"]},{"u":"f3d4","san":"Nxd4","c":"White recaptures, placing the knight powerfully in the center."},{"u":"g8f6","san":"Nf6","c":"Develop with tempo on e4.","a":["f6e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with the most natural developing move."},{"u":"d7d6","san":"d6","c":"The Classical setup complete: e5 is controlled, the bishop diagonal is open, and Black hasn't committed to a plan yet — ...e6, ...g6, or ...e5 are all still possible. Flexibility is strength."}]},{"name":"Alapin (2.c3) — White's view","intro":"Tired of facing twenty Sicilian systems? The Alapin cuts through: White simply prepares d4 and builds the center with pawns. Black's sharpest weapons don't work here — the game becomes positional, on White's terms.","plan":"White typically gets pawns on d4 and e5 with free development — a space advantage that cramps Black all game. The plans: develop with Bc4 or Be2, castle, and use the extra space to maneuver (Re1, Bf4/Bg5, Nbd2). Black will chip with ...d6 and pressure d4; hold the center calmly with Be3/Nbd2 rather than grabbing more space. If the center pawns get traded, aim for active piece play against Black's isolated d-pawn positions.","moves":[{"u":"e2e4","san":"e4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"c7c5","san":"c5","c":"The Sicilian — Black fights for d4 from the flank, unbalancing the game."},{"u":"c2c3","san":"c3","c":"The Alapin's honest plan: support d4 with a pawn, so that after d4 cxd4, cxd4 White keeps the full pawn center. The drawback — the b1-knight loses its best square — is exactly what Black tries to exploit.","k":["d4"]},{"u":"g8f6","san":"Nf6","c":"Black's best: attack e4 immediately, exploiting that Nc3 is unavailable (the pawn took the square!). White must push the pawn, which Black will undermine.","a":["f6e4"]},{"u":"e4e5","san":"e5","c":"Gain space and kick the knight — the only good way to defend.","a":["e5f6"]},{"u":"f6d5","san":"Nd5","c":"The knight sits beautifully on d5, un-evictable by pawns (c4? would weaken d4 forever). Black's whole setup works around this knight.","k":["d5"]},{"u":"d2d4","san":"d4","c":"Build the intended center."},{"u":"c5d4","san":"cxd4","c":"Black trades before White gets everything set up."},{"u":"g1f3","san":"Nf3","c":"The professional touch: develop first and recapture with the c-pawn next, keeping the d4+e5 duo intact. Rushing cxd4 first invites an early ...d6 strike.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"Black develops with pressure on d4 and e5.","a":["c6d4"]},{"u":"c3d4","san":"cxd4","c":"The dream structure: pawns on d4 and e5 grant White space and attacking chances. This duo is the whole point of the Alapin.","k":["d4","e5"]},{"u":"d7d6","san":"d6","c":"Black strikes back immediately — correct play. The center must be challenged before it becomes overwhelming. A fair, instructive middlegame follows.","a":["d6e5"]}]}]},{"name":"Queen's Gambit","side":"w","icon":"♕","desc":"White's classical 1.d4 weapon: offer the c-pawn to deflect Black's d-pawn and dominate the center.","lines":[{"name":"QGD Main Line","intro":"The Queen's Gambit Declined is chess's aristocrat — over a century of world championship pedigree. Black calmly protects d5 and accepts a slightly cramped but extraordinarily solid position. White gets enduring pressure; Black waits for the right moment to free the position.","plan":"White's two classic plans: (1) the minority attack — b4–b5 creating a weak Black queenside pawn to besiege all game, or (2) central play with Qc2, Rd1 and a timely e4. Black's freedom plan is always the same: trade pieces (a cramped position loves trades), then break with ...c5 or ...e5 at the right moment. The c8-bishop is Black's problem child — getting it to f5 or g4 (often after ...dxc4 and ...b5) means Black has equalized.","moves":[{"u":"d2d4","san":"d4","c":"Claim the center with built-in protection — unlike e4, this pawn is guarded by the queen. 1.d4 openings are slower burns: structure and squeezing replace quick strikes.","k":["d4"]},{"u":"d7d5","san":"d5","c":"Black claims an equal share and blocks the center."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit — not really a gambit! If Black takes, White regains the pawn comfortably. The real idea: pressure d5 sideways to either remove it (gaining central control) or force Black into passive defense.","a":["c4d5"],"k":["d5"]},{"u":"e7e6","san":"e6","c":"Declined — Black keeps a pawn on d5 at the small cost of boxing in the c8-bishop. That bishop becomes the defining piece of the whole opening: Black spends the next ten moves trying to free it.","k":["c8"]},{"u":"b1c3","san":"Nc3","c":"Develop with more pressure on d5.","a":["c3d5"]},{"u":"g8f6","san":"Nf6","c":"Defend d5 and develop — move for move, the same battle."},{"u":"c1g5","san":"Bg5","c":"The classical pin: the f6-knight is d5's key defender, so White ties it down. Indirect pressure on d5 through the pin — a lesson in attacking a strongpoint via its defenders.","a":["g5f6"],"k":["d5"]},{"u":"f8e7","san":"Be7","c":"Calmly break the pin. No weaknesses, no drama — the QGD way."},{"u":"e2e3","san":"e3","c":"Solidify d4 and open the f1-bishop's diagonal. Note White's restraint: the position stays compact, every piece protected.","k":["d4"]},{"u":"e8g8","san":"O-O","c":"Black castles into safety."},{"u":"g1f3","san":"Nf3","c":"Complete the kingside development. Bd3, O-O and Rc1 come next — then White chooses between the minority attack and central expansion."},{"u":"b8d7","san":"Nbd7","c":"The classical QGD tabiya. The knight supports both ...c5 and ...e5 breaks and can reroute via b6 or f8. Cramped but unbreakable — Capablanca won countless games from here with both colors."}]},{"name":"Queen's Gambit Accepted","intro":"Black takes the pawn — not to keep it, but to trade central tension for quick, free development. Black gives back the pawn at the right moment and strikes at d4 with ...c5, aiming for full equality in an open game.","plan":"White gets the freer game and a central majority; the question is whether it becomes an attack or a target. White's ideal: build with Qe2, Rd1, e4 and roll the center forward. Black's standard equalizing sequence: ...c5xd4 creating an isolated queen's pawn (IQP) for White, then blockade d5 with knights and trade pieces — an IQP grows weaker with every exchange. As White, attack before the simplification: Bd3, Qe2, and watch for Bxh7+ Greek-gift sacrifices when Black castles early.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"d7d5","san":"d5","c":"Black claims a share."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit offer: pressure d5 from the side to win the center.","a":["c4d5"]},{"u":"d5c4","san":"dxc4","c":"Accepted! Black surrenders the center temporarily. The plan is NOT to keep the pawn (tries like ...b5 lose time badly) — it's to develop fast while White spends a move recapturing.","k":["c4"]},{"u":"g1f3","san":"Nf3","c":"Develop first and prevent ...e5, which would free Black's game instantly. Stopping the opponent's best move is as valuable as making your own.","k":["e5"]},{"u":"g8f6","san":"Nf6","c":"Black develops naturally, also controlling e4."},{"u":"e2e3","san":"e3","c":"Open the bishop's path to reclaim c4."},{"u":"e7e6","san":"e6","c":"Black mirrors, preparing ...c5 — the key strike. Note Black's c8-bishop is blocked for now, just like in the QGD; ...b6 and ...Bb7 will solve it later."},{"u":"f1c4","san":"Bxc4","c":"Pawn regained with a developing move — the gambit's accounting always balances. The bishop sits actively on the a2–g8 diagonal.","a":["c4e6"],"k":["e6"]},{"u":"c7c5","san":"c5","c":"The thematic counter-strike at d4. Black challenges the center before White consolidates with Qe2 and Rd1. Without this move, Black would slowly suffocate.","a":["c5d4"],"k":["d4"]},{"u":"e1g1","san":"O-O","c":"Castle and keep the small pull: better development and a central majority. The middlegame question: will d4 become a passed pawn or a weakness?"},{"u":"a7a6","san":"a6","c":"Preparing ...b5 and ...Bb7 — finally activating the problem bishop, with queenside space as a bonus. A rich, balanced middlegame; see the strategy notes."}]},{"name":"Slav Defense Main Line","intro":"The Slav fixes the QGD's one flaw: by defending d5 with ...c6 instead of ...e6, the c8-bishop keeps its freedom and develops to f5 — actively placed before the pawn chain closes. Solid as granite, but with more dynamic potential than the QGD.","plan":"Black's setup completes with ...e6, ...Bb4 or ...Be7, and ...O-O — every piece on a sensible square, no weaknesses. White's space advantage is real but hard to convert: the standard plans are e4 (after Bg5/e3 preparation) or queenside pressure with Qb3. Black counters with ...e5 or ...c5 breaks once developed. The a4-pawn White played has a cost — the b4-square belongs to Black forever; a knight or bishop landing there is the Slav player's reward.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"d7d5","san":"d5","c":"Black claims a share."},{"u":"c2c4","san":"c4","c":"The Queen's Gambit offer: pressure d5 from the side to win the center.","a":["c4d5"]},{"u":"c7c6","san":"c6","c":"The Slav point: defend d5 while leaving the c8–h3 diagonal open. Compare with the QGD's ...e6 — same solidity, but the bishop thanks you. The small cost: c6 takes the best square from the b8-knight.","k":["c8"]},{"u":"g1f3","san":"Nf3","c":"Natural development, watching e5."},{"u":"g8f6","san":"Nf6","c":"Black develops a piece toward the center."},{"u":"b1c3","san":"Nc3","c":"More pressure on d5. White's setup is identical to the QGD — the difference is all in Black's camp.","a":["c3d5"]},{"u":"d5c4","san":"dxc4","c":"Now Black takes! The timing is the point: with ...c6 played, Black threatens to HOLD the pawn with ...b5. White must spend a move preventing it — and that move has a price.","k":["b5"]},{"u":"a2a4","san":"a4","c":"Stop ...b5, intending to regain c4. The cost: b4 is now a permanent hole in White's queenside — Black's pieces will use it for the rest of the game. Every pawn move creates a weakness somewhere.","k":["b4"]},{"u":"c8f5","san":"Bf5","c":"The Slav's payoff move: the bishop reaches its dream square BEFORE ...e6 closes the diagonal. Compare this bishop with its sad QGD cousin on c8. Black completes development smoothly next: ...e6, ...Bb4, ...O-O.","k":["f5","b4"]}]}]},{"name":"London System","side":"w","icon":"♖","desc":"A sturdy, low-theory system: d4, Bf4, e3, and the same solid setup against almost anything.","lines":[{"name":"Main Line vs ...d5","intro":"The London is a system, not a sequence — the same sound setup (d4, Bf4, e3, Bd3, Nbd2, c3) against nearly anything Black does. Perfect when you'd rather understand one structure deeply than memorize twenty variations. The f4-bishop, developed OUTSIDE the pawn chain, is the system's soul.","plan":"The London pyramid (c3–d4–e3) is nearly impregnable. White's main plans: (1) the Ne5 outpost — plant the knight, support with f4 if needed, and attack f7/h7; (2) the slow kingside attack with Bd3, Ne5, Qf3–h3; (3) in the endgame, the queenside majority after dxc5. Black's counterplay comes down the c-file with ...Qb6 hitting b2 — know the response Qb3 (or Rb1). Don't rush: the London wins by improving pieces while Black runs out of useful moves.","moves":[{"u":"d2d4","san":"d4","c":"Take the center, queen-protected."},{"u":"d7d5","san":"d5","c":"Black mirrors, claiming an equal share of the center."},{"u":"c1f4","san":"Bf4","c":"The London move, and the key idea of the whole system: develop the bishop OUTSIDE the pawn chain BEFORE playing e3. The QGD showed what happens to a bishop locked behind its own pawns — White makes sure it never happens here.","k":["f4"]},{"u":"g8f6","san":"Nf6","c":"Black develops the knight to its most natural square."},{"u":"e2e3","san":"e3","c":"Now build the pyramid behind the bishop. The structure c3–d4–e3 (c3 comes soon) defends itself — that's why the London needs so little memorization.","k":["d4"]},{"u":"e7e6","san":"e6","c":"Black builds symmetrically — accepting the same bad-bishop problem White just avoided."},{"u":"g1f3","san":"Nf3","c":"Develop, control e5 — the square White's whole middlegame revolves around.","k":["e5"]},{"u":"f8d6","san":"Bd6","c":"Black sensibly challenges the London bishop — it's White's best piece, so trading it is good business for Black."},{"u":"f4g3","san":"Bg3","c":"Refuse the trade! If Black captures on g3, White recaptures with the h-pawn — opening the h-file for the rook, a free attacking road. Black usually regrets that trade; meanwhile the bishop keeps living on the b8–h2 diagonal.","k":["g3","h2"]},{"u":"e8g8","san":"O-O","c":"Black castles — king safety before the middlegame begins."},{"u":"f1d3","san":"Bd3","c":"The attacking diagonal, pointed at h7. Together with a future Ne5, this creates real mating threats — the London is quiet, not toothless.","a":["d3h7"],"k":["h7"]},{"u":"c7c5","san":"c5","c":"Black's correct counterplay: hit d4 and open the c-file. Expect ...Qb6 next, targeting the b2-pawn the London bishop left behind — the system's one tender spot.","a":["c5d4"],"k":["b2"]},{"u":"c2c3","san":"c3","c":"Complete the pyramid. d4 is now defended three times; the structure absorbs the pressure effortlessly.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"A standard London middlegame: White will castle, reroute with Nbd2 and aim for the Ne5 outpost. Solid for White, flexible for Black — see the strategy notes."}]},{"name":"vs King's Indian Setup","intro":"Against the fianchetto, the London keeps its shape but shifts its concern: Black's g7-bishop bears down on d4, and the ...e5 break is coming. White's setup stays solid, controls e5 by piece-count, and relies on h3 to preserve the key dark-squared bishop.","plan":"Black wants ...Nbd7 and ...e5 — you usually can't prevent it forever, so prepare to meet it well: keep d4 firmly guarded (c3, Nbd2), and when ...e5 comes, choose between dxe5 (then occupy the d-file and c4/e4 squares) or letting the tension stand. The h3–Bh2 resource keeps your best piece alive. Long-term: queenside space with c4 and b4 is White's healthiest plan, since Black owns the kingside dark squares. Respect the g7-bishop — never open the long diagonal carelessly.","moves":[{"u":"d2d4","san":"d4","c":"Stake a claim in the center and open lines for the queen and bishop."},{"u":"g8f6","san":"Nf6","c":"Black stays flexible, hinting at Indian setups."},{"u":"c1f4","san":"Bf4","c":"London regardless — the system's promise: one setup against everything.","k":["f4"]},{"u":"g7g6","san":"g6","c":"Black announces the King's Indian plan: fianchetto, castle, then strike with ...e5 or ...c5. A completely different animal from ...d5 setups — the center stays fluid."},{"u":"e2e3","san":"e3","c":"The usual London structure: e3 supports d4 from behind the bishop."},{"u":"f8g7","san":"Bg7","c":"The KID bishop takes the long diagonal, staring at d4 and beyond toward b2. This piece is the heart of every Black plan — track what it sees at all times.","a":["g7d4"],"k":["d4","b2"]},{"u":"g1f3","san":"Nf3","c":"Develop while adding a defender to d4 and controlling e5 — the square Black most wants to claim.","k":["e5","d4"]},{"u":"e8g8","san":"O-O","c":"Black castles quickly, completing the standard KID sequence."},{"u":"f1e2","san":"Be2","c":"Modest on purpose: on d3 the bishop would block White's own queen from defending d4, and ...Nh5 tricks gain strength. Be2 keeps everything coordinated. Sometimes the humble square is the right square.","k":["d4"]},{"u":"d7d6","san":"d6","c":"Black prepares the thematic ...Nbd7 and ...e5 break — the KID's core plan against every White setup."},{"u":"h2h3","san":"h3","c":"A small move with a big job: when Black plays ...Nh5 hunting the bishop, it now slips back to h2, staying on its diagonal. Preserving your best piece is worth a tempo. White castles next and meets ...e5 with confidence.","k":["h2","g4"]}]}]},{"name":"French Defense","side":"b","icon":"♛","desc":"Solid and counterattacking: Black lets White build a center, then strikes it with ...c5 and ...f6.","lines":[{"name":"Advance Variation","intro":"When White locks the center with e5, the position becomes a textbook pawn-chain battle: White owns the kingside, Black owns the queenside, and the whole game revolves around the base of White's chain — d4. Black's plan is beautifully clear: pile everything onto that square.","plan":"Black's pressure scheme is a machine: ...Qb6, ...Nh6–f5 (yes, via the rim!), ...cxd4 and sometimes ...f6 to attack the chain's head too. White must defend d4 with everything and seek kingside space. Two big ideas to remember: Black often delays or even skips castling (the locked center makes the king safe in the middle), and the 'bad' c8-bishop seeks life via ...Bd7–b5, trading itself for White's good pieces. If d4 falls, Black wins the strategic battle outright.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French: prepare ...d5 with full support. Black volunteers to block the c8-bishop — the famous 'French bishop' problem — in exchange for an unbreakable pawn duo and rich counterattacking plans.","k":["d5","c8"]},{"u":"d2d4","san":"d4","c":"White builds the dream center — temporarily."},{"u":"d7d5","san":"d5","c":"Challenge it immediately. White must now choose the variation: push (e5), trade (exd5), or defend (Nc3/Nd2). Each leads to a different world.","a":["d5e4"]},{"u":"e4e5","san":"e5","c":"The Advance: White grabs kingside space and fixes the structure. The pawn chain d4–e5 points where White will attack — the kingside. But every chain has a base...","k":["d4","e5"]},{"u":"c7c5","san":"c5","c":"...and Black attacks it instantly. THE strategic lesson of the French: strike a pawn chain at its base (d4), not its head. Everything Black does for the next ten moves serves this square.","a":["c5d4"],"k":["d4"]},{"u":"c2c3","san":"c3","c":"White reinforces the base."},{"u":"b8c6","san":"Nc6","c":"Second attacker on d4. Black develops every piece toward the same target — concentration of force on one weak point.","a":["c6d4"]},{"u":"g1f3","san":"Nf3","c":"A second defender arrives for d4 — development with a defensive job."},{"u":"d8b6","san":"Qb6","c":"Third attacker — and the queen also eyes b2, tying White's c1-bishop to its defense. This is the Advance French tabiya: the siege of d4 is fully set. Next comes ...Nh6–f5 or ...cxd4 and ...Nge7–f5, adding the final attacker.","a":["b6d4","b6b2"],"k":["d4","b2"]}]},{"name":"Exchange Variation","intro":"White trades on d5 and the French's famous tension evaporates: symmetrical pawns, open lines, free development for both sides. Black's 'bad bishop' problem is solved instantly. Often chosen hoping for a quiet draw — but symmetry rewards whoever plays with more purpose.","plan":"Don't let symmetry lull you to sleep — it breaks the moment someone gains a tempo. The e-file is the whole game early on: both sides race rooks to e1/e8. Black equalizes comfortably with natural moves (...Bd6, ...O-O, ...Bg4, ...Nc6 or ...c6 with ...Re8), then plays for more: ideas include ...Ne4, ...Qf6 pointing at the kingside, or a minority-style ...b5–b4 if White commits to c3. The first player to run out of useful moves loses the symmetry battle.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French — solid, counterattacking, preparing ...d5 with support."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4d5","san":"exd5","c":"The Exchange — White releases the tension immediately. Objectively harmless, but it carries one lesson: without central tension, piece activity decides everything.","k":["d5"]},{"u":"e6d5","san":"exd5","c":"And just like that, Black's eternal problem piece — the c8-bishop — is free. Black has zero structural worries; the only question is who uses the open lines better.","k":["c8"]},{"u":"g1f3","san":"Nf3","c":"White continues developing toward a quick castle."},{"u":"g8f6","san":"Nf6","c":"Develop naturally, controlling e4. In symmetric positions, develop toward the center and grab the open file first."},{"u":"f1d3","san":"Bd3","c":"White takes the best diagonal."},{"u":"f8d6","san":"Bd6","c":"Mirror it — this bishop placement guards e5 and supports a later kingside initiative. Symmetry is fine for Black: White must prove something, and there's nothing to prove.","k":["e5"]},{"u":"e1g1","san":"O-O","c":"White castles, completing the opening's first duty."},{"u":"e8g8","san":"O-O","c":"Castled and equal. Now the real contest: rooks to the e-file, then ...Bg4 or ...Nc6. Whoever finds more active squares wins this 'drawish' position — see the strategy notes."}]},{"name":"Tarrasch Variation","intro":"White's Nd2 defends e4 while dodging the annoying ...Bb4 pin — at the cost of blocking the c1-bishop. Black's sharpest answer is an immediate ...c5, accepting an isolated d-pawn in return for free, active piece play. A classic structure-versus-activity bargain.","plan":"Black's game plan flows from the isolated d5-pawn: use the piece activity it provides BEFORE it becomes an endgame weakness. Develop fast (...Nc6, ...Bd6, ...Nge7 or ...Nf6, ...O-O), occupy e4 with a knight, and generate kingside threats — the IQP grants the e4 and c4 squares as outposts. Avoid piece trades (each one magnifies the pawn's weakness) and never drift into a pure endgame. If White blockades d4 and trades pieces, sit tight: the d-pawn is defensible, and ...d4 breaks can liquidate it at the right moment.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"e7e6","san":"e6","c":"The French — solid, counterattacking, preparing ...d5 with support."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"b1d2","san":"Nd2","c":"The Tarrasch: defend e4 while keeping c3 free for a pawn — and crucially, ...Bb4+ no longer pins anything. The price: the knight blocks its own bishop. Every square choice is a trade-off.","k":["e4","c3"]},{"u":"c7c5","san":"c5","c":"Black's most ambitious reply: strike the center NOW, while the d2-knight is awkward. Black accepts isolated-pawn positions in exchange for the freest development the French ever offers.","a":["c5d4"],"k":["d4"]},{"u":"e4d5","san":"exd5","c":"White opens the center to fix Black with the isolated pawn."},{"u":"e6d5","san":"exd5","c":"There it is: Black's d5-pawn has no pawn neighbors — isolated. Weak in the endgame, but it grants open lines and the e4/c4 outposts. Black chose this on purpose: activity now, accountability later.","k":["d5","e4","c4"]},{"u":"g1f3","san":"Ngf3","c":"White develops, already eyeing the d4 blockade square in front of the isolani — the standard anti-IQP strategy: blockade, then besiege.","k":["d4"]},{"u":"b8c6","san":"Nc6","c":"Black develops with maximum activity, fighting for d4."},{"u":"f1b5","san":"Bb5","c":"White pins, intending to castle and increase the grip on d4."},{"u":"f8d6","san":"Bd6","c":"Active development, pointing at the kingside. Black's pieces flow to natural squares — the IQP's gift. Next: ...Nge7, ...O-O, and piece play before White's blockade settles. See the strategy notes for the full IQP battle plan.","k":["e4"]}]}]},{"name":"Caro-Kann Defense","side":"b","icon":"♜","desc":"Solid like the French, but the light-squared bishop gets out before ...e6. A favorite for beginners and world champions alike.","lines":[{"name":"Classical Variation","intro":"The Caro-Kann's main line showcases its whole philosophy: build the same solid ...d5 structure as the French, but develop the light-squared bishop FIRST. Black gets a position with no weaknesses and a clear piece plan — at the cost of a small concession in space.","plan":"Black's development scheme is almost automatic: ...e6, ...Ngf6 (or ...Bd6), ...O-O (or sometimes ...Qc7 and ...O-O-O), and the central break ...c5 at the right moment — the same base-strike idea as the French, but with the good bishop already traded or tucked safely on h7. White's space means Black shouldn't rush: trade a pair of minor pieces, keep the structure intact, and the endgame will smile on you — Caro-Kann endgames are famously pleasant. Watch White's h-pawn advance: it gained kingside space, which becomes a target for a later ...g5 or endgame counterplay.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann: prepare ...d5 while keeping the c8–h3 diagonal open. Compare the French ...e6 — same plan, but THIS pawn doesn't bury the bishop. The cost: c6 takes the knight's best square, and Black concedes a little time.","k":["d5","c8"]},{"u":"d2d4","san":"d4","c":"White builds the full pawn center — Black will challenge it at once."},{"u":"d7d5","san":"d5","c":"Challenge e4 with full support.","a":["d5e4"]},{"u":"b1c3","san":"Nc3","c":"White defends e4 with a piece, keeping all options."},{"u":"d5e4","san":"dxe4","c":"Black releases the tension at the right moment — before White gets e5 in under better circumstances. Trading the d-pawn for the e-pawn leaves a small but lasting structural plus: 3 pawns vs 2 on the queenside."},{"u":"c3e4","san":"Nxe4","c":"White recaptures with a beautifully centralized knight — temporarily."},{"u":"c8f5","san":"Bf5","c":"The Caro-Kann's signature move and its whole reason for existing: the bishop develops to its best diagonal WITH TEMPO on the knight, before ...e6 would lock it in. This one move justifies 1...c6.","a":["f5e4"],"k":["f5"]},{"u":"e4g3","san":"Ng3","c":"White saves the knight by attacking the bishop — gaining time back.","a":["g3f5"]},{"u":"f5g6","san":"Bg6","c":"The bishop's safe haven. It looks passive on g6 but watch: it controls the b1–h7 diagonal, and after the coming trade on d3 or h7, Black's position has zero bad pieces."},{"u":"h2h4","san":"h4","c":"Aggressive: White threatens h5 trapping the bishop! Black must create an escape hatch immediately. White banks space; the h-pawn may later become weak — a real investment, not a free move.","a":["h4h5"],"k":["h5"]},{"u":"h7h6","san":"h6","c":"The essential response — NEVER forget this move. It gives the bishop a retreat on h7 and stops White's h5–h6 ideas. Skipping it loses a piece to h5. Drill it into memory.","k":["h7"]},{"u":"g1f3","san":"Nf3","c":"White continues developing toward a quick castle."},{"u":"b8d7","san":"Nd7","c":"The careful move order: prepare ...Ngf6 so that after Nxf6+, Black recaptures with the KNIGHT (...Nxf6), keeping the pawn structure pristine. Structure first — that's the Caro-Kann creed. Development continues ...e6, ...Bd6, ...O-O."}]},{"name":"Advance Variation","intro":"Against the space-grabbing e5, the Caro-Kann shows its superiority over the French in one move: ...Bf5, developing the bishop OUTSIDE the chain before ...e6. Black gets the French's solid structure with none of its bad-bishop sorrow.","plan":"Black has two healthy plans, often combined: the ...c5 base-strike (the French recipe, but more comfortable here), and piece pressure with ...Ne7–f5 plus ...Nd7 against d4. The thematic maneuver ...Ne7–g6 (or ...f5!?) also fights for the e5/f4 squares. White's extra space wants a kingside expansion (g4!? chasing your bishop) — meet flank aggression with the central ...c5 break, the universal answer. Endgames favor Black's healthier structure; trade into them happily.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann — prepare ...d5 while keeping the bishop's diagonal free."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4e5","san":"e5","c":"The Advance. Same chain as the French Advance (d4–e5) — but watch what Black does with the move the French never gets.","k":["d4","e5"]},{"u":"c8f5","san":"Bf5","c":"THE move that makes the Caro-Kann: the bishop escapes to its perfect diagonal BEFORE ...e6 closes the door. The whole opening exists for this tempo. Black now has the French's solidity without its one structural sorrow.","k":["f5"]},{"u":"g1f3","san":"Nf3","c":"White develops sensibly. (The aggressive tries g4!? and h4 exist — meet them calmly with ...e6/...h5; your bishop always finds safety on g6/h7.)"},{"u":"e7e6","san":"e6","c":"NOW close the chain — the bishop is already outside. Black's structure is the French Advance with a perfect light-squared bishop: strictly better version.","k":["d5","e6"]},{"u":"f1e2","san":"Be2","c":"White prepares to castle."},{"u":"b8d7","san":"Nd7","c":"Flexible development: the knight supports the coming ...c5 strike at d4's base. The other knight will choose e7, heading for f5 or g6."},{"u":"e1g1","san":"O-O","c":"White castles, completing the opening's first duty."},{"u":"g8e7","san":"Ne7","c":"The signature Caro maneuver: this knight reroutes to f5 (hitting d4) or g6 (hitting e5 and f4). From here: ...c5, ...Be7/...Nb6, castle either side. Black's position plays itself — see the strategy notes.","k":["f5","g6"]}]},{"name":"Exchange Variation","intro":"White trades on d5 hoping for an easy, symmetric game — but unlike the French Exchange, there's a real fight here: White takes the d3-square first with the bishop, trying to deny Black's c8-bishop its dream development. Black equalizes with precise, natural moves.","plan":"This is the 'Carlsbad' structure (mirrored): expect White to try the minority-attack idea in reverse or simple piece play. Black's plan: complete development (...e6, ...Bd6 or ...Be7, ...O-O), place the rooks on c8/e8, and use the half-open c-file — ...Qb6 and ...Rc8 pressure b2/c3. The g4-bishop pin on f3 is Black's active resource; retreating it to h5/g6 keeps long-term pressure. Endgames are level or better for Black: the structure is symmetric and weakness-free. Just don't fall for early Qb3 tricks against b7 — ...Qd7 or ...Qc8 holds everything.","moves":[{"u":"e2e4","san":"e4","c":"White takes the center."},{"u":"c7c6","san":"c6","c":"The Caro-Kann — prepare ...d5 while keeping the bishop's diagonal free."},{"u":"d2d4","san":"d4","c":"White builds the broad two-pawn center — strong now, a target later."},{"u":"d7d5","san":"d5","c":"Challenge e4 immediately — the supported ...d5 strike is the point of the opening.","a":["d5e4"]},{"u":"e4d5","san":"exd5","c":"The Exchange — White avoids theory and aims for a small, clean edge.","k":["d5"]},{"u":"c6d5","san":"cxd5","c":"Black recaptures with the c-pawn (the only legal pawn capture — and a good one): the structure stays symmetric and the c-file is half-open for Black's rooks.","k":["c6"]},{"u":"f1d3","san":"Bd3","c":"The point of White's move order: occupy the b1–h7 diagonal FIRST, denying Black's bishop the f5-square it lives for. A small battle for one diagonal — these things decide openings.","a":["d3f5"],"k":["f5"]},{"u":"b8c6","san":"Nc6","c":"Black develops actively, pressuring d4."},{"u":"c2c3","san":"c3","c":"White solidifies d4 and opens the queen's path to b3 — watch for tricks against b7 now that the c8-bishop wanders.","k":["b7"]},{"u":"g8f6","san":"Nf6","c":"Natural development toward e4."},{"u":"c1f4","san":"Bf4","c":"White grabs the good diagonal — a London-style setup with colors telling a different story."},{"u":"c8g4","san":"Bg4","c":"Denied f5, the bishop finds activity anyway: pinning pressure against f3/d4 ideas (after ...e6, White's d4 always needs watching). Black follows with ...e6, ...Bd6 or ...Be7, ...O-O and full equality. See the strategy notes for the middlegame plans.","a":["g4d1"],"k":["d4"]}]}]}]};
+
+const DATA_ZH = {"openings":[{"name":"意大利开局","desc":"最古老的开局之一。白方快速出子，将象瞄准 f7——黑方最薄弱的格子。","lines":[{"name":"意大利稳健式（主线）","intro":"这盘“安静的对局”是完美的入门开局：每一步都遵循黄金法则——争夺中心、每步出一个新子、尽早王车易位。双方在交火之前先建立稳固的阵型。","plan":"双方易位后，白方的经典计划是缓慢布置：Re1、Nbd2，再把马经 Nf1–g3 调往王翼，最后一举推进 d4。黑方对称地走 ...Re8、...a6、...Ba7 保留主教。关键的战场格子是 d5 和 f5——谁先在那里落下一只马，通常就能占据更好的中局。不要在 c4/c5 上无谓地兑掉你的好象。","moves":["占据一份中心，并为皇后和 f1 象打开通路。中心兵控制了关键的 d5 和 f5 格。","黑方提出对等的要求。对称意味着双方在同样的中心格上公平较量。","带威胁地出子——马攻击 e5，黑方必须应对。“带先手”出子意味着对手无法忽视你。","最自然的回应：守住 e5 同时出子。用子力防守胜过 ...d6 这种会堵住主教的兵步。","意大利象走上最佳斜线，直指 f7——黑方唯一只靠王防守的格子。许多新手的攻击（和陷阱）都围绕 f7。","黑方对称应对，反过来盯住 f2。这只象还控制 d4，抑制白方的中心扩张。","带计划的兵步：准备 d4，建立宽广的中心。注意白方在主要子力出动之前先按兵不动。新手常犯的错是出子之前先乱推兵。","黑方出动易位所需的最后一个轻子，并反击 e4。白方若大意，...Nxe4 就能赢兵。","稳健地守 e4。立刻走 5.d4 会引向尖锐局面；d3 保持中心稳定——白方稍后会妥善准备 d4。慢但安全。","黑方同样巩固 e5。双方都完成了开局的首要目标：稳固的中心和准备易位的子力。","易位！发动攻击之前，王的安全永远是第一位。车也走向它应属的中心线。","两位王都已安顿好。开局完成：真正的对局现在开始——完成本线后请看战略提示。"]},{"name":"两马防御（稳健式）","intro":"当黑方走 3...Nf6 而非 3...Bc5 时，立刻反击 e4。白方最冷静的回应是 d3，绕开狂野的“油炸肝”复杂变化，同时保持健康灵活的阵型。","plan":"白方的布置与意大利稳健式相同：c3、Re1、Nbd2–f1–g3，再走 d4 突破。黑方最积极的计划是在白方迟缓时一步走 ...d5，或标准的 ...a6、...Ba7 重新布置。留意黑方走 ...d5 的时机：exd5 Nxd5 之后，你应在黑方巩固之前迅速冲击中心。","moves":["占据中心，解放主教和皇后。","黑方要求对等的一份。","出子并攻击 e5——迫使黑方处理威胁。","用子力守住 e5。","瞄准 f7——意大利式布置。","两马防御：黑方不再对称，而是立刻反击 e4。这更具战斗性——它诱使白方用 Ng5 抢子，引向混乱。","成熟的选择。4.Ng5 攻击 f7 能强行赢子，但由此产生的局面极其锋利。d3 只是守住 e4，保持舒适的对局。","黑方稳健出子。注意 ...Bc5 也可行，会转入意大利稳健式的水域。Be7 最稳——它永远不会成为攻击目标。","先于一切易位。白方阵型自行运转：每个子都有明显的好格。","黑方完成王翼出子。","车在 e 线尚未打开时就先占据它。当中心最终因 d4xe5 或 ...d5 而打开时，这只车早已就位。","黑方加固 e5。从此双方调度：白方盯住 d4 和王翼，黑方寻求 ...d5 或 ...Be6 来兑掉强大的意大利象。"]},{"name":"埃文斯弃兵","intro":"目的明确的弃兵：b4！把黑方的象引开，再用 c3 和 d4 建立庞大的中心，而黑方却用同一只象浪费时间。从莫菲到卡斯帕罗夫，攻击型棋手都钟爱它。","plan":"白方的补偿是实打实的：庞大的中心、打开的线路，以及 2–3 步的出子领先。常见后续是 Qb3（攻击 f7）、Ba3（阻止易位！）以及 e5 驱赶 f6 马。弃兵play的黄金法则：绝不兑皇后、不断制造威胁、在黑方理顺之前打开局面。若黑方撑到残局，多兵会取胜——所以要充满活力地行棋。","moves":["在中心立桩，为皇后和象打开线路。","黑方要求一份。","带先手出子，攻击 e5。","用子力守 e5，同时朝中心出子。","意大利象，瞄准 f7。","黑方走上古典格。","埃文斯弃兵！白方献出一个翼兵，把黑象引离它的好斜线并争取时间。兵本身不重要，重要的是白方换来的先手和中心。","黑方接受——关键的考验。用 ...Bb6 谢绝更安全，但会白白让白方占据空间。","要点：再次攻击这只象，又得一先手，并准备 d4 推进。黑象至此已走了三次，而白方每步都在出子。","主要退法，保留 c3 上的牵制思路。...Be7 和 ...Bc5 也是选择，各有白方可利用的缺陷。","庞大的中心带着又一个威胁到来。白方的兵和子协同一致；黑方只有一个出动的子——还被满盘驱赶。","黑方再抓一兵，却越发落后。贪婪正是埃文斯弃兵中白方攻击的引擎。","风暴中的冷静：易位、联通双车，准备 cxd4 或 Qb3。白方少两兵，但实际上多四步先手——在开放局面里这是一笔取胜的交易。"]}]},{"name":"西班牙开局","desc":"“西班牙对局”。白方对守卫 e5 的马施压——也许是所有开局中最古典的一个。","lines":[{"name":"主线（封闭式）","intro":"西班牙开局向黑方提出一个长期问题：b5 象施压 c6 马，而后者是 e5 的唯一守卫者。白方并不威胁立刻赢兵——这是可以持续 30 步的位置压力。","plan":"封闭西班牙是缓慢的调度战。白方的标准计划：h3（阻止 ...Bg4）、d4，以及著名的马调度 Nb1–d2–f1–g3 奔向 f5。黑方以 ...Na5 攻象、...c5 和 ...Qc7 争取后翼空间回应。不要急——每步改善你最差的子。e4/e5 的兵张力决定一切：谁草率地解除它，就把中心送给对方。","moves":["在中心立桩，为皇后和象打开线路。","黑方古典地回应。","带先手出子——马攻击 e5，迫使回应。","用子力守 e5，同时朝中心出子。","西班牙之着。不同于意大利直攻 f7，这是针对 e5 的“守卫者”。潜在威胁：Bxc6 接 Nxe5。它现在还不奏效——但黑方必须时刻提防。","莫菲防御——立刻提出质问。若象吃子，黑方得双象；若象后退，...b5 稍后还能再次驱赶它。世界上下得最多的局面在此步之后出现。","保持张力。象仍透过 a4–e8 斜线盯住 c6，而 ...b5 会松动黑方后翼——日后 a4 突破的目标。","出子并攻击 e4。现在白方面临黑方刚才的同一问题：守兵还是无视威胁？","无视它！若黑方吃 e4（“开放西班牙”），白方用 d4 和 Re1 取回兵——e 线的牵制极其致命。“迎着”威胁易位是著名的一课：要计算，而非条件反射。","黑方谢绝吃兵，准备易位。稳健的主干道。","现在 e4 真正得到防守，重新制造 Bxc6 和 Nxe5 的位置威胁。黑方的下一步几乎是被迫的——你能看出为什么吗？","由于重新出现的威胁，黑方终于彻底解除 a4–e8 的牵制思路。代价：后翼兵稍有松动，日后白方可用 a4 来攻击。","象落到它永久的家，仍沿 a2–g8 斜线虎视 f7。在许多变化里，它会成为盘面上最危险的子。","黑方加固 e5 并打通 c8 象的去路。安静的巩固。","一举两得：准备 d4 推进，并在 c2 造一个退路，使 ...Na5 永远赢不到双象。预防——在对手计划发生之前就阻止它。","主线基本型。白方将续走 h3 再 d4；黑方在 ...Na5、...Bb7 或 ...Re8 的布置间选择。整整一生的棋艺都藏在这个局面里。"]},{"name":"兑变（Exchange）","intro":"白方用宝贵的象去换取一个清晰简单的资产：黑方的叠 c 兵。深层思路是——在纯兵残局里，白方健康的王翼多数兵能造出通路兵，而黑方残缺的后翼多数兵却不能。这是鲍比·费舍尔最爱的捷径。","plan":"白方的策略极其清晰：兑子（不是兑兵！）、走 d4、奔向任何残局。每一次兑换都提升优越兵形的价值。黑方的补偿是双象——所以黑方应保持局面复杂、避免兑换、利用半开放 d 线。作为白方：马调往王翼，f4–f5 多数兵推进。算到残局：健康的 4 兵对 3 兵，胜过 4 兵对叠起的 4 兵。","moves":["在中心立桩，为皇后和象打开线路。","黑方古典地回应，要求对等的一份中心。","带先手出子——马攻击 e5，迫使回应。","用子力守 e5，同时朝中心出子。","西班牙象对守卫者施压。","莫菲防御——立刻质问象的意图。","兑变：白方主动放弃双象——以换取永久的兵形损伤。这笔交易只有在黑方必须用兵回吃、从而叠起 c 兵时才成立。","朝中心回吃并解放 c8 象。（...bxc6 会把象埋住，兵形更糟。）黑方押注双象带来的活力。","先易位——5.Nxe5? 立刻被 ...Qd4! 反击，同时叉马和 e4 兵，取回兵且局面良好。著名的陷阱；自己验证一下！","黑方以丑陋但稳固的方式加固 e5。叠兵确实有一个馈赠：它们控制了极佳的中心格。","趁出子领先时出击。白方想清算中心并驶向有利的残局。","黑方兑子——若以 ...exd4 谢绝守住中心，最终也会丢兵。","盘点局势：白方有健康的王翼 4 对 3 多数兵和出子领先；黑方有双象和半开放 d 线。从此每一次兑子都对白方有利——边走边记住这一点。"]},{"name":"柏林防御","intro":"“柏林墙”——黑方对西班牙最稳固的回应，因克拉姆尼克在 2000 年借此把卡斯帕罗夫拉下王座而闻名。黑方接受略差的兵形并失去易位权，但换来双象和一个毫无弱点、堡垒般的残局。","plan":"这“本身”就是残局——皇后在第 8 步就下场。白方的资产：王翼多数兵和黑方错位的王。黑方的资产：双象和坚如磐石的兵形。白方应推进王翼兵（h3、g4、e5–e6 的思路）并在黑方协调之前激活双车。黑方走 ...Ke8–c8、...b6、...Bb7，单纯地耗下去。这里耐心取胜；急躁致败。","moves":["在中心立桩，为皇后和象打开线路。","黑方古典地回应，要求对等的一份中心。","带先手出子——马攻击 e5，迫使回应。","用子力守 e5，同时朝中心出子。","西班牙象瞄准守卫 e5 的那只马。","柏林防御：立刻出子并反击 e4，省去 ...a6。黑方提出进入深奥的技术性水域。","有原则的回应——用战术而非兵步来守 e4。白方诱使 Nxe4，因为它看得更远。","黑方上钩了——但这并不真是诱饵。这是理论：黑方知道兵会回来，但相信由此产生的残局可守。看白方如何取回它。","关键之着：在回吃之前先在中心反击。威胁 d5 叉子，并打通皇后通往 d8 的路。黑方无法保住多兵。","最佳——马带先手后退，攻击 b5 象。柏林的每一步都有这种一举两得的特质；这正是它难以攻破的原因。","插入着：先吃马，在回吃 e5 之前先破坏黑方兵形。","黑方接受叠兵以解放象——与兑变同样的兵形故事。","取回兵的同时驱赶 d6 马。注意 d 线如今完全打开——双方皇后都站在线上。","马找到它唯一的好格，盯住 d4 和 e3 的洞。","进入著名的柏林残局。白方兑皇后，正是因为黑方的王必须回吃——从此永远失去易位权。","柏林墙屹立：黑方的王困在中心，h8 车难以激活——但局面没有可攻的弱点。从此是技术性的棋；请看战略提示。"]}]},{"name":"西西里防御","desc":"黑方对 1.e4 最流行、最具战斗性的回应。用 c 兵不对称地争夺中心。","lines":[{"name":"纳道夫式","intro":"纳道夫是西西里中的劳斯莱斯——费舍尔与卡斯帕罗夫的选择。小小的 ...a6 为一切做准备：不许 Nb5 地走 ...e5，以及用 ...b5 进行后翼扩张。黑方从第一步起就为取胜而战。","plan":"黑方的典型方案：...e5（或 ...e6）、...Be7、...O-O，然后是针对白方后翼的标志性 ...b5–b4 兵推——常常与白方自己的王翼进攻赛跑。d5 格是黑方永恒的隐忧：绝不让白马在那里安家。记住西西里的黄金法则：黑方的反击沿半开放 c 线展开（...Rc8、...Qc7，施压 c2/c3）。若白方长易位，赛跑就开始了——推动那些后翼兵！","moves":["白方占据中心。","西西里！黑方不对称，而是从翼侧争夺 d4。深层要点：当白方最终走 d4 而黑方兑换时，黑方用一个“翼兵”换来一个“中心兵”——长期的兵形获利。","白方准备 d4——开放西西里，最具考验性的走法。","控制 e5（阻止 e4–e5 推进）并打通 c8 象的斜线。灵活的纳道夫走法顺序。","白方打开中心，接受兵形交换以换取子力活跃和出子领先。","基石性的兑换：翼兵换中心兵。黑方如今拥有半开放 c 线——日后一切反击的高速公路。","白方回吃，把马置于中心。","带先手出子——e4 现在需要防守。","白方用自然的出子步守住 e4。","纳道夫之着。它看似消极——其实绝非如此。它从白方双马和象手中夺走 b5，准备 ...e5（否则 Nb5 会惩罚它）以及 ...b5 扩张。一步就为整个中局做好准备。"]},{"name":"开放西西里（古典式）","intro":"古典西西里：黑方在再走任何兵之前，先把双马调到各自最佳的格子。稳健、灵活，是学习开放西西里结构而又不必背诵强制变化的好途径。","plan":"黑方的标准出子：...e6（或 ...g6）、...Be7、...O-O、...Qc7，双车到 c8/d8。每一种开放西西里反复出现的主题都适用：沿 c 线施压、在适当时机用 ...d5 突破来解放局面、以及对 d5 格的警惕。白方通常以 f3/Be3/Qd2 加王翼兵推进进攻，或用 Bc4 施压——以中心的 ...d5 反击来回应翼侧进攻。","moves":["白方占据中心。","西西里——不对称地争夺 d4。","白方准备 d4 突破——奔向开放西西里。","把马调到最自然的格子，增添对 d4 和 e5 的控制。","开放西西里——白方打开中心，最具考验性的走法。","翼兵换中心兵——黑方的兵形获利，外加半开放 c 线。","白方回吃，把马有力地置于中心。","带先手出子，攻击 e4。","白方用最自然的出子步守 e4。","古典布置完成：e5 受控、象的斜线打开，而黑方尚未确定计划——...e6、...g6 或 ...e5 都仍可行。灵活就是力量。"]},{"name":"阿拉平（2.c3）——白方视角","intro":"厌倦了面对二十种西西里体系？阿拉平一刀切：白方只管准备 d4、用兵建立中心。黑方最锋利的武器在这里不灵——对局变成位置战，且按白方的节奏进行。","plan":"白方通常获得 d4 和 e5 上的兵以及自由出子——一种全程压制黑方的空间优势。计划：用 Bc4 或 Be2 出子、易位，并利用额外空间调度（Re1、Bf4/Bg5、Nbd2）。黑方会用 ...d6 蚕食并施压 d4；用 Be3/Nbd2 冷静守住中心，而不是去抢更多空间。若中心兵被兑掉，则针对黑方的孤兵局面追求活跃的子力。","moves":["在中心立桩，为皇后和象打开线路。","西西里——黑方从翼侧争夺 d4，打破对称。","阿拉平诚实的计划：用兵支援 d4，使 d4 cxd4、cxd4 之后白方保住完整的兵中心。缺点——b1 马失去最佳格——正是黑方试图利用之处。","黑方的最佳：立刻攻击 e4，利用 Nc3 已不可行（兵占了那个格！）。白方必须推兵，而黑方随后会去削弱它。","夺取空间并驱赶马——唯一好的防守方式。","马稳稳坐在 d5，兵无法驱赶（c4? 会永久削弱 d4）。黑方的整套布置都围绕这只马。","建立预定的中心。","黑方在白方一切就绪之前先兑子。","职业的一手：先出子，下一步再用 c 兵回吃，保住 d4+e5 的兵对。急于先 cxd4 会招致早早的 ...d6 冲击。","黑方出子并施压 d4 和 e5。","梦寐以求的兵形：d4 和 e5 上的兵给白方空间与攻击机会。这对兵正是阿拉平的全部要点。","黑方立刻反击——正确的走法。中心必须在它变得势不可挡之前受到挑战。随后是一盘公平且富有教益的中局。"]}]},{"name":"后翼弃兵","desc":"白方经典的 1.d4 武器：献出 c 兵以引开黑方的 d 兵并主宰中心。","lines":[{"name":"后翼弃兵拒绝（主线）","intro":"后翼弃兵拒绝是国际象棋中的贵族——逾百年的世界冠军血统。黑方冷静地保护 d5，接受略显局促但异常稳固的局面。白方获得持久压力；黑方等待解放局面的恰当时机。","plan":"白方的两个经典计划：(1) 少数兵进攻——用 b4–b5 制造一个黑方后翼弱兵，全程围攻它；或 (2) 用 Qc2、Rd1 加适时的 e4 进行中心play。黑方的解放计划始终如一：兑子（局促的局面喜欢兑换），然后在恰当时机用 ...c5 或 ...e5 突破。c8 象是黑方的问题孩子——把它送到 f5 或 g4（常在 ...dxc4 与 ...b5 之后）就意味着黑方已经均势。","moves":["占据中心，且自带保护——不同于 e4，这只兵由皇后守卫。1.d4 开局是慢火：结构与挤压取代了快速出击。","黑方要求对等的一份并封住中心。","后翼弃兵——其实并非真弃兵！若黑方吃子，白方能从容取回。真正的思路：从侧翼施压 d5，要么消除它（夺取中心控制），要么迫使黑方被动防守。","拒绝——黑方以略微困住 c8 象为小代价，保住 d5 上的兵。那只象成为整个开局的标志性子力：黑方接下来十步都在设法解放它。","出子并对 d5 增添压力。","守住 d5 并出子——一步对一步，同样的较量。","古典牵制：f6 马是 d5 的关键守卫者，所以白方把它牵住。透过牵制间接施压 d5——一堂“借守卫者攻击据点”的课。","冷静地解除牵制。没有弱点，没有戏剧性——这就是后翼弃兵拒绝的方式。","巩固 d4 并打开 f1 象的斜线。注意白方的克制：局面保持紧凑，每个子都受保护。","黑方易位入安全。","完成王翼出子。接下来是 Bd3、O-O 和 Rc1——然后白方在少数兵进攻与中心扩张之间抉择。","古典后翼弃兵拒绝基本型。这只马支援 ...c5 和 ...e5 两种突破，并可经 b6 或 f8 重新调度。局促却牢不可破——卡帕布兰卡执双方都从此局面赢下无数对局。"]},{"name":"后翼弃兵接受","intro":"黑方吃兵——不是为了保住它，而是用中心张力换取迅速、自由的出子。黑方在恰当时机把兵还回，并用 ...c5 冲击 d4，在开放局面里追求完全的均势。","plan":"白方获得更自由的对局和中心多数兵；问题在于它会变成进攻还是靶子。白方的理想：用 Qe2、Rd1、e4 布置并推进中心。黑方标准的均势序列：...c5xd4 给白方造一个孤后兵（IQP），然后用马封锁 d5 并兑子——孤兵每兑一次就更弱。作为白方，要在简化之前进攻：Bd3、Qe2，并在黑方早早易位时留意 Bxh7+ 的“希腊献礼”。","moves":["在中心立桩，为皇后和象打开线路。","黑方要求一份。","后翼弃兵的提议：从侧翼施压 d5 以夺取中心。","接受！黑方暂时交出中心。计划“不是”保住兵（...b5 之类的尝试会严重耽误时间）——而是趁白方花一步回吃时迅速出子。","先出子并阻止 ...e5，否则它会瞬间解放黑方。阻止对手最好的一步，与走出自己最好的一步同等重要。","黑方自然出子，同时控制 e4。","打开象去取回 c4 的通路。","黑方对称应对，准备 ...c5——关键的一击。注意黑方 c8 象暂时被堵，正如后翼弃兵拒绝里一样；...b6 和 ...Bb7 稍后会解决它。","以一步出子取回兵——弃兵的账目总能平衡。象积极地站在 a2–g8 斜线上。","针对 d4 的标志性反击。黑方在白方用 Qe2 和 Rd1 巩固之前挑战中心。没有这一步，黑方会慢慢窒息。","易位并保持小小的优势：更好的出子和中心多数兵。中局的问题：d4 会变成通路兵还是弱点？","准备 ...b5 和 ...Bb7——终于激活那只问题象，并附带后翼空间。一盘丰富、均衡的中局；请看战略提示。"]},{"name":"斯拉夫防御（主线）","intro":"斯拉夫修补了后翼弃兵拒绝唯一的缺陷：用 ...c6 而非 ...e6 守 d5，c8 象保住自由并出动到 f5——在兵链封闭之前就积极就位。坚如花岗岩，却比后翼弃兵拒绝更具动态潜力。","plan":"黑方的布置以 ...e6、...Bb4 或 ...Be7 和 ...O-O 完成——每个子都在合理的格子上，毫无弱点。白方的空间优势真实却难以兑现：标准计划是 e4（在 Bg5/e3 准备之后）或用 Qb3 施压后翼。黑方出子完毕后用 ...e5 或 ...c5 突破回应。白方走的 a4 兵有代价——b4 格永远属于黑方；一只马或象落到那里就是斯拉夫棋手的回报。","moves":["在中心立桩，为皇后和象打开线路。","黑方要求一份。","后翼弃兵的提议：从侧翼施压 d5 以夺取中心。","斯拉夫的要点：守住 d5 同时保留 c8–h3 斜线。对比后翼弃兵拒绝的 ...e6——同样稳固，但这只象会感谢你。小代价：c6 占了 b8 马的最佳格。","自然出子，盯住 e5。","黑方朝中心出动一个子。","对 d5 增添压力。白方的布置与后翼弃兵拒绝完全相同——差别全在黑方一侧。","现在黑方吃子！时机正是要点：走了 ...c6 之后，黑方威胁用 ...b5 保住兵。白方必须花一步阻止——而这一步有代价。","阻止 ...b5，意在取回 c4。代价：b4 如今是白方后翼一个永久的洞——黑方的子力会在余下整盘里使用它。每一步兵都会在某处造出弱点。","斯拉夫的回报之着：象在 ...e6 封住斜线之前就到达梦想的格子。把这只象与它在 c8 上可怜的后翼弃兵拒绝表亲比一比。黑方接下来顺畅地完成出子：...e6、...Bb4、...O-O。"]}]},{"name":"伦敦体系","desc":"一套坚固、低理论量的体系：d4、Bf4、e3，几乎对任何应法都用同样稳固的布置。","lines":[{"name":"对 ...d5 主线","intro":"伦敦是一套“体系”而非一串着法——对黑方几乎一切走法都用同一套稳健布置（d4、Bf4、e3、Bd3、Nbd2、c3）。当你宁愿深入理解一种结构、也不愿背二十种变化时，它再合适不过。在兵链“外侧”出动的 f4 象，是这套体系的灵魂。","plan":"伦敦金字塔（c3–d4–e3）几乎坚不可摧。白方的主要计划：(1) Ne5 据点——落下马，必要时用 f4 支援，攻击 f7/h7；(2) 用 Bd3、Ne5、Qf3–h3 缓慢进行王翼进攻；(3) 残局里在 dxc5 之后的后翼多数兵。黑方的反击沿 c 线展开，用 ...Qb6 攻击 b2——记住应法 Qb3（或 Rb1）。别急：伦敦靠不断改善子力、而对手无好棋可走来取胜。","moves":["占据中心，由皇后守卫。","黑方对称应对，要求对等的一份中心。","伦敦之着，也是整套体系的关键思路：在走 e3 之前先把象出到兵链“外侧”。后翼弃兵拒绝展示了象被自家兵锁住的下场——白方确保这里绝不发生。","黑方把马出到最自然的格子。","现在在象身后建造金字塔。c3–d4–e3 的结构能自我防守——这正是伦敦几乎不需背谱的原因。","黑方对称建造——接受了白方刚刚避开的同一个坏象问题。","出子、控制 e5——白方整个中局都围绕这个格子。","黑方明智地挑战伦敦象——它是白方最好的子，所以兑掉它对黑方是笔好买卖。","拒绝兑换！若黑方在 g3 吃子，白方用 h 兵回吃——打开 h 线给车，一条免费的攻击通道。黑方通常会后悔那次兑换；与此同时象继续活在 b8–h2 斜线上。","黑方易位——中局开始之前先保王安全。","瞄准 h7 的攻击斜线。配合未来的 Ne5，这制造出真实的将杀威胁——伦敦安静，却并非没有牙齿。","黑方正确的反击：打击 d4 并打开 c 线。预计接下来是 ...Qb6，瞄准伦敦象身后留下的 b2 兵——这套体系唯一的软肋。","完成金字塔。d4 如今被守三次；结构毫不费力地吸收压力。","标准的伦敦中局：白方将易位、用 Nbd2 重新调度并瞄准 Ne5 据点。对白方稳固，对黑方灵活——请看战略提示。"]},{"name":"对王翼印度布置","intro":"面对侧翼出象，伦敦保持它的形状，但关注点转移：黑方的 g7 象压向 d4，而 ...e5 突破即将到来。白方的布置保持稳固，靠子力数量控制 e5，并依靠 h3 保住关键的暗格象。","plan":"黑方想走 ...Nbd7 和 ...e5——你通常无法永远阻止它，所以要准备好妥善应对：把 d4 守牢（c3、Nbd2），当 ...e5 到来时，在 dxe5（随后占据 d 线和 c4/e4 格）与保持张力之间抉择。h3–Bh2 的资源保住你最好的子。长期来看：用 c4 和 b4 争取后翼空间是白方最健康的计划，因为黑方占据王翼暗格。尊重 g7 象——绝不草率打开长斜线。","moves":["在中心立桩，为皇后和象打开线路。","黑方保持灵活，暗示印度式布置。","照样伦敦——这套体系的承诺：一套布置应对一切。","黑方宣告王翼印度计划：侧翼出象、易位，再用 ...e5 或 ...c5 出击。与 ...d5 布置截然不同的另一种生物——中心保持流动。","通常的伦敦结构：e3 在象身后支援 d4。","王翼印度象走上长斜线，盯住 d4 并越过它指向 b2。这只子是黑方一切计划的核心——时刻追踪它看到了什么。","出子的同时为 d4 增添一名守卫，并控制 e5——黑方最想占据的格子。","黑方迅速易位，完成标准的王翼印度序列。","刻意保持低调：在 d3 上，象会挡住白方自己皇后对 d4 的防守，而 ...Nh5 的小花招会增强。Be2 让一切协调。有时谦逊的格子才是正确的格子。","黑方准备标志性的 ...Nbd7 和 ...e5 突破——王翼印度对一切白方布置的核心计划。","一小步，大作用：当黑方走 ...Nh5 追猎象时，它如今可退回 h2，留在斜线上。保住你最好的子，值一个先手。白方接着易位，从容迎接 ...e5。"]}]},{"name":"法兰西防御","desc":"稳固而反击：黑方放任白方建立中心，再用 ...c5 和 ...f6 冲击它。","lines":[{"name":"挺进变例","intro":"当白方用 e5 锁住中心，局面变成教科书般的兵链之战：白方占据王翼，黑方占据后翼，整盘棋围绕白方兵链的根基——d4。黑方的计划清晰漂亮：把一切都堆向那个格子。","plan":"黑方的施压方案像一台机器：...Qb6、...Nh6–f5（没错，走边线！）、...cxd4，有时还用 ...f6 去攻击兵链的头部。白方必须倾力守住 d4 并争取王翼空间。两个要记住的大思路：黑方常推迟甚至省去易位（封闭的中心使王在中央也安全），以及那只“坏”的 c8 象经 ...Bd7–b5 谋生，用自己去换白方的好子。若 d4 失守，黑方就彻底赢得战略之战。","moves":["白方占据中心。","法兰西：在充分支援下准备 ...d5。黑方主动堵住 c8 象——著名的“法兰西坏象”问题——以换取一对牢不可破的兵和丰富的反击计划。","白方建立梦幻中心——只是暂时的。","立刻挑战它。白方现在必须选择变化：挺进（e5）、兑换（exd5）或防守（Nc3/Nd2）。每一种都通向不同的世界。","挺进变例：白方夺取王翼空间并固定兵形。d4–e5 的兵链指向白方将要进攻的方向——王翼。但每条链都有根基……","……而黑方立刻攻击它。法兰西最重要的战略一课：打击兵链的“根基”（d4），而非头部。接下来十步黑方所做的一切都服务于这个格子。","白方加固根基。","d4 的第二名攻击者。黑方把每个子都朝同一目标出动——把力量集中于一个弱点。","d4 的第二名守卫者到来——出子的同时承担防守任务。","第三名攻击者——皇后还盯住 b2，把白方 c1 象拴在防守上。这就是挺进法兰西的基本型：对 d4 的围攻已布置完毕。接下来是 ...Nh6–f5 或 ...cxd4 加 ...Nge7–f5，添上最后一名攻击者。"]},{"name":"兑变（Exchange）","intro":"白方在 d5 兑换，法兰西著名的张力随之蒸发：对称的兵、打开的线路、双方自由出子。黑方的“坏象”问题瞬间解决。常被希望平稳和棋者选用——但对称会奖励行棋更有目的的一方。","plan":"别让对称催你入睡——一旦有人抢到一先手，它就被打破。早期 e 线就是全部：双方都抢着把车调到 e1/e8。黑方用自然着法（...Bd6、...O-O、...Bg4、...Nc6 或带 ...Re8 的 ...c6）从容均势，然后追求更多：思路包括 ...Ne4、指向王翼的 ...Qf6，或在白方走 c3 时来一个少数兵式的 ...b5–b4。先无好棋可走的一方，就输掉对称之战。","moves":["白方占据中心。","法兰西——稳固、反击，在支援下准备 ...d5。","白方建立宽广的双兵中心——此刻强大，日后是靶子。","立刻挑战 e4——有支援的 ...d5 一击正是这套开局的要点。","兑变——白方立刻解除张力。客观上无害，但它带着一课：没有中心张力，子力活跃决定一切。","就这样，黑方永恒的问题子——c8 象——自由了。黑方毫无兵形隐忧；唯一的问题是谁更会利用打开的线路。","白方继续出子，奔向迅速易位。","自然出子，控制 e4。在对称局面里，朝中心出子并先抢占开放线。","白方走上最佳斜线。","对称应对——这只象的位置守卫 e5 并支援日后的王翼主动权。对称对黑方没问题：白方得证明些什么，而这里无可证明。","白方易位，完成开局的首要职责。","易位完毕且均势。现在真正的较量：把车调上 e 线，再走 ...Bg4 或 ...Nc6。谁找到更多活跃的格子，谁就赢下这个“和棋味”的局面——请看战略提示。"]},{"name":"塔拉施变例","intro":"白方的 Nd2 守住 e4，同时躲开恼人的 ...Bb4 牵制——代价是堵住了 c1 象。黑方最锋利的回应是立刻 ...c5，接受一个孤后兵以换取自由、活跃的子力play。一笔经典的“结构换活力”交易。","plan":"黑方的对局计划源自孤立的 d5 兵：在它沦为残局弱点“之前”利用它带来的子力活跃。迅速出子（...Nc6、...Bd6、...Nge7 或 ...Nf6、...O-O），用马占据 e4，并制造王翼威胁——孤兵把 e4 和 c4 格作为据点赠予黑方。避免兑子（每兑一次都放大兵的弱点），且绝不滑入纯残局。若白方封锁 d4 并兑子，则稳住：这只 d 兵可守，且 ...d4 突破能在恰当时机清算它。","moves":["白方占据中心。","法兰西——稳固、反击，在支援下准备 ...d5。","白方建立宽广的双兵中心——此刻强大，日后是靶子。","立刻挑战 e4——有支援的 ...d5 一击正是这套开局的要点。","塔拉施变例：守住 e4，同时给 c3 留出走兵的余地——而且关键在于，...Bb4+ 不再牵制任何东西。代价：这只马挡住了自己的象。每一次格子的选择都是权衡。","黑方最具野心的回应：趁 d2 马别扭时“现在”就冲击中心。黑方接受孤兵局面，以换取法兰西所能提供的最自由出子。","白方打开中心，给黑方留下孤兵。","瞧：黑方的 d5 兵没有相邻兵——孤立了。残局里弱，但它带来打开的线路和 e4/c4 据点。黑方是有意为之：现在要活力，日后再算账。","白方出子，已经盯上孤兵前方的 d4 封锁格——标准的反孤兵策略：先封锁，再围攻。","黑方以最大活跃度出子，争夺 d4。","白方牵制，意在易位并加强对 d4 的控制。","积极出子，指向王翼。黑方的子力流向自然的格子——孤兵的馈赠。接下来：...Nge7、...O-O，并在白方封锁稳固之前展开子力play。完整的孤兵作战计划请看战略提示。"]}]},{"name":"卡罗-卡恩防御","desc":"像法兰西一样稳固，但浅色格象在 ...e6 之前就先出来。从初学者到世界冠军都喜爱的一手。","lines":[{"name":"古典变例","intro":"卡罗-卡恩的主线展示了它的全部哲学：建立与法兰西相同的稳固 ...d5 结构，但“先”把浅色格象出动。黑方得到一个毫无弱点、子力计划清晰的局面——代价是在空间上略作让步。","plan":"黑方的出子方案几乎是自动的：...e6、...Ngf6（或 ...Bd6）、...O-O（有时是 ...Qc7 加 ...O-O-O），并在恰当时机用 ...c5 进行中心突破——与法兰西同样的打击根基思路，但好象已经兑掉或安稳地待在 h7。白方的空间意味着黑方不该急：兑掉一对轻子、保持兵形完整，残局会对你微笑——卡罗-卡恩的残局以舒适著称。留意白方的 h 兵推进：它夺取了王翼空间，却也成为日后 ...g5 或残局反击的靶子。","moves":["白方占据中心。","卡罗-卡恩：准备 ...d5，同时保持 c8–h3 斜线畅通。对比法兰西的 ...e6——同样的计划，但“这只”兵不会埋葬象。代价：c6 占了马的最佳格，黑方也略让一点时间。","白方建立完整的兵中心——黑方会立刻挑战它。","在充分支援下挑战 e4。","白方用一个子守 e4，保留一切选择。","黑方在恰当时机解除张力——在白方以更好条件走出 e5 之前。用 d 兵换 e 兵，留下一个细小却持久的兵形优势：后翼 3 兵对 2 兵。","白方用一只居于中心的漂亮马回吃——只是暂时的。","卡罗-卡恩的标志之着，也是它存在的全部理由：象“带先手”地出动到最佳斜线、攻击那只马，赶在 ...e6 把它锁住之前。这一步证明了 1...c6 的价值。","白方攻击象以救马——把时间赚回来。","象的安全港。它在 g6 看似消极，但请注意：它控制 b1–h7 斜线，且在即将到来的 d3 或 h7 兑换之后，黑方的局面没有任何坏子。","咄咄逼人：白方威胁 h5 困住象！黑方必须立刻造一个逃生口。白方囤积空间；h 兵日后可能变弱——这是一笔投资，而非免费的一步。","至关重要的回应——“永远”别忘了这一步。它给象在 h7 留下退路，并阻止白方的 h5–h6 思路。省去它会因 h5 而丢子。把它牢记于心。","白方继续出子，奔向迅速易位。","谨慎的走法顺序：准备 ...Ngf6，使 Nxf6+ 之后黑方用“马”回吃（...Nxf6），保持兵形完好无损。结构第一——这就是卡罗-卡恩的信条。出子继续：...e6、...Bd6、...O-O。"]},{"name":"挺进变例","intro":"面对夺取空间的 e5，卡罗-卡恩用一步就显出它相对法兰西的优越：...Bf5，在 ...e6 之前就把象出到兵链“外侧”。黑方得到法兰西的稳固结构，却没有它坏象的烦恼。","plan":"黑方有两个健康的计划，常常并用：...c5 打击根基（法兰西的配方，但在这里更舒适），以及用 ...Ne7–f5 加 ...Nd7 对 d4 施加子力压力。标志性的调度 ...Ne7–g6（或 ...f5!?）也争夺 e5/f4 格。白方的额外空间想要王翼扩张（g4!? 追你的象）——以中心的 ...c5 突破回应翼侧进攻，这是万能答案。残局有利于黑方更健康的兵形；乐于兑入残局。","moves":["白方占据中心。","卡罗-卡恩——准备 ...d5，同时保持象的斜线畅通。","白方建立宽广的双兵中心——此刻强大，日后是靶子。","立刻挑战 e4——有支援的 ...d5 一击正是这套开局的要点。","挺进变例。与挺进法兰西相同的兵链（d4–e5）——但看黑方如何用上那一步法兰西永远得不到的着法。","成就卡罗-卡恩的那一步：象在 ...e6 关门之前逃到它完美的斜线上。整套开局都为这一先手而存在。黑方如今拥有法兰西的稳固，却没有它唯一的兵形烦恼。","白方稳健出子。（咄咄逼人的 g4!? 和 h4 也存在——以 ...e6/...h5 冷静应对；你的象总能在 g6/h7 找到安全。）","现在封住兵链——象已经在外侧了。黑方的结构是带着一只完美浅色格象的挺进法兰西：严格更优的版本。","白方准备易位。","灵活出子：这只马支援即将到来的、打击 d4 根基的 ...c5。另一只马会选择 e7，奔向 f5 或 g6。","白方易位，完成开局的首要职责。","标志性的卡罗调度：这只马重新奔向 f5（攻击 d4）或 g6（攻击 e5 和 f4）。从此：...c5、...Be7/...Nb6、任意一侧易位。黑方的局面自行运转——请看战略提示。"]},{"name":"兑变（Exchange）","intro":"白方在 d5 兑换，希望得到一盘轻松对称的棋——但不同于法兰西兑变，这里有真正的较量：白方“先”用象占据 d3 格，试图剥夺黑方 c8 象梦寐以求的出动。黑方用精确而自然的着法均势。","plan":"这是（镜像的）“卡尔斯巴德”兵形：预计白方会尝试反向的少数兵进攻思路或简单的子力play。黑方的计划：完成出子（...e6、...Bd6 或 ...Be7、...O-O），把车放到 c8/e8，并利用半开放 c 线——...Qb6 和 ...Rc8 施压 b2/c3。g4 象对 f3 的牵制是黑方的活跃资源；退到 h5/g6 保持长期压力。残局对黑方持平或更优：兵形对称且无弱点。只是别中了针对 b7 的早期 Qb3 小花招——...Qd7 或 ...Qc8 守住一切。","moves":["白方占据中心。","卡罗-卡恩——准备 ...d5，同时保持象的斜线畅通。","白方建立宽广的双兵中心——此刻强大，日后是靶子。","立刻挑战 e4——有支援的 ...d5 一击正是这套开局的要点。","兑变——白方回避理论，追求一个细小而干净的优势。","黑方用 c 兵回吃（唯一合法的兵吃法——而且是好的一种）：兵形保持对称，c 线为黑方的车半开放。","白方走法顺序的要点：“先”占据 b1–h7 斜线，剥夺黑方象赖以生存的 f5 格。一场为一条斜线而进行的小战斗——正是这种事决定开局。","黑方积极出子，施压 d4。","白方巩固 d4 并打开皇后通往 b3 的路——既然 c8 象出游了，就要留意针对 b7 的小花招。","自然出子，朝向 e4。","白方走上好斜线——一套伦敦式布置，只是颜色讲述着不同的故事。","被剥夺 f5 后，象照样找到活跃：对 f3/d4 思路的牵制压力（...e6 之后，白方的 d4 总需提防）。黑方接着 ...e6、...Bd6 或 ...Be7、...O-O，完全均势。中局计划请看战略提示。"]}]}]};
+const I18N_ZH = {"tagline":"国际象棋开局训练器——先学懂套路，再凭记忆操练。","learn":"学习","drill":"操练","play":"对弈","hint":"提示","restart":"重来","lines":"← 变例","menu":"← 菜单","back":"◀ 上一步","next":"下一步 ▶","drillThisLine":"🎯 操练此线","backToDrill":"🎯 回到操练","drillAgain":"再练一次","nextLine":"下一线 →","allOpenings":"全部开局","playVsEngine":"♟ 与引擎对弈","engineMove":"↻ 引擎代走","restartGame":"↺ 重新开始","playWhite":"执白","playBlack":"执黑","yourMove":"轮到你走。","engineThinking":"引擎思考中…","overview":"📖 概览","lineComplete":"本线完成！","whatNext":"接下来会发生什么：","tryDrill":"准备好了？点 <b>操练此线</b> 来检验你的记忆。","playToMove":"——轮到{side}走：在棋盘上走出，或点“下一步”。","white":"白方","black":"黑方","notTheOne":"不是这一步——本线走的是 <b>{san}</b>。试试看，或点“下一步”。","correctNow":"✓ 正确！","notTheLine":"✗ 不是本线——再试一次。","notQuite":"差一点——这就是思路：","theLinePlays":"本线走的是 {san}。","tryAgainHint":"再试一次，或用 💡 提示。（再试一次后会显示完整答案。）","dotsOn":"圆点：开","dotsOff":"圆点：关","arrowsOn":"箭头：开","arrowsOff":"箭头：关","evalOn":"评估条：开","evalOff":"评估条：关","engineStrength":"引擎强度","yourMovePlay":"轮到你走。","freePlayTitle":"与引擎下一整盘","freePlaySub":"从第 1 步开始——我会随着局面成形说出你下的开局","freePlayAsWhite":"执白对弈","freePlayAsBlack":"执黑对弈","fullGame":"🤖 完整对局","makeFirstMove":"对引擎执{side} —— 走出你的第一步","makeMove":"对引擎执{side} —— 请走子","playPosition":"你现在身处 <b>{name}</b> 局面。从这里开始就是与 Stockfish 的真实对局——走你自己的着法。用强度滑块设定引擎等级。","playFromStart":"从初始局面开始的一整盘。随意下——我会随着局面成形说出开局名称。用滑块设定引擎等级。","checkmateWin":"🏆 将杀——你击败了引擎！下得漂亮。","checkmateLose":"♚ 将杀——这一盘引擎赢了。复盘并再试一次！","stalemate":"½–½ 逼和——无合法着法，但未被将军。和棋。","gameOverMate":"对局结束——将杀","gameOverStale":"对局结束——逼和","restartHint":" <br><br>用 <b>↺ 重新开始</b> 再来一盘，或用 <b>← 菜单</b> 选择别的。","linesWord":"条变例","masteredWord":"已精通（连续 3 次全对）","totalDrills":"次操练","pickLine":"先学一条线，再凭记忆操练。","mastered":"★ 已精通","newWord":"新","perfectOf":"{p}/{r} 次全对","perfectStreak":"连续全对：","masteredTag":" ★ 已精通","runsPerfect":"{p}/{r} 次全对","perfectRun":"<b>完美的一遍！</b>本线完成。","slips":"本线完成——这次有 <b>{n}</b> 处失误。","whatHappensAfter":"开局之后会发生什么：","groupWE4":"⚪ 执白 —— 1.e4 开局","groupWD4":"⚪ 执白 —— 1.d4 开局","groupBE4":"⚫ 执黑 —— 应对 1.e4","groupBD4":"⚫ 执黑 —— 应对 1.d4","clickCard":"点击直接开始 —— 或在下方选择具体的变例","engLoading":"⏳ 正在加载引擎…","engOn":"⚙ 引擎已开","engOff":"引擎已关 — 点此重试","material":"子力","even":"均势","hangWarn":"小心——你的{piece}走到 {dest} 会<b style=\"color:var(--bad)\">白白被吃</b>（受攻击且无保护）。在开局白送一子通常意味着满盘皆输。","tempoWarn":"你的{piece}在 {dest} 会被攻击——开局过早出动皇后或车，常常在它被驱赶时白白损失时间。","captureWarn":"这步吃子不是本线的续法——开局抢子往往意味着出子落后。","pawnLegal":"看似合理的兵步，但不是这里的理论着法。","legalNotTheory":"这是合法着法，只是不是这个局面理论上的走法。","pieceKing":"王","pieceQueen":"皇后","pieceRook":"车","pieceBishop":"象","pieceKnight":"马","piecePawn":"兵","engineSays":"⚙ 引擎：","engEqual":"有意思——引擎认为你这步差不多一样好（评估 {ev}）。它只是不是主要的理论线。","engInacc":"小小的不精确：它损失了约 {loss} 兵的优势（你的着法 {pl} 对最佳 {best}）。","engMistake":"这是一个真正的错误——比最佳差约 {loss} 兵（你的着法 {pl} 对 {best}）。","engBlunder":"严重的漏着——大约 {loss} 兵（你的着法 {pl} 对 {best}）。在真实对局里这通常会决定胜负。","engTop":" 引擎在这里的首选是 <b>{san}</b>。","backMenu":"← 全部开局"};
 
 /* ================= OPENING RECOGNITION (curated, keyed by SAN sequence) ================= */
 const OPENINGS_DB = {
@@ -317,6 +325,107 @@ function recognizeOpening(sans){
   return null;
 }
 
+/* ================= i18n (English + 中文) ================= */
+const I18N_EN = {
+"tagline":"Chess opening trainer — learn the lines, then drill them from memory.",
+"learn":"Learn","drill":"Drill","play":"Play",
+"hint":"💡 Hint","restart":"↻ Restart","lines":"← Lines","menu":"← Menu","back":"◀ Back","next":"Next ▶",
+"drillThisLine":"🎯 Drill This Line","backToDrill":"🎯 Back to Drill","drillAgain":"Drill Again","nextLine":"Next Line →","allOpenings":"All Openings",
+"playVsEngine":"♟ Play vs Engine","engineMove":"↻ Engine move","restartGame":"↺ Restart game","playWhite":"Play White","playBlack":"Play Black",
+"yourMove":"Your move.","engineThinking":"Engine is thinking…",
+"overview":"📖 Overview","lineComplete":"line complete!","whatNext":"What happens next:","tryDrill":"Ready? Hit <b>Drill This Line</b> to test your memory.",
+"playToMove":" — {side} to move: play it on the board or tap Next.","white":"White","black":"Black",
+"notTheOne":"Not that one — the line plays <b>{san}</b>. Try it, or tap Next.",
+"correctNow":"✓ correct!",
+"notTheLine":"✗ Not the line — try again.","notQuite":"Not quite — here’s the idea:",
+"theLinePlays":"The line plays {san}.","tryAgainHint":"Try again, or use 💡 Hint. (Full answer after another try.)",
+"dotsOn":"Dots: On","dotsOff":"Dots: Off","arrowsOn":"Arrows: On","arrowsOff":"Arrows: Off","evalOn":"Eval bar: On","evalOff":"Eval bar: Off",
+"engineStrength":"Engine strength","yourMovePlay":"Your move.",
+"freePlayTitle":"Play a full game vs the Engine","freePlaySub":"Start from move 1 — I'll name your opening as you go",
+"freePlayAsWhite":"Play as White","freePlayAsBlack":"Play as Black",
+"fullGame":"🤖 Full Game","makeFirstMove":"vs engine as {side} — make your first move","makeMove":"vs engine as {side} — make your move",
+"playPosition":"You're now in the <b>{name}</b> position. From here it's a real game against Stockfish — play your own moves. Use the strength slider to set the engine's level.",
+"playFromStart":"A full game from the starting position. Play whatever you like — I'll name the opening as it takes shape. Set the engine's level with the slider.",
+"checkmateWin":"🏆 Checkmate — you beat the engine! Well played.","checkmateLose":"♚ Checkmate — the engine won this one. Review the moves and try again!",
+"stalemate":"½–½ Stalemate — no legal moves, but no check. The game is a draw.",
+"gameOverMate":"Game over — checkmate","gameOverStale":"Game over — stalemate",
+"restartHint":" <br><br>Use <b>↺ Restart game</b> to play again, or <b>← Menu</b> to choose something else.",
+"linesWord":"lines","masteredWord":"mastered (3 perfect in a row)","totalDrills":"total drills","pickLine":"Learn a line first, then drill it from memory.",
+"mastered":"★ mastered","newWord":"new","perfectOf":"{p}/{r} perfect","perfectStreak":"Perfect streak: ","masteredTag":" ★ mastered","runsPerfect":"{p}/{r} runs perfect",
+"perfectRun":"<b style=\"color:var(--accent2)\">Perfect run!</b> Line complete.","slips":"Line complete — <b>{n}</b> slip(s) this time.",
+"whatHappensAfter":"What happens after the opening:",
+"groupWE4":"⚪ Play as White — 1.e4 openings","groupWD4":"⚪ Play as White — 1.d4 openings","groupBE4":"⚫ Play as Black — answering 1.e4","groupBD4":"⚫ Play as Black — answering 1.d4",
+"clickCard":"Click to jump straight in — or pick a specific line below",
+"engLoading":"⏳ loading engine…","engOn":"⚙ engine on","engOff":"engine off — click to retry",
+"material":"Material","even":"even",
+"hangWarn":"Careful — your {piece} on {dest} would be <b style=\"color:var(--bad)\">hanging</b> (attacked and undefended). In the opening, losing a piece for nothing is usually game-over.",
+"tempoWarn":"Your {piece} on {dest} can be attacked there — bringing the queen or rooks out early often just loses time when they get chased.",
+"captureWarn":"That capture isn’t how the line continues here — grabbing material in the opening often means falling behind in development.",
+"pawnLegal":"A reasonable-looking pawn move, but it isn’t the theory here.",
+"legalNotTheory":"That’s a legal move, just not what theory plays in this position.",
+"pieceKing":"king","pieceQueen":"queen","pieceRook":"rook","pieceBishop":"bishop","pieceKnight":"knight","piecePawn":"pawn",
+"engineSays":"⚙ Engine:","engEqual":"Interesting — the engine rates your move about as good (eval {ev}). It just isn't the main theoretical line.",
+"engInacc":"A small inaccuracy: it costs about {loss} pawns of advantage (your move {pl} vs best {best}).",
+"engMistake":"That's a real mistake — about {loss} pawns worse than best (your move {pl} vs {best}).",
+"engBlunder":"A serious blunder — roughly {loss} pawns (your move {pl} vs {best}). In a real game this usually decides the result.",
+"engTop":" The engine's top move here is <b>{san}</b>.",
+"backMenu":"← All Openings"
+};
+const I18N = { en:I18N_EN, zh:(typeof I18N_ZH!=='undefined'?I18N_ZH:I18N_EN) };
+// a few extra runtime strings not carried in the content file
+Object.assign(I18N_EN, {
+  oppReplying:'Opponent is replying…',
+  drillYourMove:'Your move — what does {side} play here?',
+  engineChoosing:'Engine is choosing your move…',
+  hintPrompt:'Hint: the piece on {sq} moves.'
+});
+if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
+  oppReplying:'对手应招中…',
+  drillYourMove:'轮到你走——{side}该走什么？',
+  engineChoosing:'引擎正在为你选择着法…',
+  hintPrompt:'提示：移动 {sq} 上的子。'
+});
+let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
+if(LANG!=='zh' && LANG!=='en') LANG='en';
+function t(key, vars){
+  let s = (I18N[LANG] && I18N[LANG][key]!=null) ? I18N[LANG][key] : (I18N_EN[key]!=null?I18N_EN[key]:key);
+  if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+// Merge Chinese opening text onto the English DATA nodes (same structure, verified counts).
+(function mergeZh(){
+  if(typeof DATA_ZH==='undefined') return;
+  DATA_ZH.openings.forEach((o,i)=>{
+    const O=DATA.openings[i]; if(!O) return;
+    O.nameZh=o.name; O.descZh=o.desc;
+    o.lines.forEach((l,j)=>{
+      const L=O.lines[j]; if(!L) return;
+      L.nameZh=l.name; L.introZh=l.intro; L.planZh=l.plan;
+      (l.moves||[]).forEach((c,k)=>{ if(L.moves[k]) L.moves[k].cZh=c; });
+    });
+  });
+})();
+const zhOn = ()=>LANG==='zh';
+function opName(op){ return zhOn()&&op.nameZh ? op.nameZh : op.name; }
+function opDesc(op){ return zhOn()&&op.descZh ? op.descZh : op.desc; }
+function lnName(l){ return zhOn()&&l.nameZh ? l.nameZh : l.name; }
+function lnIntro(l){ return zhOn()&&l.introZh ? l.introZh : l.intro; }
+function lnPlan(l){ return zhOn()&&l.planZh ? l.planZh : l.plan; }
+function mvC(mv){ return zhOn()&&mv.cZh ? mv.cZh : mv.c; }
+function setLang(l){
+  LANG=l; if(typeof localStorage!=='undefined') localStorage.setItem('otLang', l);
+  applyStaticI18n();
+  const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
+  if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
+  renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge();
+  showMenu();
+}
+function applyStaticI18n(){
+  if(!document.querySelectorAll) return;   // headless/test stub has no querySelectorAll
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n')); });
+  if(document.documentElement) document.documentElement.lang = LANG==='zh'?'zh':'en';
+}
+
 /* ================= STATE ================= */
 /* Classic Unicode chess glyphs — clean and crisp, matching the ♞ Debut logo. */
 const PIECES = { K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟', k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟' };
@@ -338,7 +447,7 @@ function toggleAims(){
   if(curOp!==null) render(curLastU());
 }
 function renderAimBtn(){
-  const b=document.getElementById('aimBtn'); if(b) b.textContent='Dots: '+(showAims?'On':'Off');
+  const b=document.getElementById('aimBtn'); if(b) b.textContent=t(showAims?'dotsOn':'dotsOff');
 }
 
 const store = {
@@ -726,7 +835,7 @@ const Engine = {
 };
 function updateEngineBadge(){
   const el=document.getElementById('engineBadge'); if(!el) return;
-  const map={idle:'',loading:'⏳ loading engine…',ready:'⚙ engine on',unavailable:'engine off — click to retry'};
+  const map={idle:'',loading:t('engLoading'),ready:t('engOn'),unavailable:t('engOff')};
   el.textContent=map[Engine.STATUS]||'';
   el.className='eng-badge '+Engine.STATUS;
 }
@@ -769,7 +878,7 @@ function toggleAnnots(){
   renderAnnotBtn(); drawAnnots();
 }
 function renderAnnotBtn(){
-  const b=document.getElementById('annotBtn'); if(b) b.textContent='Arrows: '+(showAnnots?'On':'Off');
+  const b=document.getElementById('annotBtn'); if(b) b.textContent=t(showAnnots?'arrowsOn':'arrowsOff');
 }
 function drawAnnots(){
   const ov=document.getElementById('overlay'); if(!ov) return;
@@ -797,10 +906,10 @@ function showMenu(){
   let mastered=0, totalLines=0, totalRuns=0;
   // group: side + first move (e2e4 / d2d4)
   const groups=[
-    {label:'⚪ Play as White — 1.e4 openings', test:op=>op.side==='w'&&op.lines[0].moves[0].u==='e2e4'},
-    {label:'⚪ Play as White — 1.d4 openings', test:op=>op.side==='w'&&op.lines[0].moves[0].u==='d2d4'},
-    {label:'⚫ Play as Black — answering 1.e4', test:op=>op.side==='b'&&op.lines[0].moves[0].u==='e2e4'},
-    {label:'⚫ Play as Black — answering 1.d4', test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'}
+    {label:t('groupWE4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='e2e4'},
+    {label:t('groupWD4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='d2d4'},
+    {label:t('groupBE4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='e2e4'},
+    {label:t('groupBD4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'}
   ];
   const order=[];
   groups.forEach(g=>{
@@ -814,23 +923,22 @@ function showMenu(){
   });
   function buildOpCard(op,oi){
     const card=document.createElement('div'); card.className='op-card clickable';
-    const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?'White':'Black'}</span>`;
-    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${op.name}${tag}</h2><div class="desc">${op.desc}</div>`;
+    const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?t('white'):t('black')}</span>`;
+    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}</h2><div class="desc">${opDesc(op)}</div>`;
     card.onclick=()=>quickStart(oi);
-    card.title='Click to jump straight in — or pick a specific line below';
+    card.title=t('clickCard');
     op.lines.forEach((line,li)=>{
       totalLines++;
       const st=store.get(oi,li); totalRuns+=st.runs;
       const isMastered = st.streak>=3; if(isMastered) mastered++;
-      const stat = isMastered ? '★ mastered' : st.runs? `${st.perfect}/${st.runs} perfect` : 'new';
+      const stat = isMastered ? t('mastered') : st.runs? t('runsPerfect',{p:st.perfect,r:st.runs}) : t('newWord');
       const row=document.createElement('div'); row.className='line-row';
-      row.innerHTML=`<span class="nm">${line.name}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span>`;
-      const lb=document.createElement('button'); lb.className='mini'; lb.textContent='Learn';
+      row.innerHTML=`<span class="nm">${lnName(line)}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span>`;
+      const lb=document.createElement('button'); lb.className='mini'; lb.textContent=t('learn');
       lb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startLearn(oi,li,op.side); };
-      const db=document.createElement('button'); db.className='mini'; db.textContent='Drill';
+      const db=document.createElement('button'); db.className='mini'; db.textContent=t('drill');
       db.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startDrill(oi,li,op.side); };
-      const pb=document.createElement('button'); pb.className='mini'; pb.textContent='Play';
-      pb.title='Play this opening out against the engine';
+      const pb=document.createElement('button'); pb.className='mini'; pb.textContent=t('play');
       pb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startPlay(oi,li,op.side); };
       row.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); };
       row.appendChild(lb); row.appendChild(db); row.appendChild(pb);
@@ -839,8 +947,8 @@ function showMenu(){
     return card;
   }
   document.getElementById('summaryBar').innerHTML=
-    `<div><b>${totalLines}</b>lines</div><div><b>${mastered}</b>mastered (3 perfect in a row)</div><div><b>${totalRuns}</b>total drills</div>
-     <div style="margin-left:auto;align-self:center">Learn a line first, then drill it from memory.</div>`;
+    `<div><b>${totalLines}</b>${t('linesWord')}</div><div><b>${mastered}</b>${t('masteredWord')}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
+     <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
 }
 function backToLines(){ showMenu(); }
 
@@ -871,10 +979,10 @@ function startDrill(oi,li,side){
   document.getElementById('sideW').classList.toggle('on',side==='w');
   document.getElementById('sideB').classList.toggle('on',side==='b');
   const op=DATA.openings[oi], line=op.lines[li];
-  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — you play ${side==='w'?'White':'Black'}</small>`;
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small>${lnName(line)} — ${side==='w'?t('white'):t('black')}</small>`;
   const st=store.get(oi,li);
-  document.getElementById('streakInfo').innerHTML = st.streak?`Perfect streak: <b>${st.streak}</b>${st.streak>=3?' ★ mastered':''}`:'';
-  document.getElementById('comment').innerHTML = `📖 ${line.intro}`;
+  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
+  document.getElementById('comment').innerHTML = `📖 ${lnIntro(line)}`;
   syncLineSel();
   updateMoveList(); updateProgress(); render();
   Engine.load(); // warm up engine in the background for explanations
@@ -949,13 +1057,12 @@ function startPlay(oi,li,side){
   document.getElementById('playRestartBtn').onclick=()=>startPlay(curOp,curLine,playerSide);
   document.getElementById('playDrillBtn').style.display='';
   const op=DATA.openings[oi], line=op.lines[li];
-  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small id="openingName">${line.name} — vs engine as ${side==='w'?'White':'Black'}</small>`;
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small id="openingName">${lnName(line)} — ${side==='w'?t('white'):t('black')}</small>`;
   // play the book line to reach the opening position
   for(const mv of line.moves){ applyMove(mv.u); playHist.push({u:mv.u,san:mv.san}); playWhite=!playWhite; }
   syncLineSel(); updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
-  document.getElementById('comment').innerHTML =
-    `You're now in the <b>${line.name}</b> position. From here it's a real game against Stockfish — play your own moves. Use the strength slider to set the engine's level.`;
+  document.getElementById('comment').innerHTML = t('playPosition',{name:lnName(line)});
   resumePlay();
 }
 function startFreePlay(side){
@@ -965,28 +1072,27 @@ function startFreePlay(side){
   playSetupUI(side);
   document.getElementById('playRestartBtn').onclick=()=>startFreePlay(playerSide);
   document.getElementById('playDrillBtn').style.display='none';   // no "back to drill" in a free game
-  document.getElementById('lineTitle').innerHTML=`🤖 Full Game<small id="openingName">vs engine as ${side==='w'?'White':'Black'} — make your first move</small>`;
+  document.getElementById('lineTitle').innerHTML=`${t('fullGame')}<small id="openingName">${t('makeFirstMove',{side: side==='w'?t('white'):t('black')})}</small>`;
   const sel=document.getElementById('lineSel'); if(sel) sel.value='';
   updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
-  document.getElementById('comment').innerHTML =
-    `A full game from the starting position. Play whatever you like — I'll name the opening as it takes shape. Set the engine's level with the slider.`;
+  document.getElementById('comment').innerHTML = t('playFromStart');
   resumePlay();
 }
 function updateOpeningName(){
   const el=document.getElementById('openingName'); if(!el) return;
   const name=recognizeOpening(playHist.map(h=>h.san));
   if(freeMode){
-    el.textContent = name ? '📖 '+name : 'vs engine as '+(playerSide==='w'?'White':'Black')+' — make your move';
+    el.textContent = name ? '📖 '+name : t('makeMove',{side: playerSide==='w'?t('white'):t('black')});
   } else if(name){
-    const base=DATA.openings[curOp].lines[curLine].name;
+    const base=lnName(DATA.openings[curOp].lines[curLine]);
     el.textContent = base+' · 📖 '+name;
   }
 }
 /* ---- evaluation bar (optional, engine-driven) ---- */
 let showEvalBar = (typeof localStorage!=='undefined' && localStorage.getItem('otEval')==='1');
 let evalSeq=0;
-function renderEvalBtn(){ const b=document.getElementById('evalBtn'); if(b) b.textContent='Eval bar: '+(showEvalBar?'On':'Off'); }
+function renderEvalBtn(){ const b=document.getElementById('evalBtn'); if(b) b.textContent=t(showEvalBar?'evalOn':'evalOff'); }
 function toggleEvalBar(){
   showEvalBar=!showEvalBar;
   if(typeof localStorage!=='undefined') localStorage.setItem('otEval', showEvalBar?'1':'0');
@@ -1028,7 +1134,7 @@ function resumePlay(){
   if(status!=='ongoing'){ finishPlay(status); return; }
   if(userTurnInPlay()){
     locked=false;
-    setPrompt('Your move.','');
+    setPrompt(t('yourMove'),'');
   } else {
     engineMove();
   }
@@ -1056,7 +1162,7 @@ function playUserMove(u){
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return true; }
-  setPrompt('Engine is thinking…','');
+  setPrompt(t('engineThinking'),'');
   setTimeout(engineMove, 550);
   return true;
 }
@@ -1088,19 +1194,19 @@ async function engineMove(){
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return; }
   locked=false;
-  setPrompt('Your move.','');
+  setPrompt(t('yourMove'),'');
 }
 function engineMoveNow(){ // "Engine move" button: play the user's move for them (full strength)
   if(playOver || !userTurnInPlay() || locked) return;
   (async()=>{
-    locked=true; setPrompt('Engine is choosing your move…','');
+    locked=true; setPrompt(t('engineChoosing'),'');
     const white=playWhite; const fen=toFEN(white);
     let u = await Engine.load() ? await Engine.bestMove(fen,{skill:20,movetime:600}) : pickFallbackMove(white);
     if(!u){ locked=false; return; }
     makePlayMove(u);
     const status=gameStatus(playWhite);
     if(status!=='ongoing'){ finishPlay(status); return; }
-    setPrompt('Engine is thinking…','');
+    setPrompt(t('engineThinking'),'');
     setTimeout(engineMove,180);
   })();
 }
@@ -1149,14 +1255,13 @@ function finishPlay(status){
   if(status==='checkmate'){
     const loserWhite=playWhite; const userLost = (loserWhite===(playerSide==='w'));
     SFX.mate();
-    msg = userLost ? '♚ Checkmate — the engine won this one. Review the moves and try again!'
-                   : '🏆 Checkmate — you beat the engine! Well played.';
+    msg = userLost ? t('checkmateLose') : t('checkmateWin');
   } else {
     SFX.success();
-    msg = '½–½ Stalemate — no legal moves, but no check. The game is a draw.';
+    msg = t('stalemate');
   }
-  setPrompt(status==='checkmate'?'Game over — checkmate':'Game over — stalemate', status==='checkmate'?'bad':'');
-  document.getElementById('comment').innerHTML = msg + ' <br><br>Use <b>↺ Restart game</b> to play again, or <b>← Menu</b> to choose something else.';
+  setPrompt(status==='checkmate'?t('gameOverMate'):t('gameOverStale'), status==='checkmate'?'bad':'');
+  document.getElementById('comment').innerHTML = msg + t('restartHint');
 }
 function lineMoves(){ return DATA.openings[curOp].lines[curLine].moves; }
 function isPlayerTurn(){ return (ply%2===0?'w':'b')===playerSide; }
@@ -1165,11 +1270,11 @@ function tick(){
   const moves=lineMoves();
   if(ply>=moves.length){ finishLine(); return; }
   if(isPlayerTurn()){
-    setPrompt(`Your move — what does ${playerSide==='w'?'White':'Black'} play here?`,'');
+    setPrompt(t('drillYourMove',{side: playerSide==='w'?t('white'):t('black')}),'');
     locked=false;
   } else {
     locked=true;
-    setPrompt('Opponent is replying…','');
+    setPrompt(t('oppReplying'),'');
     setTimeout(()=>{
       const mv=moves[ply];
       const cap=isCapture(mv.u);
@@ -1220,7 +1325,7 @@ function attemptMove(u){
     applyMove(expected.u); ply++;
     playMoveSound(expected,cap);
     render(expected.u);
-    setPrompt(`✓ ${expected.san} — correct!`,'good');
+    setPrompt(`✓ ${expected.san} ${t('correctNow')}`,'good');
     showComment(expected);
     updateMoveList(); updateProgress();
     setTimeout(tick, 650);
@@ -1230,7 +1335,7 @@ function attemptMove(u){
     boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
     render(plyLastU());
     const reveal = misses>=2;
-    setPrompt(reveal ? 'Not quite — here’s the idea:' : '✗ Not the line — try again.','bad');
+    setPrompt(reveal ? t('notQuite') : t('notTheLine'),'bad');
     document.getElementById('comment').innerHTML = explainWrong(u, expected, reveal);
     if(reveal) highlightSq(expected.u.slice(0,2));
     engineExplain(u, expected, reveal, ply); // async upgrade if engine is available
@@ -1264,16 +1369,17 @@ async function engineExplain(wrongU, expected, reveal, atPly){
   const bestSan = before.bestmove ? uciToSan(before.bestmove) : null;
   const fmt = cp => (cp>=0?'+':'') + (cp/100).toFixed(1);
   let verdict;
-  if(loss < 30) verdict = `Interesting — the engine rates your move about as good (eval ${fmt(playedCp)}). It just isn't the main theoretical line.`;
-  else if(loss < 90) verdict = `A small inaccuracy: it costs about ${(loss/100).toFixed(1)} pawns of advantage (your move ${fmt(playedCp)} vs best ${fmt(bestCp)}).`;
-  else if(loss < 250) verdict = `That's a real mistake — about ${(loss/100).toFixed(1)} pawns worse than best (your move ${fmt(playedCp)} vs ${fmt(bestCp)}).`;
-  else verdict = `A serious blunder — roughly ${(loss/100).toFixed(1)} pawns (your move ${fmt(playedCp)} vs ${fmt(bestCp)}). In a real game this usually decides the result.`;
-  const enginePick = bestSan ? ` The engine's top move here is <b>${bestSan}</b>.` : '';
+  const lossP=(loss/100).toFixed(1);
+  if(loss < 30) verdict = t('engEqual',{ev:fmt(playedCp)});
+  else if(loss < 90) verdict = t('engInacc',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
+  else if(loss < 250) verdict = t('engMistake',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
+  else verdict = t('engBlunder',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
+  const enginePick = bestSan ? t('engTop',{san:bestSan}) : '';
   const want = reveal
-    ? `<br><br><b>The line plays ${expected.san}.</b> ${expected.c}`
-    : `<br><br><span style="color:var(--dim)">Try again, or use 💡 Hint. (Full answer after another try.)</span>`;
+    ? `<br><br><b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}`
+    : `<br><br><span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
   document.getElementById('comment').innerHTML =
-    `<span style="color:var(--accent2)">⚙ Engine:</span> ${verdict}${enginePick}${want}`;
+    `<span style="color:var(--accent2)">${t('engineSays')}</span> ${verdict}${enginePick}${want}`;
 }
 
 /* Analyze a wrong move and explain why, plus what the line wants. */
@@ -1281,7 +1387,7 @@ function explainWrong(wrongU, expected, reveal){
   const [r1,f1]=sqRC(wrongU.slice(0,2)), [r2,f2]=sqRC(wrongU.slice(2,4));
   const p=board[r1][f1];
   const dest=wrongU.slice(2,4);
-  const pname={P:'pawn',N:'knight',B:'bishop',R:'rook',Q:'queen',K:'king'}[p.toUpperCase()];
+  const pname={P:t('piecePawn'),N:t('pieceKnight'),B:t('pieceBishop'),R:t('pieceRook'),Q:t('pieceQueen'),K:t('pieceKing')}[p.toUpperCase()];
   const white = playerSide==='w';
   // simulate the wrong move on a copy
   const b2=board.map(row=>row.slice());
@@ -1293,19 +1399,19 @@ function explainWrong(wrongU, expected, reveal){
   const captured = board[r2][f2] && (board[r2][f2]===board[r2][f2].toUpperCase())!==white;
   const val={P:1,N:3,B:3,R:5,Q:9,K:99};
   if(p.toUpperCase()!=='K' && attacked && !defended){
-    note = `Careful — your ${pname} on ${dest} would be <b style="color:var(--bad)">hanging</b> (attacked and undefended). In the opening, losing a piece for nothing is usually game-over.`;
+    note = t('hangWarn',{piece:pname, dest});
   } else if(p.toUpperCase()!=='K' && attacked && defended && val[p.toUpperCase()]>=5){
-    note = `Your ${pname} on ${dest} can be attacked there — bringing the queen or rooks out early often just loses time when they get chased.`;
+    note = t('tempoWarn',{piece:pname, dest});
   } else if(captured){
-    note = `That capture isn’t how the line continues here — grabbing material in the opening often means falling behind in development.`;
+    note = t('captureWarn');
   } else if(p.toUpperCase()==='P' && Math.abs(f2-f1)===0){
-    note = `A reasonable-looking pawn move, but it isn’t the theory here.`;
+    note = t('pawnLegal');
   } else {
-    note = `That’s a legal move, just not what theory plays in this position.`;
+    note = t('legalNotTheory');
   }
   const want = reveal
-    ? `<br><br><b>The line plays ${expected.san}.</b> ${expected.c}`
-    : `<br><br><span style="color:var(--dim)">Try again — or use the 💡 Hint button. (The full answer shows after another try.)</span>`;
+    ? `<br><br><b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}`
+    : `<br><br><span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
   return note + want;
 }
 
@@ -1314,7 +1420,7 @@ function giveHint(){
   mistakesThisRun++; // hints cost the perfect run
   const exp=lineMoves()[ply];
   highlightSq(exp.u.slice(0,2));
-  setPrompt(`Hint: the piece on ${exp.u.slice(0,2)} moves.`,'');
+  setPrompt(t('hintPrompt',{sq:exp.u.slice(0,2)}),'');
 }
 function highlightSq(name){
   const el=[...boardEl.children].find(s=>s.dataset.sq===name);
@@ -1329,13 +1435,13 @@ function finishLine(){
   document.getElementById('promptBox').style.display='none';
   const box=document.getElementById('doneBox'); box.style.display='block';
   document.getElementById('doneMsg').innerHTML = perfect
-    ? `<b style="color:var(--accent2)">Perfect run!</b> Line complete.`
-    : `Line complete — <b>${mistakesThisRun}</b> slip${mistakesThisRun>1?'s':''} this time.`;
+    ? t('perfectRun')
+    : t('slips',{n:mistakesThisRun});
   document.getElementById('doneStats').textContent =
-    `Perfect streak: ${st.streak}${st.streak>=3?' ★ mastered':''} · ${st.perfect}/${st.runs} runs perfect`;
+    `${t('perfectStreak')}${st.streak}${st.streak>=3?t('masteredTag'):''} · ${t('runsPerfect',{p:st.perfect,r:st.runs})}`;
   document.getElementById('donePlan').innerHTML =
-    `<b>What happens after the opening:</b> ${DATA.openings[curOp].lines[curLine].plan}`;
-  document.getElementById('streakInfo').innerHTML = st.streak?`Perfect streak: <b>${st.streak}</b>${st.streak>=3?' ★ mastered':''}`:'';
+    `<b>${t('whatHappensAfter')}</b> ${lnPlan(DATA.openings[curOp].lines[curLine])}`;
+  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
 }
 
 function nextLine(){
@@ -1346,9 +1452,9 @@ function nextLine(){
 }
 
 /* ================= UI helpers ================= */
-function setPrompt(t,cls){ const p=document.getElementById('prompt'); p.textContent=t; p.className=cls; }
+function setPrompt(msg,cls){ const p=document.getElementById('prompt'); p.textContent=msg; p.className=cls; }
 function showComment(mv){
-  document.getElementById('comment').innerHTML=`<b>${mv.san}</b> — ${mv.c}`;
+  document.getElementById('comment').innerHTML=`<b>${mv.san}</b> — ${mvC(mv)}`;
   curAnnot = (mv.a||mv.k) ? {a:mv.a||[], k:mv.k||[]} : null;
   drawAnnots();
 }
@@ -1382,7 +1488,7 @@ function startLearn(oi,li,side){
   document.getElementById('evalBarWrap').style.display='none';
   document.getElementById('streakInfo').innerHTML='';
   const op=DATA.openings[oi], line=op.lines[li];
-  document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — Learn: play each move or tap Next</small>`;
+  document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small>${lnName(line)} — ${t('learn')}</small>`;
   syncLineSel();
   learnShowStep();
   render();
@@ -1392,22 +1498,22 @@ function learnNextHint(){
   const moves=lineMoves();
   if(learnPly>=moves.length) return '';
   const nextWhite = learnPly%2===0;
-  return ` <span style="color:var(--dim)">— ${nextWhite?'White':'Black'} to move: play it on the board or tap Next.</span>`;
+  return ` <span style="color:var(--dim)">${t('playToMove',{side: nextWhite?t('white'):t('black')})}</span>`;
 }
 function learnShowStep(){
   const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
   if(learnPly===0){
-    document.getElementById('prompt').innerHTML = '📖 Overview' + learnNextHint();
+    document.getElementById('prompt').innerHTML = t('overview') + learnNextHint();
     document.getElementById('prompt').className='';
-    document.getElementById('comment').innerHTML = line.intro;
+    document.getElementById('comment').innerHTML = lnIntro(line);
     curAnnot=null; drawAnnots();
   } else {
     const mv=moves[learnPly-1];
     const num=Math.ceil(learnPly/2), isW=learnPly%2===1;
     showComment(mv);
     if(learnPly===moves.length){
-      setPrompt(`✓ ${mv.san} — line complete!`,'good');
-      document.getElementById('comment').innerHTML += `<br><br><b>What happens next:</b> ${line.plan}<br><br>Ready? Hit <b>Drill This Line</b> to test your memory.`;
+      setPrompt(`✓ ${mv.san} — ${t('lineComplete')}`,'good');
+      document.getElementById('comment').innerHTML += `<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
     } else {
       const p=document.getElementById('prompt');
       p.innerHTML = `✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint();
@@ -1448,13 +1554,15 @@ function learnTryMove(u){
     render(curLastU());
     highlightSq(expected.u.slice(0,2));
     const p=document.getElementById('prompt');
-    p.innerHTML = `Not that one — the line plays <b>${expected.san}</b>. Try it, or tap Next.`;
+    p.innerHTML = t('notTheOne',{san:expected.san});
     p.className='bad';
   }
 }
 
 renderMuteBtn();
 buildLineSel();
+applyStaticI18n();
+document.getElementById(LANG==='zh'?'langZH':'langEN').classList.add('on');
 renderAnnotBtn();
 renderAimBtn();
 renderEvalBtn();
