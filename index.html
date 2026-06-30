@@ -32,6 +32,8 @@ header p { color:var(--dim); font-size:.9rem; }
 /* ---- menu ---- */
 #menu { max-width:1000px; width:100%; }
 .op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+#buildTag { text-align:center; color:var(--dim); font-size:.72rem; margin-top:22px; opacity:.6; }
+#buildTag b { color:var(--accent); }
 #freePlayCard { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   background:linear-gradient(120deg, #2a2218, #2f2820); border:1px solid var(--accent); border-radius:12px;
   padding:14px 18px; margin-bottom:16px; }
@@ -212,6 +214,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     </div>
     <div class="summary-bar" id="summaryBar"></div>
     <div class="op-grid" id="opGrid"></div>
+    <div id="buildTag">Debut · build <b>G3</b></div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -317,9 +320,12 @@ function recognizeOpening(sans){
 /* ================= STATE ================= */
 /* Classic Unicode chess glyphs — clean and crisp, matching the ♞ Debut logo. */
 const PIECES = { K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟', k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟' };
+// ︎ = text-presentation selector: stops iOS from rendering pieces (esp. the pawn) as colour
+// emoji, so our white/black CSS colour is respected.
+const VS_TEXT=String.fromCharCode(0xFE0E);
 function pieceSVG(p){
   const w = p===p.toUpperCase();
-  return `<span class="pc ${w?'wp':'bp'}">${PIECES[p.toUpperCase()]}</span>`;
+  return `<span class="pc ${w?'wp':'bp'}">${PIECES[p.toUpperCase()]}${VS_TEXT}</span>`;
 }
 let board, curOp=null, curLine=null, playerSide='w', ply=0, selSq=null, misses=0, mistakesThisRun=0, locked=false;
 let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
@@ -677,35 +683,45 @@ const Engine = {
   setStrength(skill){
     this.send('setoption name Skill Level value '+Math.max(0,Math.min(20,skill|0)));
   },
-  async bestMove(fen, {skill=20, movetime=400}={}){
-    if(!this.ready) return null;
-    this.setStrength(skill);
-    this.send('ucinewgame'); this.send('position fen '+fen);
-    const p=this._await(l=>l.startsWith('bestmove'), movetime+6000);
-    this.send('go movetime '+movetime);
-    const line=await p;
-    const m=line.match(/^bestmove\s+(\S+)/);
-    return m && m[1]!=='(none)' ? m[1] : null;
+  // Serialize every engine request — only one search may talk to the worker at a time,
+  // otherwise a move-search and an eval-analysis stomp on each other's results.
+  _run(fn){
+    const next = (this._q || Promise.resolve()).then(fn, fn);
+    this._q = next.catch(()=>{});
+    return next;
   },
-  // analyze a position to fixed movetime; returns {bestmove, cp} where cp is from side-to-move POV
-  async analyse(fen, {movetime=500}={}){
-    if(!this.ready) return null;
-    this.send('setoption name Skill Level value 20');
-    this.send('ucinewgame'); this.send('position fen '+fen);
-    let lastCp=0, mate=null;
-    const done=new Promise(resolve=>{
-      const to=setTimeout(()=>{ this._onLine=null; resolve(); }, movetime+6000);
-      this._onLine=line=>{
-        const cp=line.match(/score cp (-?\d+)/); if(cp) { lastCp=+cp[1]; mate=null; }
-        const mt=line.match(/score mate (-?\d+)/); if(mt) { mate=+mt[1]; }
-        if(line.startsWith('bestmove')){ clearTimeout(to); this._onLine=null;
-          const m=line.match(/^bestmove\s+(\S+)/); resolve(m?m[1]:null); }
-      };
+  bestMove(fen, {skill=20, movetime=400}={}){
+    if(!this.ready) return Promise.resolve(null);
+    return this._run(async()=>{
+      this.setStrength(skill);
+      this.send('ucinewgame'); this.send('position fen '+fen);
+      const p=this._await(l=>l.startsWith('bestmove'), movetime+6000);
+      this.send('go movetime '+movetime);
+      let line; try { line=await p; } catch(e){ return null; }
+      const m=line.match(/^bestmove\s+(\S+)/);
+      return m && m[1]!=='(none)' ? m[1] : null;
     });
-    this.send('go movetime '+movetime);
-    const best=await done;
-    let cp = mate!==null ? (mate>0?100000-mate:-100000-mate) : lastCp;
-    return {bestmove:best, cp};
+  },
+  // analyze a position; returns {bestmove, cp} where cp is from the side-to-move POV
+  analyse(fen, {movetime=500}={}){
+    if(!this.ready) return Promise.resolve(null);
+    return this._run(()=> new Promise(resolve=>{
+      this.send('setoption name Skill Level value 20');
+      this.send('ucinewgame'); this.send('position fen '+fen);
+      let lastCp=0, mate=null;
+      const to=setTimeout(()=>{ this._onLine=null; resolve({bestmove:null,cp:lastCp}); }, movetime+6000);
+      this._onLine=line=>{
+        const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; }
+        const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; }
+        if(line.startsWith('bestmove')){
+          clearTimeout(to); this._onLine=null;
+          const m=line.match(/^bestmove\s+(\S+)/);
+          const finalCp = mate!==null ? (mate>0?100000-mate:-100000-mate) : lastCp;
+          resolve({bestmove:m?m[1]:null, cp:finalCp});
+        }
+      };
+      this.send('go movetime '+movetime);
+    }));
   }
 };
 function updateEngineBadge(){
@@ -991,7 +1007,7 @@ async function updateEvalBar(){
   if(!(await Engine.load())){ setEvalBar(null); return; }
   const myseq=++evalSeq;
   const fen=toFEN(playWhite);
-  const r=await Engine.analyse(fen,{movetime:300});
+  const r=await Engine.analyse(fen,{movetime:600});
   if(myseq!==evalSeq || mode!=='play') return;   // a newer position superseded this
   setEvalBar(r ? (playWhite ? r.cp : -r.cp) : null);
 }
@@ -1456,10 +1472,9 @@ function setupSwipeBack(){
     const t=e.changedTouches[0];
     const dx=t.clientX-s.x, dy=t.clientY-s.y, dt=Date.now()-s.t;
     s=null;
-    // Never quit an active game by accident — use the ← Menu button instead.
-    if(mode==='play' && !playOver) return;
-    // Require a long, fast, clearly-horizontal swipe from the edge.
-    if(dx>120 && Math.abs(dy)<45 && dx>Math.abs(dy)*3 && dt<600){
+    // Require a long, fast, clearly-horizontal swipe that STARTED at the left edge.
+    // (The edge-start requirement is what makes it un-triggerable by normal board taps/drags.)
+    if(dx>110 && Math.abs(dy)<45 && dx>Math.abs(dy)*3 && dt<600){
       if(document.getElementById('drill').style.display!=='none') showMenu();
     }
   }, {passive:true});
