@@ -56,7 +56,12 @@ header p { color:var(--dim); font-size:.9rem; }
 
 /* ---- drill ---- */
 #drill { display:none; }
-.board-wrap { position:relative; --bsize:min(92vw, calc(100vh - 170px), 660px); }
+#boardCol { display:flex; flex-direction:column; align-items:center; gap:6px; --bsize:min(92vw, calc(100vh - 170px), 660px); }
+.board-wrap { position:relative; }
+.cap-tray { width:var(--bsize); min-height:22px; display:none; align-items:center; flex-wrap:wrap; }
+.cap-tray .cap { width:20px; height:20px; display:inline-flex; margin-right:-5px; }
+.cap-tray .cap svg { width:20px; height:20px; filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
+.cap-tray .adv { margin-left:10px; font-weight:700; color:var(--accent2); font-size:.9rem; }
 #board {
   display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr);
   width:var(--bsize); height:var(--bsize);
@@ -151,7 +156,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   header p { display:none; }              /* tagline not needed on small screens */
   .layout { padding:6px 8px 16px; gap:10px; }
   #drill { gap:8px; }
-  .board-wrap { --bsize:min(96vw, calc(100dvh - 260px - env(safe-area-inset-top, 0px))); }
+  #boardCol { --bsize:min(96vw, calc(100dvh - 286px - env(safe-area-inset-top, 0px))); }
   .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; }
   .panel-box { padding:10px 12px; }
   /* reorder: prompt + active buttons sit right under the board */
@@ -172,7 +177,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .toggle button { flex:1; }
 }
 @media (max-width:760px) and (max-height:680px){
-  .board-wrap { --bsize:min(86vw, calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }  /* shorter phones: smaller board */
+  #boardCol { --bsize:min(86vw, calc(100dvh - 276px - env(safe-area-inset-top, 0px))); }  /* shorter phones: smaller board */
   #promptBox { max-height:24vh; }
 }
 </style>
@@ -194,7 +199,11 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 
   <!-- ============ DRILL ============ -->
   <div id="drill" class="layout" style="padding:0;">
-    <div class="board-wrap"><div id="board"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
+    <div id="boardCol">
+      <div id="capTop" class="cap-tray"></div>
+      <div class="board-wrap"><div id="board"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
+      <div id="capBottom" class="cap-tray"></div>
+    </div>
     <div class="side-panel">
       <div class="panel-box" id="titleBox">
         <div id="lineTitle"></div>
@@ -209,7 +218,6 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
             <span>Engine strength</span><span id="eloLabel"></span>
           </label>
           <input type="range" id="eloSlider" min="0" max="20" value="6" oninput="onEloInput(this.value)" style="width:100%">
-          <div id="evalBar" style="font-size:.78rem;color:var(--dim);margin-top:4px"></div>
         </div>
       </div>
       <div class="panel-box" id="promptBox">
@@ -804,6 +812,7 @@ function startDrill(oi,li,side){
   document.getElementById('learnNav').style.display='none';
   document.getElementById('playNav').style.display='none';
   document.getElementById('strengthRow').style.display='none';
+  showCapTrays(false);
   document.getElementById('sideW').classList.toggle('on',side==='w');
   document.getElementById('sideB').classList.toggle('on',side==='b');
   const op=DATA.openings[oi], line=op.lines[li];
@@ -868,6 +877,7 @@ function startPlay(oi,li,side){
   document.getElementById('learnNav').style.display='none';
   document.getElementById('playNav').style.display='flex';
   document.getElementById('strengthRow').style.display='block';
+  showCapTrays(true);
   document.getElementById('sideW').classList.remove('on'); document.getElementById('sideB').classList.remove('on');
   document.getElementById('streakInfo').innerHTML='';
   onEloInput(playSkill);
@@ -918,8 +928,8 @@ function playUserMove(u){
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return true; }
-  setPrompt('Engine is thinking…','');
-  setTimeout(engineMove, 180);
+  // reply almost instantly (next frame), like an online bot
+  setTimeout(engineMove, 20);
   return true;
 }
 function pickFallbackMove(white){ // used only if engine unavailable
@@ -935,11 +945,13 @@ async function engineMove(){
   locked=true;
   const white=playWhite;
   const fen=toFEN(white);
-  const movetime=200+playSkill*25;
+  // keep it snappy: short, lightly skill-scaled think time
+  const movetime=Math.min(60+playSkill*9, 240);
   let u=null;
   if(await Engine.load()) u=await Engine.bestMove(fen,{skill:playSkill,movetime});
   if(!u) u=pickFallbackMove(white); // graceful fallback
   if(!u){ finishPlay(gameStatus(white)); return; }
+  if(playOver) return;
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return; }
@@ -969,13 +981,35 @@ function updatePlayList(){
   const ml=document.getElementById('movelist');
   ml.innerHTML=html||'&nbsp;'; ml.scrollTop=ml.scrollHeight;
 }
+/* chess.com-style captured-piece trays: opponent's captures above the board,
+   yours below, with a "+N" badge on whoever is ahead in material. */
+const INIT_COUNTS={P:8,N:2,B:2,R:2,Q:1,K:1,p:8,n:2,b:2,r:2,q:1,k:1};
 function updateEval(){
-  const val={P:1,N:3,B:3,R:5,Q:9,K:0};
-  let s=0;
-  for(let r=0;r<8;r++) for(let f=0;f<8;f++){ const p=board[r][f]; if(p) s+= (p===p.toUpperCase()?1:-1)*val[p.toUpperCase()]; }
-  const bar=document.getElementById('evalBar'); if(!bar) return;
-  const who = s>0?'White':'Black', amt=Math.abs(s);
-  bar.textContent = amt===0 ? 'Material: even' : `Material: ${who} +${amt}`;
+  const top=document.getElementById('capTop'), bot=document.getElementById('capBottom');
+  if(!top||!bot) return;
+  const c={};
+  for(let r=0;r<8;r++) for(let f=0;f<8;f++){ const p=board[r][f]; if(p) c[p]=(c[p]||0)+1; }
+  const order=['q','r','b','n','p'], val={p:1,n:3,b:3,r:5,q:9};
+  const byWhite=[], byBlack=[]; let netW=0;
+  for(const t of order){
+    const up=t.toUpperCase();
+    const missBlack=INIT_COUNTS[t]-(c[t]||0);   // black pieces gone = captured by White
+    const missWhite=INIT_COUNTS[up]-(c[up]||0); // white pieces gone = captured by Black
+    for(let i=0;i<missBlack;i++) byWhite.push(t);
+    for(let i=0;i<missWhite;i++) byBlack.push(up);
+    netW += val[t]*((c[up]||0)-(c[t]||0));
+  }
+  const tray = arr => arr.map(p=>`<span class="cap">${pieceSVG(p)}</span>`).join('');
+  const youWhite = playerSide==='w';
+  const yourCaps = youWhite?byWhite:byBlack, engCaps = youWhite?byBlack:byWhite;
+  const yourNet  = youWhite?netW:-netW;
+  top.innerHTML = tray(engCaps) + (yourNet<0?`<span class="adv">+${-yourNet}</span>`:'');
+  bot.innerHTML = tray(yourCaps) + (yourNet>0?`<span class="adv">+${yourNet}</span>`:'');
+}
+function showCapTrays(on){
+  const d=on?'flex':'none';
+  const t=document.getElementById('capTop'), b=document.getElementById('capBottom');
+  if(t) t.style.display=d; if(b) b.style.display=d;
 }
 function finishPlay(status){
   playOver=true; locked=true;
@@ -1212,6 +1246,7 @@ function startLearn(oi,li,side){
   document.getElementById('learnNav').style.display='flex';
   document.getElementById('playNav').style.display='none';
   document.getElementById('strengthRow').style.display='none';
+  showCapTrays(false);
   document.getElementById('streakInfo').innerHTML='';
   const op=DATA.openings[oi], line=op.lines[li];
   document.getElementById('lineTitle').innerHTML=`${op.icon} ${op.name}<small>${line.name} — Learn: play each move or tap Next</small>`;
