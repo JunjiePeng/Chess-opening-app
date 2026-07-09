@@ -48,7 +48,7 @@ header p { color:var(--dim); font-size:.9rem; }
 .op-card.clickable { cursor:pointer; transition:border-color .15s, transform .15s; }
 .op-card.clickable:hover { border-color:var(--accent); transform:translateY(-2px); }
 .card-foot { font-size:.78rem; color:var(--dim); margin-top:4px; }
-.op-card h2 { font-size:1.05rem; display:flex; align-items:center; gap:8px; }
+.op-card h2 { font-size:1.05rem; display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; min-width:0; }
 .op-card h2 .ico { font-size:1.4rem; color:var(--accent); }
 .op-card .desc { color:var(--dim); font-size:.82rem; margin:6px 0 10px; line-height:1.45; }
 .op-card h2 .fav-btn { margin-left:auto; background:none; border:none; cursor:pointer; font-size:1.2rem; line-height:1; color:var(--dim); padding:2px 4px; transition:transform .15s, color .15s; }
@@ -139,13 +139,14 @@ button.act.primary { background:var(--accent); color:#241c10; border-color:var(-
   pointer-events:none; z-index:5; }
 #overlay line { stroke:rgba(212,162,78,.8); stroke-width:.14; }
 #overlay circle { fill:none; stroke:rgba(143,181,115,.85); stroke-width:.07; }
-.line-row { display:flex; align-items:center; gap:8px; width:100%; background:var(--panel2);
-  border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px; font-size:.88rem; }
-.line-row .nm { flex:1; }
-.line-row .stat { font-size:.75rem; color:var(--dim); white-space:nowrap; }
+.line-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; width:100%; background:var(--panel2);
+  border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px; font-size:.88rem;
+  box-sizing:border-box; overflow:hidden; }
+.line-row .nm { flex:1 1 auto; min-width:0; overflow-wrap:anywhere; }
+.line-row .stat { font-size:.75rem; color:var(--dim); white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
 .line-row .stat.mastered { color:var(--accent2); }
 button.mini { background:none; border:1px solid var(--line); color:var(--dim); border-radius:6px;
-  padding:4px 10px; cursor:pointer; font-size:.78rem; transition:all .15s; }
+  padding:4px 10px; cursor:pointer; font-size:.78rem; transition:all .15s; flex:0 0 auto; white-space:nowrap; }
 button.mini:hover { border-color:var(--accent); color:var(--text); }
 #lineSel { flex:1; min-width:0; background:var(--panel2); color:var(--text); border:1px solid var(--line);
   border-radius:6px; padding:6px 8px; font-size:.82rem; cursor:pointer; }
