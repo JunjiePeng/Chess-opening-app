@@ -141,6 +141,10 @@ button.act.primary { background:var(--accent); color:#241c10; border-color:var(-
 .line-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; width:100%; background:var(--panel2);
   border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px; font-size:.88rem;
   box-sizing:border-box; overflow:hidden; }
+.ln-fav { background:none; border:none; cursor:pointer; font-size:1rem; line-height:1; color:var(--dim);
+  padding:0 2px; flex:0 0 auto; transition:transform .15s, color .15s; }
+.ln-fav:hover { transform:scale(1.25); color:#f5c542; }
+.ln-fav.on { color:#f5c542; }
 .ln-info { flex:1 1 130px; min-width:0; display:flex; flex-direction:column; gap:2px; }
 .line-row .nm { overflow-wrap:anywhere; line-height:1.3; }
 .line-row .stat { font-size:.72rem; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -510,12 +514,21 @@ const favs = {
   has(name){ return this.load().indexOf(name)>=0; },
   toggle(name){ const a=this.load(); const i=a.indexOf(name); if(i>=0) a.splice(i,1); else a.push(name); this.save(a); }
 };
-function toggleFav(name){
-  favs.toggle(name);
+/* Favorite lines: starred individual lines, keyed by "opening name|line name". */
+const lineFavs = {
+  load(){ try { return JSON.parse(localStorage.getItem('otFavLines')||'[]'); } catch(e){ return []; } },
+  save(a){ localStorage.setItem('otFavLines', JSON.stringify(a)); },
+  key(op,l){ return op.name+'|'+l.name; },
+  has(op,l){ return this.load().indexOf(this.key(op,l))>=0; },
+  toggle(op,l){ const a=this.load(); const k=this.key(op,l); const i=a.indexOf(k); if(i>=0) a.splice(i,1); else a.push(k); this.save(a); }
+};
+function refreshMenuKeepScroll(){
   const y=(typeof window!=='undefined')?window.scrollY:0;
   showMenu();
   if(typeof window!=='undefined') window.scrollTo(0,y);
 }
+function toggleFav(name){ favs.toggle(name); refreshMenuKeepScroll(); }
+function toggleLineFav(op,line){ lineFavs.toggle(op,line); refreshMenuKeepScroll(); }
 
 const store = {
   load(){ try { return JSON.parse(localStorage.getItem('openingTrainer')||'{}'); } catch(e){ return {}; } },
@@ -983,8 +996,12 @@ function showMenu(){
     {label:t('groupBD4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'}
   ];
   const order=[];
-  // starred openings pinned first
-  const favMembers=DATA.openings.map((op,oi)=>({op,oi})).filter(x=>favs.has(x.op.name));
+  // starred openings (full card) and openings with starred lines (card filtered to those lines) pinned first
+  const favMembers=[];
+  DATA.openings.forEach((op,oi)=>{
+    if(favs.has(op.name)) favMembers.push({op,oi});
+    else if(op.lines.some(l=>lineFavs.has(op,l))) favMembers.push({op,oi,onlyFav:true});
+  });
   if(favMembers.length) order.push({label:t('groupFav'), members:favMembers});
   groups.forEach(g=>{
     const members=DATA.openings.map((op,oi)=>({op,oi})).filter(x=>g.test(x.op));
@@ -993,9 +1010,9 @@ function showMenu(){
   order.forEach(group=>{
     const h=document.createElement('div'); h.className='group-head'; h.textContent=group.label;
     grid.appendChild(h);
-    group.members.forEach(({op,oi})=>{ grid.appendChild(buildOpCard(op,oi)); });
+    group.members.forEach(({op,oi,onlyFav})=>{ grid.appendChild(buildOpCard(op,oi,onlyFav)); });
   });
-  function buildOpCard(op,oi){
+  function buildOpCard(op,oi,onlyFavLines){
     const card=document.createElement('div'); card.className='op-card clickable';
     const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?t('white'):t('black')}</span>`;
     const isFav=favs.has(op.name);
@@ -1006,11 +1023,15 @@ function showMenu(){
     card.onclick=()=>quickStart(oi);
     card.title=t('clickCard');
     op.lines.forEach((line,li)=>{
+      if(onlyFavLines && !lineFavs.has(op,line)) return;
       const st=store.get(oi,li);
       const isMastered = st.streak>=3;
       const stat = isMastered ? t('mastered') : st.runs? t('runsPerfect',{p:st.perfect,r:st.runs}) : t('newWord');
       const row=document.createElement('div'); row.className='line-row';
-      row.innerHTML=`<div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span></div>`;
+      const isLF=lineFavs.has(op,line);
+      row.innerHTML=`<button class="ln-fav${isLF?' on':''}" title="${t(isLF?'favRemove':'favAdd')}" aria-label="${t(isLF?'favRemove':'favAdd')}">${isLF?'★':'☆'}</button><div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span></div>`;
+      const lf=row.querySelector('.ln-fav');
+      if(lf) lf.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); toggleLineFav(op,line); };
       const lb=document.createElement('button'); lb.className='mini'; lb.textContent=t('learn');
       lb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); startLearn(oi,li,op.side); };
       const db=document.createElement('button'); db.className='mini'; db.textContent=t('drill');
