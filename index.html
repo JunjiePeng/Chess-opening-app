@@ -87,7 +87,8 @@ header p { color:var(--dim); font-size:.9rem; }
   border:4px solid #15110d; border-radius:6px; overflow:hidden; user-select:none;
   box-shadow:0 10px 30px rgba(0,0,0,.45); }
 .sq { position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
-  font-size:calc(var(--bsize)/8*.80); line-height:1; min-width:0; min-height:0; overflow:hidden; }
+  font-size:calc(var(--bsize)/8*.80); line-height:1; min-width:0; min-height:0; }
+.sq.anim-top { z-index:3; }
 .sq.light { background:var(--light-sq); } .sq.dark { background:var(--dark-sq); }
 .sq .pc { pointer-events:none; }
 .pc { display:inline-flex; }
@@ -570,14 +571,15 @@ const SFX = {
     const g=c.createGain(); g.gain.value=vol;
     s.connect(flt); flt.connect(g); g.connect(c.destination); s.start(t);
   },
-  knock(f,vol,delay=0){ // short dry "wooden" tap — the familiar online-chess move sound
-    this.tone(f,.06,{slide:f*.55,vol:vol*.95,delay});
-    this.noise(.03,{vol:vol*.45,delay,freq:1000});
+  knock(f,vol,delay=0){ // dry wooden "tock" — modelled on the chess.com/lichess move sound:
+    this.noise(.02,{vol:vol*.55,delay,freq:2600});           // sharp "t" transient
+    this.tone(f*1.9,.045,{slide:f*.9,vol:vol*.7,delay});     // hard attack body
+    this.tone(f,.085,{slide:f*.55,vol:vol*.5,delay:delay+.004}); // low woody resonance
   },
-  move(){ this.knock(210,.5); },
-  capture(){ this.knock(130,.62); this.noise(.07,{vol:.26,freq:520,delay:.005}); },                 // deeper, fuller thud
-  castle(){ this.knock(205,.45); this.knock(170,.45,.13); },                                        // double knock
-  check(){ this.knock(210,.38); this.tone(1047,.11,{vol:.13,delay:.04}); this.tone(1319,.16,{vol:.11,delay:.13}); },
+  move(){ this.knock(190,.55); },
+  capture(){ this.knock(160,.62); this.knock(100,.5,.018); this.noise(.05,{vol:.28,freq:850,delay:.008}); }, // fuller two-hit "clack"
+  castle(){ this.knock(190,.5); this.knock(160,.5,.11); },                                          // double knock
+  check(){ this.knock(250,.55); this.knock(330,.42,.06); },                                         // sharper, urgent double tap
   mate(){ this.knock(130,.6); [523,659,784,1047].forEach((f,i)=>this.tone(f,.22,{vol:.16,delay:.12+i*.09})); },
   error(){ this.tone(110,.14,{type:'square',vol:.12}); this.tone(88,.18,{type:'square',vol:.1,delay:.07}); },
   success(){ [523,659,784].forEach((f,i)=>this.tone(f,.18,{vol:.18,delay:i*.09})); },
@@ -615,6 +617,7 @@ function initBoard(){
 }
 function sqRC(s){ return [parseInt(s[1])-1, s.charCodeAt(0)-97]; } // [rank,file]
 function applyMove(u){
+  pendingAnim=u;   // the next render(lastU) matching this move will slide the piece
   const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
   const p=board[r1][f1];
   // en passant: pawn moves diagonally to empty square
@@ -928,6 +931,34 @@ function retryEngine(){
 
 /* ================= RENDER ================= */
 const boardEl = document.getElementById('board');
+/* Piece slide animation (chess.com-style): after a real move, the piece glides from
+   its source square to its destination (~150ms). Only the render immediately
+   following applyMove() animates — selection/redraw renders don't replay it. */
+let pendingAnim=null;
+function slidePiece(from,to){
+  if(!boardEl.querySelector||typeof requestAnimationFrame==='undefined') return;
+  const fromEl=boardEl.querySelector(`[data-sq="${from}"]`), toEl=boardEl.querySelector(`[data-sq="${to}"]`);
+  if(!fromEl||!toEl) return;
+  const pc=toEl.querySelector('.pc'); if(!pc) return;
+  const dx=fromEl.offsetLeft-toEl.offsetLeft, dy=fromEl.offsetTop-toEl.offsetTop;
+  if(!dx&&!dy) return;
+  toEl.classList.add('anim-top');
+  pc.style.transition='none'; pc.style.transform=`translate(${dx}px,${dy}px)`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    pc.style.transition='transform .15s cubic-bezier(.25,.7,.3,1)';
+    pc.style.transform='translate(0,0)';
+  }));
+  setTimeout(()=>{ pc.style.transition=''; pc.style.transform=''; toEl.classList.remove('anim-top'); },230);
+}
+function animMove(u){
+  const to=u.slice(2,4);
+  slidePiece(u.slice(0,2),to);
+  const [r2,f2]=sqRC(to), p=board[r2]&&board[r2][f2];
+  if(p && p.toUpperCase()==='K' && Math.abs(f2-(u.charCodeAt(0)-97))===2){  // castling: slide the rook too
+    const rank=to[1];
+    if(f2===6) slidePiece('h'+rank,'f'+rank); else slidePiece('a'+rank,'d'+rank);
+  }
+}
 function render(lastU){
   boardEl.innerHTML='';
   const flip = playerSide==='b';
@@ -949,6 +980,7 @@ function render(lastU){
     sq.onclick = ()=>onSquare(name);
     boardEl.appendChild(sq);
   }
+  if(lastU && lastU===pendingAnim){ pendingAnim=null; animMove(lastU); }
   drawAnnots();
 }
 
