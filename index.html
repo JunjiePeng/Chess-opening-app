@@ -145,6 +145,20 @@ button.act.primary { background:var(--accent); color:#241c10; border-color:var(-
   box-sizing:border-box; overflow:hidden; }
 .line-row.faved { border-left:3px solid #f5c542; border-radius:0 8px 8px 0; background:rgba(245,197,66,.06); }
 .due-tag { color:var(--accent); font-weight:700; font-size:.7rem; }
+.day-streak b { color:var(--accent); }
+.op-prog-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.op-prog { flex:1; height:5px; background:var(--panel2); border:1px solid var(--line); border-radius:3px; overflow:hidden; }
+.op-prog-fill { height:100%; background:var(--accent2); border-radius:3px; transition:width .3s; }
+.op-prog-n { font-size:.7rem; color:var(--dim); }
+.hm-wrap { display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid var(--line);
+  border-radius:10px; padding:8px 14px; margin-bottom:14px; overflow-x:auto; }
+.hm-title { font-size:.75rem; color:var(--dim); white-space:nowrap; flex:0 0 auto; }
+.hm-grid { display:grid; grid-auto-flow:column; grid-template-rows:repeat(7,10px); gap:2px; }
+.hm-cell { width:10px; height:10px; border-radius:2px; background:var(--panel2); }
+.hm-cell.l1 { background:rgba(212,162,78,.3); }
+.hm-cell.l2 { background:rgba(212,162,78,.55); }
+.hm-cell.l3 { background:rgba(212,162,78,.8); }
+.hm-cell.l4 { background:var(--accent); }
 .review-btn { background:var(--accent); color:#1c1712; border:none; border-radius:8px; padding:6px 14px;
   font-weight:700; font-size:.82rem; cursor:pointer; transition:transform .15s, filter .15s; }
 .review-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
@@ -235,6 +249,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
       </div>
     </div>
     <div class="summary-bar" id="summaryBar"></div>
+    <div id="heatmapBox"></div>
     <div class="op-grid" id="opGrid"></div>
     <div id="buildTag">Debut · build <b>G5</b> · 中文</div>
   </div>
@@ -402,7 +417,9 @@ Object.assign(I18N_EN, {
   noneDue:'✓ no reviews due',
   dueTag:'due',
   nextReview:'next review in {d}d',
-  reviewsLeft:'{n} review(s) left'
+  reviewsLeft:'{n} review(s) left',
+  dayStreak:'-day streak',
+  heatTitle:'Training activity'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -416,7 +433,9 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   noneDue:'✓ 暂无待复习',
   dueTag:'待复习',
   nextReview:'下次复习：{d} 天后',
-  reviewsLeft:'剩余 {n} 条待复习'
+  reviewsLeft:'剩余 {n} 条待复习',
+  dayStreak:' 天连续训练',
+  heatTitle:'训练记录'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -607,6 +626,20 @@ const srs = {
     }));
     out.sort((a,b)=>b.overdue-a.overdue);
     return out;
+  }
+};
+
+/* ================= ACTIVITY LOG (streak + heatmap) ================= */
+const activity = {
+  load(){ try { return JSON.parse(localStorage.getItem('otActivity')||'{}'); } catch(e){ return {}; } },
+  save(o){ localStorage.setItem('otActivity', JSON.stringify(o)); },
+  key(d){ const x=d||new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); },
+  log(){ const a=this.load(); const k=this.key(); a[k]=(a[k]||0)+1; this.save(a); },
+  streak(){ // consecutive training days ending today (or yesterday, so a fresh morning doesn't read as 0)
+    const a=this.load(); let n=0; const d=new Date();
+    if(!a[this.key(d)]) d.setDate(d.getDate()-1);
+    while(a[this.key(d)]){ n++; d.setDate(d.getDate()-1); }
+    return n;
   }
 };
 
@@ -1118,7 +1151,9 @@ function showMenu(){
     const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?t('white'):t('black')}</span>`;
     const isFav=favs.has(op.name);
     const star=`<button class="fav-btn${isFav?' on':''}" title="${t(isFav?'favRemove':'favAdd')}" aria-label="${t(isFav?'favRemove':'favAdd')}">${isFav?'★':'☆'}</button>`;
-    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}${star}</h2><div class="desc">${opDesc(op)}</div>`;
+    const doneN=op.lines.reduce((s,_,li2)=>s+(store.get(oi,li2).streak>=3?1:0),0);
+    const prog=`<div class="op-prog-row"><div class="op-prog"><div class="op-prog-fill" style="width:${Math.round(100*doneN/op.lines.length)}%"></div></div><span class="op-prog-n">${doneN}/${op.lines.length}</span></div>`;
+    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}${star}</h2>${prog}<div class="desc">${opDesc(op)}</div>`;
     const fb=card.querySelector('.fav-btn');
     if(fb) fb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); toggleFav(op.name); };
     card.onclick=()=>quickStart(oi);
@@ -1149,13 +1184,29 @@ function showMenu(){
     });
     return card;
   }
-  const due=srs.dueList();
+  const due=srs.dueList(), dayStreak=activity.streak();
   document.getElementById('summaryBar').innerHTML=
     `<div><b>${totalLines}</b>${t('linesWord')}</div><div><b>${mastered}</b>${t('masteredWord')}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
+     ${dayStreak?`<div class="day-streak">🔥 <b>${dayStreak}</b>${t('dayStreak')}</div>`:''}
      ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:`<div>${t('noneDue')}</div>`}
      <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
+  renderHeatmap();
 }
 function backToLines(){ showMenu(); }
+
+/* GitHub-style training heatmap: last ~16 weeks, one column per week. */
+function renderHeatmap(){
+  const el=document.getElementById('heatmapBox'); if(!el) return;
+  const a=activity.load(), today=new Date(); today.setHours(0,0,0,0);
+  const start=new Date(today); start.setDate(start.getDate()-7*15-today.getDay());
+  const lvl=n=> n>=7?4 : n>=4?3 : n>=2?2 : n>=1?1 : 0;
+  let cells='';
+  for(const d=new Date(start); d<=today; d.setDate(d.getDate()+1)){
+    const k=activity.key(d), n=a[k]||0;
+    cells+=`<div class="hm-cell l${lvl(n)}" title="${k}: ${n}"></div>`;
+  }
+  el.innerHTML=`<div class="hm-wrap"><span class="hm-title">${t('heatTitle')}</span><div class="hm-grid">${cells}</div></div>`;
+}
 
 /* Click an opening card: jump straight into a sensible line —
    first unmastered line; Learn mode if it's never been practiced, otherwise Drill. */
@@ -1637,6 +1688,7 @@ function finishLine(){
   const perfect = mistakesThisRun===0;
   if(perfect) SFX.perfect(); else SFX.success();
   const st=store.record(curOp,curLine,perfect);
+  activity.log();
   // FSRS grade: perfect on an established streak = easy, perfect = good, 1-2 slips = hard, more = again
   const g = perfect ? (st.streak>=3?4:3) : (mistakesThisRun<=2?2:1);
   const sv=srs.grade(curOp,curLine,g);
