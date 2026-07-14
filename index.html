@@ -144,6 +144,10 @@ button.act.primary { background:var(--accent); color:#241c10; border-color:var(-
   border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:6px; font-size:.88rem;
   box-sizing:border-box; overflow:hidden; }
 .line-row.faved { border-left:3px solid #f5c542; border-radius:0 8px 8px 0; background:rgba(245,197,66,.06); }
+.due-tag { color:var(--accent); font-weight:700; font-size:.7rem; }
+.review-btn { background:var(--accent); color:#1c1712; border:none; border-radius:8px; padding:6px 14px;
+  font-weight:700; font-size:.82rem; cursor:pointer; transition:transform .15s, filter .15s; }
+.review-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
 .ln-fav { background:none; border:none; cursor:pointer; font-size:1rem; line-height:1; color:var(--dim);
   padding:0 2px; flex:0 0 auto; transition:transform .15s, color .15s; }
 .ln-fav:hover { transform:scale(1.25); color:#f5c542; }
@@ -393,7 +397,12 @@ Object.assign(I18N_EN, {
   hintPrompt:'Hint: the piece on {sq} moves.',
   groupFav:'⭐ Favorites — openings you’re focusing on',
   favAdd:'Star this opening to pin it at the top',
-  favRemove:'Unstar this opening'
+  favRemove:'Unstar this opening',
+  startReview:'▶ Review {n} due',
+  noneDue:'✓ no reviews due',
+  dueTag:'due',
+  nextReview:'next review in {d}d',
+  reviewsLeft:'{n} review(s) left'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -402,7 +411,12 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   hintPrompt:'提示：移动 {sq} 上的子。',
   groupFav:'⭐ 收藏 — 你正在重点练习的开局',
   favAdd:'收藏此开局，置顶显示',
-  favRemove:'取消收藏'
+  favRemove:'取消收藏',
+  startReview:'▶ 复习到期的 {n} 条',
+  noneDue:'✓ 暂无待复习',
+  dueTag:'待复习',
+  nextReview:'下次复习：{d} 天后',
+  reviewsLeft:'剩余 {n} 条待复习'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -542,6 +556,58 @@ const store = {
     const v=s[k]||{runs:0,perfect:0,streak:0};
     v.runs++; if(perfect){ v.perfect++; v.streak++; } else v.streak=0;
     s[k]=v; this.save(s); return v; }
+};
+
+/* ================= SPACED REPETITION (FSRS-4.5) =================
+   Free Spaced Repetition Scheduler with default weights (open-spaced-repetition
+   project). Models memory per line: difficulty D, stability S (days until recall
+   drops to 90%). Each drill run is graded 1 (again) / 2 (hard) / 3 (good) / 4 (easy)
+   and the next review is scheduled when predicted recall hits R_TARGET. */
+const FSRS = {
+  w:[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.031,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.587,0.2272,2.8755],
+  R_TARGET:0.9, DECAY:-0.5, FACTOR:19/81,
+  retrievability(days,s){ return Math.pow(1+this.FACTOR*days/s, this.DECAY); },
+  interval(s){ return Math.max(1, Math.round(s/this.FACTOR*(Math.pow(this.R_TARGET,1/this.DECAY)-1))); },
+  initDifficulty(g){ return Math.min(10,Math.max(1,this.w[4]-Math.exp(this.w[5]*(g-1))+1)); },
+  initStability(g){ return Math.max(.1,this.w[g-1]); },
+  nextDifficulty(d,g){
+    const nd=d-this.w[6]*(g-3);
+    return Math.min(10,Math.max(1,this.w[7]*this.initDifficulty(4)+(1-this.w[7])*nd));
+  },
+  nextStability(d,s,r,g){
+    if(g===1) return Math.max(.1, Math.min(s, this.w[11]*Math.pow(d,-this.w[12])*(Math.pow(s+1,this.w[13])-1)*Math.exp(this.w[14]*(1-r))));
+    const hard=(g===2)?this.w[15]:1, easy=(g===4)?this.w[16]:1;
+    return s*(Math.exp(this.w[8])*(11-d)*Math.pow(s,-this.w[9])*(Math.exp(this.w[10]*(1-r))-1)*hard*easy+1);
+  }
+};
+const DAY_MS=864e5;
+const srs = {
+  load(){ try { return JSON.parse(localStorage.getItem('otSrs')||'{}'); } catch(e){ return {}; } },
+  save(o){ localStorage.setItem('otSrs', JSON.stringify(o)); },
+  get(oi,li){ return this.load()[oi+':'+li] || null; },
+  grade(oi,li,g){
+    const all=this.load(), k=oi+':'+li, now=Date.now();
+    let v=all[k];
+    if(!v){ v={d:FSRS.initDifficulty(g), s:FSRS.initStability(g), last:now, reps:1}; }
+    else {
+      const days=Math.max(0,(now-v.last)/DAY_MS);
+      const r=FSRS.retrievability(days,v.s);
+      v.s=FSRS.nextStability(v.d,v.s,r,g);
+      v.d=FSRS.nextDifficulty(v.d,g);
+      v.last=now; v.reps=(v.reps||0)+1;
+    }
+    v.due=now+FSRS.interval(v.s)*DAY_MS;
+    all[k]=v; this.save(all); return v;
+  },
+  dueList(){
+    const all=this.load(), now=Date.now(), out=[];
+    DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{
+      const v=all[oi+':'+li];
+      if(v && v.due<=now) out.push({oi,li,overdue:now-v.due});
+    }));
+    out.sort((a,b)=>b.overdue-a.overdue);
+    return out;
+  }
 };
 
 /* ================= SOUND (Web Audio, fully synthesized) ================= */
@@ -1014,6 +1080,7 @@ function drawAnnots(){
 
 /* ================= MENU ================= */
 function showMenu(){
+  reviewQueue=null;
   document.getElementById('drill').style.display='none';
   document.getElementById('menu').style.display='block';
   const grid=document.getElementById('opGrid'); grid.innerHTML='';
@@ -1060,7 +1127,9 @@ function showMenu(){
       if(onlyFavLines && !lineFavs.has(op,line)) return;
       const st=store.get(oi,li);
       const isMastered = st.streak>=3;
-      const stat = isMastered ? t('mastered') : st.runs? t('runsPerfect',{p:st.perfect,r:st.runs}) : t('newWord');
+      const sv=srs.get(oi,li);
+      const dueTag = (sv && sv.due<=Date.now()) ? ` <span class="due-tag">${t('dueTag')}</span>` : '';
+      const stat = (isMastered ? t('mastered') : st.runs? t('runsPerfect',{p:st.perfect,r:st.runs}) : t('newWord')) + dueTag;
       const isLF=lineFavs.has(op,line);
       const row=document.createElement('div'); row.className='line-row'+(isLF?' faved':'');
       row.innerHTML=`<button class="ln-fav${isLF?' on':''}" title="${t(isLF?'favRemove':'favAdd')}" aria-label="${t(isLF?'favRemove':'favAdd')}">${isLF?'★':'☆'}</button><div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span></div>`;
@@ -1080,8 +1149,10 @@ function showMenu(){
     });
     return card;
   }
+  const due=srs.dueList();
   document.getElementById('summaryBar').innerHTML=
     `<div><b>${totalLines}</b>${t('linesWord')}</div><div><b>${mastered}</b>${t('masteredWord')}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
+     ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:`<div>${t('noneDue')}</div>`}
      <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
 }
 function backToLines(){ showMenu(); }
@@ -1566,23 +1637,43 @@ function finishLine(){
   const perfect = mistakesThisRun===0;
   if(perfect) SFX.perfect(); else SFX.success();
   const st=store.record(curOp,curLine,perfect);
+  // FSRS grade: perfect on an established streak = easy, perfect = good, 1-2 slips = hard, more = again
+  const g = perfect ? (st.streak>=3?4:3) : (mistakesThisRun<=2?2:1);
+  const sv=srs.grade(curOp,curLine,g);
+  const inDays=Math.max(1,Math.round((sv.due-Date.now())/DAY_MS));
   document.getElementById('promptBox').style.display='none';
   const box=document.getElementById('doneBox'); box.style.display='block';
   document.getElementById('doneMsg').innerHTML = perfect
     ? t('perfectRun')
     : t('slips',{n:mistakesThisRun});
+  const revLeft = (reviewQueue&&reviewQueue.length) ? ` · ${t('reviewsLeft',{n:reviewQueue.length})}` : '';
   document.getElementById('doneStats').textContent =
-    `${t('perfectStreak')}${st.streak}${st.streak>=3?t('masteredTag'):''} · ${t('runsPerfect',{p:st.perfect,r:st.runs})}`;
+    `${t('perfectStreak')}${st.streak}${st.streak>=3?t('masteredTag'):''} · ${t('runsPerfect',{p:st.perfect,r:st.runs})} · ${t('nextReview',{d:inDays})}${revLeft}`;
   document.getElementById('donePlan').innerHTML =
     `<b>${t('whatHappensAfter')}</b> ${lnPlan(DATA.openings[curOp].lines[curLine])}`;
   document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
 }
 
 function nextLine(){
+  if(reviewQueue && reviewQueue.length){   // in a review session: next due line
+    const x=reviewQueue.shift();
+    startDrill(x.oi,x.li,DATA.openings[x.oi].side);
+    return;
+  }
+  if(reviewQueue){ reviewQueue=null; showMenu(); return; }  // review session finished
   const op=DATA.openings[curOp];
   if(curLine+1 < op.lines.length) startDrill(curOp,curLine+1,playerSide);
   else if(curOp+1 < DATA.openings.length) startDrill(curOp+1,0,DATA.openings[curOp+1].side);
   else showMenu();
+}
+
+/* ================= REVIEW QUEUE ================= */
+let reviewQueue=null;
+function startReview(){
+  reviewQueue=srs.dueList();
+  if(!reviewQueue.length){ reviewQueue=null; showMenu(); return; }
+  const x=reviewQueue.shift();
+  startDrill(x.oi,x.li,DATA.openings[x.oi].side);
 }
 
 /* ================= UI helpers ================= */
