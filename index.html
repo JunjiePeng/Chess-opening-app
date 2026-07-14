@@ -93,7 +93,8 @@ header p { color:var(--dim); font-size:.9rem; }
 .sq .pc { pointer-events:none; }
 .pc { display:inline-flex; }
 .pc svg { width:1em; height:1em; display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.3)); }
-.sq.sel::after, .sq.hint::after, .sq.last::after { content:''; position:absolute; inset:0; }
+.sq.sel::after, .sq.hint::after, .sq.last::after { content:''; position:absolute; inset:0; z-index:0; }
+.sq .pc { position:relative; z-index:1; }
 .sq.sel::after { background:var(--hl); }
 .sq.last::after { background:var(--hl-last); }
 .sq.hint::after { box-shadow:inset 0 0 0 4px var(--accent); }
