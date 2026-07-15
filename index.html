@@ -146,6 +146,15 @@ button.act.primary { background:var(--accent); color:#241c10; border-color:var(-
 .line-row.faved { border-left:3px solid #f5c542; border-radius:0 8px 8px 0; background:rgba(245,197,66,.06); }
 .due-tag { color:var(--accent); font-weight:700; font-size:.7rem; }
 .day-streak b { color:var(--accent); }
+.today-bar { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; justify-content:space-between;
+  background:var(--panel); border:1px solid var(--accent); border-radius:12px; padding:12px 16px; margin-bottom:14px; }
+.tb-stats { font-size:.9rem; color:var(--dim); } .tb-stats b { color:var(--accent); }
+.tb-btns { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.tb-cont { max-width:340px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.group-head.clickable { cursor:pointer; user-select:none; }
+.group-head.clickable:hover { color:var(--accent); }
+.group-head .caret { margin-right:6px; color:var(--accent); }
+.group-head .g-count { margin-left:8px; color:var(--dim); font-weight:400; font-size:.72rem; }
 .op-prog-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
 .op-prog { flex:1; height:5px; background:var(--panel2); border:1px solid var(--line); border-radius:3px; overflow:hidden; }
 .op-prog-fill { height:100%; background:var(--accent2); border-radius:3px; transition:width .3s; }
@@ -241,6 +250,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <div class="layout">
   <!-- ============ MENU ============ -->
   <div id="menu">
+    <div id="todayBar" class="today-bar" style="display:none"></div>
     <div id="freePlayCard">
       <div class="fp-text"><span class="fp-emoji">🤖</span><span><b data-i18n="freePlayTitle">Play a full game vs the Engine</b><br><span class="fp-sub" data-i18n="freePlaySub">Start from move 1 — I'll name your opening as you go</span></span></div>
       <div class="fp-btns">
@@ -248,9 +258,9 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <button class="act" data-i18n="freePlayAsBlack" onclick="startFreePlay('b')">Play as Black</button>
       </div>
     </div>
+    <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div class="op-grid" id="opGrid"></div>
     <div id="buildTag">Debut · build <b>G5</b> · 中文</div>
   </div>
 
@@ -420,7 +430,10 @@ Object.assign(I18N_EN, {
   reviewsLeft:'{n} review(s) left',
   dayStreak:'-day streak',
   heatTitle:'Training activity',
-  groupWFlank:'⚪ Play as White — flank openings (1.c4)'
+  groupWFlank:'⚪ Play as White — flank openings (1.c4)',
+  dueShort:'due for review',
+  continueWord:'Continue',
+  opCount:'{n} opening(s)'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -437,7 +450,10 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   reviewsLeft:'剩余 {n} 条待复习',
   dayStreak:' 天连续训练',
   heatTitle:'训练记录',
-  groupWFlank:'⚪ 执白 —— 侧翼开局（1.c4）'
+  groupWFlank:'⚪ 执白 —— 侧翼开局（1.c4）',
+  dueShort:'条待复习',
+  continueWord:'继续',
+  opCount:'{n} 个开局'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -1126,11 +1142,11 @@ function showMenu(){
   }));
   // group: side + first move (e2e4 / d2d4)
   const groups=[
-    {label:t('groupWE4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='e2e4'},
-    {label:t('groupWD4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='d2d4'},
-    {label:t('groupBE4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='e2e4'},
-    {label:t('groupBD4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'},
-    {label:t('groupWFlank'), test:op=>op.side==='w'&&op.lines[0].moves[0].u!=='e2e4'&&op.lines[0].moves[0].u!=='d2d4'}
+    {id:'we4', label:t('groupWE4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='e2e4'},
+    {id:'wd4', label:t('groupWD4'), test:op=>op.side==='w'&&op.lines[0].moves[0].u==='d2d4'},
+    {id:'be4', label:t('groupBE4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='e2e4'},
+    {id:'bd4', label:t('groupBD4'), test:op=>op.side==='b'&&op.lines[0].moves[0].u==='d2d4'},
+    {id:'wfl', label:t('groupWFlank'), test:op=>op.side==='w'&&op.lines[0].moves[0].u!=='e2e4'&&op.lines[0].moves[0].u!=='d2d4'}
   ];
   const order=[];
   // starred openings (full card) and openings with starred lines (card filtered to those lines) pinned first
@@ -1139,15 +1155,19 @@ function showMenu(){
     if(favs.has(op.name)) favMembers.push({op,oi});
     else if(op.lines.some(l=>lineFavs.has(op,l))) favMembers.push({op,oi,onlyFav:true});
   });
-  if(favMembers.length) order.push({label:t('groupFav'), members:favMembers});
+  if(favMembers.length) order.push({id:'fav', label:t('groupFav'), members:favMembers});
   groups.forEach(g=>{
     const members=DATA.openings.map((op,oi)=>({op,oi})).filter(x=>g.test(x.op));
-    if(members.length) order.push({label:g.label, members});
+    if(members.length) order.push({id:g.id, label:g.label, members});
   });
+  let collapsed={}; try{ collapsed=JSON.parse(localStorage.getItem('otGroups')||'{}'); }catch(e){}
   order.forEach(group=>{
-    const h=document.createElement('div'); h.className='group-head'; h.textContent=group.label;
+    const isC=!!collapsed[group.id];
+    const h=document.createElement('div'); h.className='group-head clickable';
+    h.innerHTML=`<span class="caret">${isC?'▸':'▾'}</span>${group.label}<span class="g-count">${t('opCount',{n:group.members.length})}</span>`;
+    h.onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
     grid.appendChild(h);
-    group.members.forEach(({op,oi,onlyFav})=>{ grid.appendChild(buildOpCard(op,oi,onlyFav)); });
+    if(!isC) group.members.forEach(({op,oi,onlyFav})=>{ grid.appendChild(buildOpCard(op,oi,onlyFav)); });
   });
   function buildOpCard(op,oi,onlyFavLines){
     const card=document.createElement('div'); card.className='op-card clickable';
@@ -1187,13 +1207,36 @@ function showMenu(){
     });
     return card;
   }
-  const due=srs.dueList(), dayStreak=activity.streak();
   document.getElementById('summaryBar').innerHTML=
     `<div><b>${totalLines}</b>${t('linesWord')}</div><div><b>${mastered}</b>${t('masteredWord')}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
-     ${dayStreak?`<div class="day-streak">🔥 <b>${dayStreak}</b>${t('dayStreak')}</div>`:''}
-     ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:`<div>${t('noneDue')}</div>`}
      <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
+  renderTodayBar();
   renderHeatmap();
+}
+
+/* "Today" bar: review queue, streak, and continue-where-you-left-off. */
+function renderTodayBar(){
+  const el=document.getElementById('todayBar'); if(!el) return;
+  const due=srs.dueList(), dayStreak=activity.streak();
+  let last=null; try{ last=JSON.parse(localStorage.getItem('otLast')||'null'); }catch(e){}
+  const lastOp = last && DATA.openings[last.oi];
+  const lastOk = lastOp && lastOp.lines[last.li];
+  el.style.display='flex';
+  el.innerHTML=
+    `<div class="tb-stats">${dayStreak?`🔥 <b>${dayStreak}</b>${t('dayStreak')} · `:''}${due.length?`<b>${due.length}</b> ${t('dueShort')}`:t('noneDue')}</div>
+     <div class="tb-btns">
+       ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:''}
+       ${lastOk?`<button class="mini tb-cont" onclick="resumeLast()">${t('continueWord')}: ${opName(lastOp)} — ${lnName(lastOp.lines[last.li])}</button>`:''}
+     </div>`;
+}
+function rememberLast(oi,li,mode){ try{ localStorage.setItem('otLast',JSON.stringify({oi,li,mode})); }catch(e){} }
+function resumeLast(){
+  let last=null; try{ last=JSON.parse(localStorage.getItem('otLast')||'null'); }catch(e){}
+  if(!last || !DATA.openings[last.oi] || !DATA.openings[last.oi].lines[last.li]) return;
+  const side=DATA.openings[last.oi].side;
+  if(last.mode==='learn') startLearn(last.oi,last.li,side);
+  else if(last.mode==='play') startPlay(last.oi,last.li,side);
+  else startDrill(last.oi,last.li,side);
 }
 function backToLines(){ showMenu(); }
 
@@ -1223,6 +1266,7 @@ function quickStart(oi){
 
 /* ================= DRILL ================= */
 function startDrill(oi,li,side){
+  rememberLast(oi,li,'drill');
   curOp=oi; curLine=li; playerSide=side; mode='drill';
   board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
@@ -1309,6 +1353,7 @@ function playSetupUI(side){
   Engine.load();
 }
 function startPlay(oi,li,side){
+  rememberLast(oi,li,'play');
   curOp=oi; curLine=li; playerSide=side; mode='play'; freeMode=false;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
   playHist=[]; playWhite=true; playOver=false;
@@ -1754,6 +1799,7 @@ function updateProgress(){
 
 /* ================= LEARN MODE ================= */
 function startLearn(oi,li,side){
+  rememberLast(oi,li,'learn');
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
