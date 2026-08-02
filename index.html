@@ -34,6 +34,10 @@ header p { color:var(--dim); font-size:.9rem; }
 .op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
 #buildTag { text-align:center; color:var(--dim); font-size:.72rem; margin-top:22px; opacity:.6; }
 #buildTag b { color:var(--accent); }
+#backupRow { text-align:center; margin-top:4px; }
+#backupRow .linklike { background:none; border:none; color:var(--dim); cursor:pointer; font-size:.72rem;
+  opacity:.75; text-decoration:underline dotted; padding:2px 4px; }
+#backupRow .linklike:hover { color:var(--accent); opacity:1; }
 #freePlayCard { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   background:linear-gradient(120deg, #2a2218, #2f2820); border:1px solid var(--accent); border-radius:12px;
   padding:14px 18px; margin-bottom:16px; }
@@ -261,7 +265,13 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G5</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G6</b> · 中文</div>
+    <div id="backupRow">
+      <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
+      <span style="color:var(--dim);opacity:.5">·</span>
+      <button class="linklike" data-i18n="backupImport" onclick="importProgress()"></button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -433,7 +443,11 @@ Object.assign(I18N_EN, {
   groupWFlank:'⚪ Play as White — flank openings (1.c4)',
   dueShort:'due for review',
   continueWord:'Continue',
-  opCount:'{n} opening(s)'
+  opCount:'{n} opening(s)',
+  backupExport:'💾 Export progress',
+  backupImport:'📥 Import progress',
+  importOk:'Imported {n} item(s) — reloading…',
+  importBad:'Not a valid Debut progress file.'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -453,7 +467,11 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   groupWFlank:'⚪ 执白 —— 侧翼开局（1.c4）',
   dueShort:'条待复习',
   continueWord:'继续',
-  opCount:'{n} 个开局'
+  opCount:'{n} 个开局',
+  backupExport:'💾 导出进度',
+  backupImport:'📥 导入进度',
+  importOk:'已导入 {n} 项——正在刷新…',
+  importBad:'不是有效的 Debut 进度文件。'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -584,10 +602,32 @@ function refreshMenuKeepScroll(){
 function toggleFav(name){ favs.toggle(name); refreshMenuKeepScroll(); }
 function toggleLineFav(op,line){ lineFavs.toggle(op,line); refreshMenuKeepScroll(); }
 
+/* Progress and SRS records are keyed by stable English names ("Opening|Line"),
+   like favorites, so inserting or reordering openings in DATA can never
+   mis-attribute a user's history. Index-based keys from older builds are
+   migrated once, mapped through the current DATA order. */
+function lineKey(oi,li){ const op=DATA.openings[oi]; return op.name+'|'+op.lines[li].name; }
+(function migrateIndexKeys(){
+  try{
+    if(localStorage.getItem('otKeysV2')) return;
+    ['openingTrainer','otSrs'].forEach(name=>{
+      let o; try{ o=JSON.parse(localStorage.getItem(name)||'{}'); }catch(e){ return; }
+      let changed=false;
+      for(const k of Object.keys(o)){
+        const m=k.match(/^(\d+):(\d+)$/); if(!m) continue;
+        const op=DATA.openings[+m[1]], ln=op&&op.lines[+m[2]];
+        if(ln && !(op.name+'|'+ln.name in o)) o[op.name+'|'+ln.name]=o[k];
+        delete o[k]; changed=true;
+      }
+      if(changed) localStorage.setItem(name, JSON.stringify(o));
+    });
+    localStorage.setItem('otKeysV2','1');
+  }catch(e){}
+})();
 const store = {
   load(){ try { return JSON.parse(localStorage.getItem('openingTrainer')||'{}'); } catch(e){ return {}; } },
   save(o){ localStorage.setItem('openingTrainer', JSON.stringify(o)); },
-  key(oi,li){ return oi+':'+li; },
+  key(oi,li){ return lineKey(oi,li); },
   get(oi,li){ const s=this.load(); return s[this.key(oi,li)] || {runs:0,perfect:0,streak:0}; },
   record(oi,li,perfect){ const s=this.load(); const k=this.key(oi,li);
     const v=s[k]||{runs:0,perfect:0,streak:0};
@@ -621,9 +661,9 @@ const DAY_MS=864e5;
 const srs = {
   load(){ try { return JSON.parse(localStorage.getItem('otSrs')||'{}'); } catch(e){ return {}; } },
   save(o){ localStorage.setItem('otSrs', JSON.stringify(o)); },
-  get(oi,li){ return this.load()[oi+':'+li] || null; },
+  get(oi,li){ return this.load()[lineKey(oi,li)] || null; },
   grade(oi,li,g){
-    const all=this.load(), k=oi+':'+li, now=Date.now();
+    const all=this.load(), k=lineKey(oi,li), now=Date.now();
     let v=all[k];
     if(!v){ v={d:FSRS.initDifficulty(g), s:FSRS.initStability(g), last:now, reps:1}; }
     else {
@@ -639,7 +679,7 @@ const srs = {
   dueList(){
     const all=this.load(), now=Date.now(), out=[];
     DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{
-      const v=all[oi+':'+li];
+      const v=all[op.name+'|'+l.name];
       if(v && v.due<=now) out.push({oi,li,overdue:now-v.due});
     }));
     out.sort((a,b)=>b.overdue-a.overdue);
@@ -660,6 +700,45 @@ const activity = {
     return n;
   }
 };
+
+/* ================= PROGRESS BACKUP (export / import file) =================
+   Everything lives in localStorage, which browsers wipe without warning and
+   which can't follow the user to another device. A plain JSON file is the
+   escape hatch until real sync exists. */
+const BUILD='G6';
+const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
+function exportProgress(){
+  const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString()};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(BACKUP_KEY_RE.test(k)) out[k]=localStorage.getItem(k);
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));
+  a.download='debut-progress-'+activity.key()+'.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+}
+function importProgress(){ const el=document.getElementById('importFile'); if(el) el.click(); }
+(function(){
+  const el=document.getElementById('importFile'); if(!el) return;
+  el.addEventListener('change', e=>{
+    const f=e.target.files && e.target.files[0]; if(!f) return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      try{
+        const o=JSON.parse(rd.result);
+        if(!o || o.__app!=='debut-progress') throw new Error('not a progress file');
+        let n=0;
+        for(const k in o){ if(BACKUP_KEY_RE.test(k) && typeof o[k]==='string'){ localStorage.setItem(k,o[k]); n++; } }
+        alert(t('importOk',{n}));
+        location.reload();
+      }catch(err){ alert(t('importBad')); }
+    };
+    rd.readAsText(f);
+    e.target.value='';
+  });
+})();
 
 /* ================= SOUND (Web Audio, fully synthesized) ================= */
 const SFX = {
@@ -1829,7 +1908,9 @@ function learnNextHint(){
 function learnShowStep(){
   const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
   if(learnPly===0){
-    document.getElementById('prompt').innerHTML = t('overview') + learnNextHint();
+    // single <span> child: #prompt is a flex box, and multiple inline children
+    // would be laid out as separate centered columns instead of flowing text
+    document.getElementById('prompt').innerHTML = '<span>'+t('overview')+learnNextHint()+'</span>';
     document.getElementById('prompt').className='';
     document.getElementById('comment').innerHTML = lnIntro(line);
     curAnnot=null; drawAnnots();
@@ -1842,7 +1923,7 @@ function learnShowStep(){
       document.getElementById('comment').innerHTML += `<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
     } else {
       const p=document.getElementById('prompt');
-      p.innerHTML = `✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint();
+      p.innerHTML = `<span>✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint() + '</span>';
       p.className='good';
     }
   }
@@ -1880,7 +1961,7 @@ function learnTryMove(u){
     render(curLastU());
     highlightSq(expected.u.slice(0,2));
     const p=document.getElementById('prompt');
-    p.innerHTML = t('notTheOne',{san:expected.san});
+    p.innerHTML = '<span>'+t('notTheOne',{san:expected.san})+'</span>';
     p.className='bad';
   }
 }
@@ -1895,6 +1976,11 @@ renderEvalBtn();
 updateEngineBadge();
 setupSwipeBack();
 showMenu();
+// Offline shell: the manifest alone doesn't make a PWA work offline — the
+// service worker does. file:// and headless test stubs are skipped.
+if(typeof navigator!=='undefined' && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 
 /* Swipe right anywhere on the board screen → go back to the menu (one level up).
    Ignores gestures that start on interactive controls (slider, buttons, move list). */
