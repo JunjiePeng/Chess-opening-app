@@ -84,12 +84,12 @@ header p { color:var(--dim); font-size:.9rem; }
 .side-tag { font-size:.7rem; padding:2px 9px; border-radius:999px; margin-left:6px; vertical-align:middle; }
 .side-w { background:#f0e5d3; color:#33281a; } .side-b { background:#1c1610; color:#d8c9b0; border:1px solid var(--line); }
 .summary-bar { display:flex; gap:18px; flex-wrap:wrap; background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4);
-  border-radius:24px; padding:12px 18px; margin-bottom:16px; font-size:.85rem; color:var(--dim); }
+  border-radius:24px; padding:12px 18px; margin:16px 0 16px; font-size:.85rem; color:var(--dim); }
 .summary-bar b { color:var(--text); font-size:1.05rem; display:block; }
 
 /* ---- drill ---- */
 #drill { display:none; }
-#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100vh - 170px), 660px); }
+#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100vh - 170px), max(560px, calc(100vw - 470px)), 840px); }
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
 #evalBarWrap { display:none; width:20px; height:var(--bsize); position:relative; flex:0 0 auto;
@@ -99,8 +99,8 @@ header p { color:var(--dim); font-size:.9rem; }
 #evalNum { position:absolute; left:0; right:0; top:3px; text-align:center; font-size:.52rem; font-weight:800;
   color:#f0e5d3; text-shadow:0 0 3px rgba(0,0,0,.75), 0 0 3px rgba(0,0,0,.75); z-index:2; }
 .cap-tray { width:var(--bsize); min-height:22px; display:none; align-items:center; flex-wrap:wrap; }
-.cap-tray .cap { display:inline-flex; align-items:center; font-size:19px; line-height:1; margin-right:-1px; }
-.cap-tray .bp svg { filter:drop-shadow(0 0 1.5px rgba(255,246,230,.4)); }  /* halo so dark pieces show on the wood panel */
+.cap-tray .cap { display:inline-flex; align-items:center; font-size:23px; line-height:1; margin-right:-1px; }
+.cap-tray .bp svg { filter:drop-shadow(0 0 2px rgba(255,246,230,.85)) drop-shadow(0 0 5px rgba(255,246,230,.35)); }  /* halo so dark pieces show on the wood panel */
 .cap-tray .adv { margin-left:10px; font-weight:700; color:#a9bb8a; font-size:.9rem; }
 #board {
   display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr);
@@ -831,10 +831,12 @@ const SFX = {
     this.tone(f,.05,{type:'triangle',vol:vol*.5,delay,slide:f*.72});
   },
   move(){ this.tap(330,.5); },
-  capture(){ this.tap(300,.55); this.tap(205,.42,.035); }, // softer two-piece "clack"
+  capture(){ this.noise(.018,{vol:.3,freq:3200}); this.tap(340,.65); this.tap(215,.5,.03); }, // crisp snap + two-piece clack
   castle(){ this.tap(330,.45); this.tap(290,.45,.1); },                                          // double knock
   check(){ this.tap(490,.42); this.tap(620,.3,.055); },                                          // lighter double tap
-  mate(){ this.tap(180,.5); [392,494,587,784].forEach((f,i)=>this.tone(f,.2,{vol:.09,delay:.12+i*.085})); },
+  mate(){ this.tap(180,.55); this.tap(140,.45,.09); },   // neutral, heavy double tap for the mating move itself
+  mateWin(){ [392,494,587,784].forEach((f,i)=>this.tone(f,.2,{vol:.09,delay:.15+i*.085})); },     // rising major — you won
+  mateLose(){ [330,262,220].forEach((f,i)=>this.tone(f,.3,{vol:.07,delay:.18+i*.15})); },         // slow descending — subdued, not punishing
   error(){ this.tone(170,.1,{vol:.07}); this.tone(136,.14,{vol:.055,delay:.055}); },
   success(){ [392,494,587].forEach((f,i)=>this.tone(f,.16,{vol:.09,delay:i*.08})); },
   perfect(){ [392,494,587,784].forEach((f,i)=>this.tone(f,.18,{vol:.09,delay:i*.08})); this.tone(784,.45,{vol:.045,delay:.38}); }
@@ -1583,8 +1585,12 @@ function setEvalBar(cp){
 }
 async function updateEvalBar(){
   const wrap=document.getElementById('evalBarWrap'); if(!wrap) return;
-  if(mode!=='play' || !showEvalBar){ wrap.style.display='none'; return; }
+  if(mode!=='play'){ wrap.style.display='none'; return; }
+  // In play mode the bar always keeps its layout slot; only visibility toggles,
+  // so switching it on/off never shifts the board.
   wrap.style.display='block';
+  wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
+  if(!showEvalBar) return;
   if(!(await Engine.load())){ setEvalBar(null); return; }
   const myseq=++evalSeq;
   const fen=toFEN(playWhite);
@@ -1724,7 +1730,7 @@ function finishPlay(status){
   let msg;
   if(status==='checkmate'){
     const loserWhite=playWhite; const userLost = (loserWhite===(playerSide==='w'));
-    SFX.mate();
+    if(userLost) SFX.mateLose(); else SFX.mateWin();
     msg = userLost ? t('checkmateLose') : t('checkmateWin');
   } else {
     SFX.success();
@@ -1736,6 +1742,12 @@ function finishPlay(status){
 function lineMoves(){ return DATA.openings[curOp].lines[curLine].moves; }
 function isPlayerTurn(){ return (ply%2===0?'w':'b')===playerSide; }
 
+// Opponent replies speed up as the line becomes familiar (per-line perfect streak),
+// so well-known lines feel fluid instead of waiting on a fixed delay.
+function drillReplyDelay(){
+  const st=store.get(curOp,curLine);
+  return st.streak>=3 ? 260 : st.streak>=1 ? 400 : st.runs>0 ? 550 : 650;
+}
 function tick(){
   const moves=lineMoves();
   if(ply>=moves.length){ finishLine(); return; }
@@ -1754,7 +1766,7 @@ function tick(){
       showComment(mv);
       updateMoveList(); updateProgress();
       tick();
-    }, ply===0?500:700);
+    }, ply===0?400:drillReplyDelay());
   }
 }
 
@@ -1798,7 +1810,7 @@ function attemptMove(u){
     setPrompt(`✓ ${expected.san} ${t('correctNow')}`,'good');
     showComment(expected);
     updateMoveList(); updateProgress();
-    setTimeout(tick, 650);
+    setTimeout(tick, drillReplyDelay());
   } else {
     misses++; mistakesThisRun++; selSq=null; aimSet=null;
     buzz([12,40,12]);
@@ -2026,6 +2038,7 @@ function nextStep(){
   selSq=null; aimSet=null;
   applyMove(mv.u); learnPly++;
   playMoveSound(mv,cap);
+  if(learnPly===moves.length) setTimeout(()=>SFX.success(), 200);   // line complete
   learnShowStep();
   render(mv.u);
 }
