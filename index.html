@@ -185,7 +185,26 @@ button.act.primary:hover { background:#bb6f36; }
 .op-prog-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
 .op-prog { flex:1; height:6px; background:#453623; border:none; border-radius:999px; overflow:hidden; }
 .op-prog-fill { height:100%; background:var(--accent2); border-radius:999px; transition:width .3s; }
-.op-prog-n { font-size:.7rem; color:var(--dim); }
+.op-prog-n { font-size:.7rem; color:var(--dim); letter-spacing:1px; white-space:nowrap; }
+.op-prog-fill.full { background:#f2cf9a; }
+.rank-chip { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px;
+  background:#453623; color:#c9bba3; white-space:nowrap; }
+.rank-chip.r2 { color:#d8c9b0; background:#4a3b27; }
+.rank-chip.r3 { color:#a9bb8a; background:#39412a; }
+.rank-chip.r4 { color:#e0a878; background:#4d3a20; }
+.rank-chip.r5 { color:#f2cf9a; background:#553f1d; box-shadow:0 0 8px rgba(242,207,154,.25); }
+.stat-row .due-tag { margin-left:4px; }
+.next-rank-hint { color:var(--dim); font-size:.8rem; }
+.tier-counts { display:flex; gap:10px; align-items:center; }
+.tier-count { font-size:.85rem; color:var(--dim); }
+.tier-count b { margin-left:3px; }
+.tier-count.r3 { color:#a9bb8a; } .tier-count.r4 { color:#e0a878; } .tier-count.r5 { color:#f2cf9a; }
+.rep-strength b { color:#f2cf9a; font-size:1.05rem; }
+#rankUpBanner { margin:0 auto 12px; padding:10px 16px; border-radius:14px; background:#39412a; color:#c3d1a6;
+  font-weight:700; max-width:420px; animation:rankpop .5s ease; }
+#rankUpBanner.r4 { background:#4d3a20; color:#e0a878; }
+#rankUpBanner.r5 { background:#553f1d; color:#f2cf9a; box-shadow:0 0 14px rgba(242,207,154,.3); }
+@keyframes rankpop { 0%{transform:scale(.85);opacity:0} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
 .hm-wrap { display:flex; align-items:center; gap:12px; background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4);
   border-radius:18px; padding:10px 16px; margin-bottom:14px; overflow-x:auto; }
 .hm-title { font-size:.75rem; color:var(--dim); white-space:nowrap; flex:0 0 auto; }
@@ -336,6 +355,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <div id="comment"></div>
       </div>
       <div class="panel-box" id="doneBox">
+        <div id="rankUpBanner" style="display:none"></div>
         <div class="big"><span class="win-ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span></div>
         <div id="doneMsg"></div>
         <p id="doneStats"></p>
@@ -487,7 +507,21 @@ Object.assign(I18N_EN, {
   drawMaterial:'½–½ Draw — neither side has enough pieces left to checkmate.',
   drawRepetition:'½–½ Draw — the same position occurred three times (threefold repetition).',
   drawFifty:'½–½ Draw — 50 moves passed without a pawn move or a capture.',
-  gameOverDraw:'Game over — draw'
+  gameOverDraw:'Game over — draw',
+  rank1:'Learned', rank2:'Drilled', rank3:'Mastered', rank4:'Solid', rank5:'Cold',
+  rank1Tip:'You walked through this line in Learn mode.',
+  rank2Tip:'First perfect drill from memory.',
+  rank3Tip:'Three perfect drills in a row.',
+  rank4Tip:'Two-week memory — reviews keep succeeding.',
+  rank5Tip:'Month-deep memory. You know it cold.',
+  rankUp:'Rank up! {line} is now {rank}.',
+  learnedBadge:'♙ Learned! This line joins your drills.',
+  repStrength:'repertoire strength',
+  rankBarTip:'Each line climbs ♙→♘→♗→♖→♕',
+  toRank2:'A perfect drill earns ♘.',
+  toRank3:'{n} more perfect in a row earns ♗.',
+  toRank4:'Keep acing reviews — ♖ comes with a two-week memory.',
+  toRank5:'Keep going — ♕ comes with a month-deep memory.'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -521,7 +555,21 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   drawMaterial:'½–½ 和棋——双方剩余子力都不足以将杀。',
   drawRepetition:'½–½ 和棋——同一局面第三次出现（三次重复）。',
   drawFifty:'½–½ 和棋——连续 50 回合没有兵着或吃子。',
-  gameOverDraw:'对局结束——和棋'
+  gameOverDraw:'对局结束——和棋',
+  rank1:'已学会', rank2:'已操练', rank3:'已精通', rank4:'很扎实', rank5:'滚瓜烂熟',
+  rank1Tip:'已在学习模式走完本线。',
+  rank2Tip:'首次凭记忆全对操练。',
+  rank3Tip:'连续三次全对操练。',
+  rank4Tip:'记忆保持两周以上——复习持续成功。',
+  rank5Tip:'记忆超过一个月，烂熟于心。',
+  rankUp:'升级！{line} 现在是「{rank}」。',
+  learnedBadge:'♙ 已学会！本线加入你的操练列表。',
+  repStrength:'开局库强度',
+  rankBarTip:'每条线沿 ♙→♘→♗→♖→♕ 升级',
+  toRank2:'一次全对操练即可获得 ♘。',
+  toRank3:'再连续全对 {n} 次即可获得 ♗。',
+  toRank4:'保持复习全对——记忆满两周获得 ♖。',
+  toRank5:'继续保持——记忆满一个月获得 ♕。'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -694,8 +742,48 @@ const store = {
   record(oi,li,perfect){ const s=this.load(); const k=this.key(oi,li);
     const v=s[k]||{runs:0,perfect:0,streak:0};
     v.runs++; if(perfect){ v.perfect++; v.streak++; } else v.streak=0;
-    s[k]=v; this.save(s); return v; }
+    s[k]=v; this.save(s); return v; },
+  markLearned(oi,li){ const s=this.load(); const k=this.key(oi,li);
+    const v=s[k]||{runs:0,perfect:0,streak:0};
+    if(!v.learned){ v.learned=true; s[k]=v; this.save(s); } return v; }
 };
+
+/* ================= RANK LADDER (accomplishment system) =================
+   Every line climbs a chess-piece ladder: ♙ Learned → ♘ Drilled (first
+   perfect) → ♗ Mastered (3 perfect in a row) → ♖ Solid (two-week FSRS
+   stability) → ♕ Cold (month-deep memory). Ranks come from real signals and
+   NEVER go back down — the badge is a ratchet; only the review schedule
+   reacts to slips. */
+const RANKS=[null,
+  {icon:'♙'},{icon:'♘'},{icon:'♗'},{icon:'♖'},{icon:'♕'}];
+function computeRank(st, sv, prior){
+  let r = prior||0;
+  if(st.learned || st.runs>0) r=Math.max(r,1);
+  if(st.perfect>0) r=Math.max(r,2);
+  if(st.streak>=3) r=Math.max(r,3);
+  if(r>=3 && sv && (sv.reps||0)>=4 && sv.s>=14) r=Math.max(r,4);
+  if(r>=4 && sv && (sv.reps||0)>=5 && sv.s>=30) r=Math.max(r,5);
+  return r;
+}
+function lineRank(oi,li){ const st=store.get(oi,li); return computeRank(st, srs.get(oi,li), st.rank||0); }
+function persistRank(oi,li){   // ratchet the stored badge to whatever is earned now
+  const s=store.load(), k=store.key(oi,li);
+  const v=s[k]||{runs:0,perfect:0,streak:0};
+  const r=computeRank(v, srs.get(oi,li), v.rank||0);
+  if(r>(v.rank||0)){ v.rank=r; s[k]=v; store.save(s); }
+  return r;
+}
+function rankChipHTML(r){
+  return r ? `<span class="rank-chip r${r}" title="${t('rank'+r+'Tip')}">${RANKS[r].icon} ${t('rank'+r)}</span>` : '';
+}
+function nextRankHint(oi,li){
+  const r=lineRank(oi,li), st=store.get(oi,li);
+  if(r>=5) return '';
+  if(r<=1) return t('toRank2');
+  if(r===2) return t('toRank3',{n:Math.max(1,3-st.streak)});
+  if(r===3) return t('toRank4');
+  return t('toRank5');
+}
 
 /* ================= SPACED REPETITION (FSRS-4.5) =================
    Free Spaced Repetition Scheduler with default weights (open-spaced-repetition
@@ -848,6 +936,7 @@ const SFX = {
   mateLose(){ [330,262,220].forEach((f,i)=>this.tone(f,.3,{vol:.07,delay:.18+i*.15})); },         // slow descending — subdued, not punishing
   error(){ this.tone(170,.1,{vol:.07}); this.tone(136,.14,{vol:.055,delay:.055}); },
   success(){ [392,494,587].forEach((f,i)=>this.tone(f,.16,{vol:.09,delay:i*.08})); },
+  rankUp(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.16,{vol:.11,delay:i*.07})); this.tone(1568,.4,{vol:.05,delay:.34}); },
   perfect(){ [392,494,587,784].forEach((f,i)=>this.tone(f,.18,{vol:.09,delay:i*.08})); this.tone(784,.45,{vol:.045,delay:.38}); }
 };
 const ICON_ON = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
@@ -1287,6 +1376,7 @@ function renderAnnotBtn(){
   const b=document.getElementById('annotBtn'); if(b) b.textContent=t(showAnnots?'arrowsOn':'arrowsOff');
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
+let learnCredited=false;  // one ♙/streak credit per learn run, guarded against Back/Next refires
 let userShapes=[];     // right-click marks: {from,to} arrows and {sq} highlights
 let rcFrom=null;       // square where a right-button drag started
 function drawAnnots(){
@@ -1325,9 +1415,10 @@ function showMenu(){
   document.getElementById('menu').style.display='block';
   const grid=document.getElementById('opGrid'); grid.innerHTML='';
   // summary stats over all openings (computed here, not per card, since favorites duplicate cards)
-  let mastered=0, totalLines=0, totalRuns=0;
+  let totalLines=0, totalRuns=0, rankSum=0; const tierCounts=[0,0,0,0,0,0];
   DATA.openings.forEach((op,oi)=>op.lines.forEach((line,li)=>{
-    totalLines++; const st=store.get(oi,li); totalRuns+=st.runs; if(st.streak>=3) mastered++;
+    totalLines++; const st=store.get(oi,li); totalRuns+=st.runs;
+    const r=lineRank(oi,li); rankSum+=r; tierCounts[r]++;
   }));
   // group: side + first move (e2e4 / d2d4)
   const groups=[
@@ -1385,8 +1476,10 @@ function showMenu(){
     const tag = `<span class="side-tag ${op.side==='w'?'side-w':'side-b'}">${op.side==='w'?t('white'):t('black')}</span>`;
     const isFav=favs.has(op.name);
     const star=`<button class="fav-btn${isFav?' on':''}" title="${t(isFav?'favRemove':'favAdd')}" aria-label="${t(isFav?'favRemove':'favAdd')}">${isFav?'★':'☆'}</button>`;
-    const doneN=op.lines.reduce((s,_,li2)=>s+(store.get(oi,li2).streak>=3?1:0),0);
-    const prog=`<div class="op-prog-row"><div class="op-prog"><div class="op-prog-fill" style="width:${Math.round(100*doneN/op.lines.length)}%"></div></div><span class="op-prog-n">${doneN}/${op.lines.length}</span></div>`;
+    const ranks=op.lines.map((_,li2)=>lineRank(oi,li2));
+    const rankSum=ranks.reduce((a,b)=>a+b,0), rankMax=op.lines.length*5;
+    const icons=ranks.map(r=>r?RANKS[r].icon:'·').join(' ');
+    const prog=`<div class="op-prog-row"><div class="op-prog"><div class="op-prog-fill${rankSum===rankMax?' full':''}" style="width:${Math.round(100*rankSum/rankMax)}%"></div></div><span class="op-prog-n" title="${t('rankBarTip')}">${icons}</span></div>`;
     card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}${star}</h2>${prog}<div class="desc">${opDesc(op)}</div>`;
     const fb=card.querySelector('.fav-btn');
     if(fb) fb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); toggleFav(op.name); };
@@ -1394,14 +1487,13 @@ function showMenu(){
     card.title=t('clickCard');
     op.lines.forEach((line,li)=>{
       if(lineFilter && !lineFilter(line)) return;
-      const st=store.get(oi,li);
-      const isMastered = st.streak>=3;
       const sv=srs.get(oi,li);
+      const r=lineRank(oi,li);
       const dueTag = (sv && sv.due<=Date.now()) ? ` <span class="due-tag">${t('dueTag')}</span>` : '';
-      const stat = (isMastered ? t('mastered') : st.runs? t('runsPerfect',{p:st.perfect,r:st.runs}) : t('newWord')) + dueTag;
+      const stat = (r ? rankChipHTML(r) : `<span class="stat">${t('newWord')}</span>`) + dueTag;
       const isLF=lineFavs.has(op,line);
       const row=document.createElement('div'); row.className='line-row'+(isLF?' faved':'');
-      row.innerHTML=`<button class="ln-fav${isLF?' on':''}" title="${t(isLF?'favRemove':'favAdd')}" aria-label="${t(isLF?'favRemove':'favAdd')}">${isLF?'★':'☆'}</button><div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat ${isMastered?'mastered':''}">${stat}</span></div>`;
+      row.innerHTML=`<button class="ln-fav${isLF?' on':''}" title="${t(isLF?'favRemove':'favAdd')}" aria-label="${t(isLF?'favRemove':'favAdd')}">${isLF?'★':'☆'}</button><div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat-row">${stat}</span></div>`;
       const lf=row.querySelector('.ln-fav');
       if(lf) lf.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); toggleLineFav(op,line); };
       const lb=document.createElement('button'); lb.className='mini'; lb.textContent=t('learn');
@@ -1418,8 +1510,10 @@ function showMenu(){
     });
     return card;
   }
+  const strength=Math.round(100*rankSum/(totalLines*5));
+  const tiers=[1,2,3,4,5].map(r=>`<span class="tier-count r${r}" title="${t('rank'+r)} — ${t('rank'+r+'Tip')}">${RANKS[r].icon}<b>${tierCounts[r]}</b></span>`).join('');
   document.getElementById('summaryBar').innerHTML=
-    `<div><b>${totalLines}</b>${t('linesWord')}</div><div><b>${mastered}</b>${t('masteredWord')}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
+    `<div class="rep-strength"><b>${strength}%</b>${t('repStrength')}</div><div class="tier-counts">${tiers}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
      <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
   renderTodayBar();
   renderHeatmap();
@@ -2009,22 +2103,33 @@ function highlightSq(name){
 
 function finishLine(){
   locked=true;
+  const preRank = lineRank(curOp,curLine);
   const perfect = mistakesThisRun===0;
-  if(perfect) SFX.perfect(); else SFX.success();
   const st=store.record(curOp,curLine,perfect);
   activity.log();
   // FSRS grade: perfect on an established streak = easy, perfect = good, 1-2 slips = hard, more = again
   const g = perfect ? (st.streak>=3?4:3) : (mistakesThisRun<=2?2:1);
   const sv=srs.grade(curOp,curLine,g);
+  const newRank = persistRank(curOp,curLine);
+  const rankedUp = newRank>preRank;
+  if(rankedUp) SFX.rankUp(); else if(perfect) SFX.perfect(); else SFX.success();
   const inDays=Math.max(1,Math.round((sv.due-Date.now())/DAY_MS));
   document.getElementById('promptBox').style.display='none';
   const box=document.getElementById('doneBox'); box.style.display='block';
+  const banner=document.getElementById('rankUpBanner');
+  if(banner){
+    banner.className='r'+newRank;
+    banner.style.display = rankedUp ? 'block' : 'none';
+    if(rankedUp) banner.innerHTML = `${RANKS[newRank].icon} ${t('rankUp',{line: lnName(DATA.openings[curOp].lines[curLine]), rank: t('rank'+newRank)})}`;
+  }
   document.getElementById('doneMsg').innerHTML = perfect
     ? t('perfectRun')
     : t('slips',{n:mistakesThisRun});
   const revLeft = (reviewQueue&&reviewQueue.length) ? ` · ${t('reviewsLeft',{n:reviewQueue.length})}` : '';
-  document.getElementById('doneStats').textContent =
-    `${t('perfectStreak')}${st.streak}${st.streak>=3?t('masteredTag'):''} · ${t('runsPerfect',{p:st.perfect,r:st.runs})} · ${t('nextReview',{d:inDays})}${revLeft}`;
+  const hint = nextRankHint(curOp,curLine);
+  document.getElementById('doneStats').innerHTML =
+    `${rankChipHTML(newRank)} ${t('runsPerfect',{p:st.perfect,r:st.runs})} · ${t('nextReview',{d:inDays})}${revLeft}` +
+    (hint?`<br><span class="next-rank-hint">${hint}</span>`:'');
   document.getElementById('donePlan').innerHTML =
     `<b>${t('whatHappensAfter')}</b> ${lnPlan(DATA.openings[curOp].lines[curLine])}`;
   document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
@@ -2076,6 +2181,7 @@ function updateProgress(){
 /* ================= LEARN MODE ================= */
 function startLearn(oi,li,side){
   rememberLast(oi,li,'learn');
+  learnCredited=false;
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
@@ -2118,7 +2224,14 @@ function learnShowStep(){
     showComment(mv);
     if(learnPly===moves.length){
       setPrompt(`✓ ${mv.san} — ${t('lineComplete')}`,'good');
-      document.getElementById('comment').innerHTML += `<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
+      let learnedNote='';
+      if(!learnCredited){
+        learnCredited=true;
+        const pre=lineRank(curOp,curLine);
+        store.markLearned(curOp,curLine); activity.log();
+        if(persistRank(curOp,curLine)>pre) learnedNote=`<br><br><span class="rank-chip r1">${t('learnedBadge')}</span>`;
+      }
+      document.getElementById('comment').innerHTML += `${learnedNote}<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
     } else {
       const p=document.getElementById('prompt');
       p.innerHTML = `<span>✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint() + '</span>';
