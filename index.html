@@ -93,7 +93,7 @@ header p { color:var(--dim); font-size:.9rem; }
 .board-wrap { position:relative; }
 #evalBarWrap { display:none; width:20px; height:var(--bsize); position:relative; flex:0 0 auto;
   background:#171006; border:2px solid rgba(0,0,0,.45); border-radius:6px; overflow:hidden; }
-#evalFill { position:absolute; left:0; right:0; bottom:0; height:50%; background:#f0e9da; transition:height .35s ease; }
+#evalFill { position:absolute; left:0; right:0; bottom:0; height:50%; background:#f0e9da; transition:height .65s cubic-bezier(.22,.8,.36,1); }
 #evalBarWrap::after { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(198,113,57,.7); }
 #evalNum { position:absolute; left:0; right:0; top:3px; text-align:center; font-size:.52rem; font-weight:800;
   color:#f0e5d3; text-shadow:0 0 3px rgba(0,0,0,.75), 0 0 3px rgba(0,0,0,.75); z-index:2; }
@@ -227,6 +227,13 @@ button.act.primary:hover { background:#bb6f36; }
 .medal-row.got { opacity:1; }
 .medal-row .m-txt { display:flex; flex-direction:column; min-width:0; }
 .medal-row .m-txt span { color:var(--dim); font-size:.78rem; }
+.medal-row.series { opacity:1; }
+.medal-row.series:not(.got) .m-txt { opacity:.6; }
+.m-dots { display:flex; gap:3px; flex:0 0 auto; align-items:center; }
+.m-dot.off { opacity:.25; }
+.m-prog { height:4px; background:#3f3222; border-radius:999px; overflow:hidden; margin-top:4px; width:150px; }
+.m-prog-fill { height:100%; background:var(--accent); border-radius:999px; }
+.m-prog-n { color:var(--dim); font-size:.72rem; margin-top:2px; }
 .rank-chip.r2 { color:#d8c9b0; background:#4a3b27; }
 .rank-chip.r3 { color:#a9bb8a; background:#39412a; }
 .rank-chip.r4 { color:#e0a878; background:#4d3a20; }
@@ -572,7 +579,9 @@ Object.assign(I18N_EN, {
   deepCount:'{n} deepening',
   medalsTitle:'Medals',
   medalEarned:'Medal earned',
-  secretMedal:'??? — a secret medal'
+  secretMedal:'??? — a secret medal',
+  pieceCue:'Hint: the line plays a {piece} move.',
+  cueCastle:'Hint: the line castles here.'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -633,7 +642,9 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   deepCount:'{n} 条巩固中',
   medalsTitle:'奖章',
   medalEarned:'获得奖章',
-  secretMedal:'??? —— 隐藏奖章'
+  secretMedal:'??? —— 隐藏奖章',
+  pieceCue:'提示：本线这步走的是{piece}。',
+  cueCastle:'提示：本线在这里易位。'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -910,31 +921,37 @@ const MEDALS=[
  {id:'first_steps', t:'b', en:'First Steps', zh:'第一步', ce:'Finish your first line', cz:'走完第一条线', test:S=>S.lines.some(x=>x.r>=1)},
  {id:'clean_sheet', t:'b', en:'Clean Sheet', zh:'零失误', ce:'A perfect drill with no hints', cz:'不用提示，全对操练一次', test:S=>S.ev==='drill'&&S.d.clean},
  {id:'first_rook', t:'s', en:'First Rook', zh:'首个车', ce:'Promote any line to ♜', cz:'任一条线升为 ♜', test:S=>S.lines.some(x=>x.r>=4)},
- {id:'first_queen', t:'g', en:'First Queen', zh:'首个后', ce:'Crown any line ♛', cz:'任一条线加冕为 ♛', test:S=>S.lines.some(x=>x.r>=5)},
- {id:'gap14', t:'s', en:'Two Weeks Strong', zh:'两周不忘', ce:'Perfect recall after a 14-day break', cz:'相隔 14 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=14},
- {id:'gap30', t:'g', en:'Iron Memory', zh:'三十天铁记', ce:'Perfect recall after a 30-day break', cz:'相隔 30 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=30},
+ {id:'first_queen', t:'g', series:'queens', goal:1, en:'First Queen', zh:'首个后', ce:'Crown any line ♛', cz:'任一条线加冕为 ♛', test:S=>S.lines.some(x=>x.r>=5)},
+ {id:'queens3', t:'g', series:'queens', goal:3, en:'Royal Court', zh:'三后临朝', ce:'Crown three lines ♛', cz:'三条线加冕为 ♛', test:S=>S.lines.filter(x=>x.r>=5).length>=3},
+ {id:'gap14', t:'s', series:'gap', goal:14, en:'Two Weeks Strong', zh:'两周不忘', ce:'Perfect recall after a 14-day break', cz:'相隔 14 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=14},
+ {id:'gap30', t:'g', series:'gap', goal:30, en:'Iron Memory', zh:'三十天铁记', ce:'Perfect recall after a 30-day break', cz:'相隔 30 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=30},
+ {id:'gap60', t:'g', series:'gap', goal:60, en:'Unforgettable', zh:'过目不忘', ce:'Perfect recall after 60 days away', cz:'相隔 60 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=60},
  {id:'opening_read', t:'b', en:'Cover to Cover', zh:'读完一册', ce:'Learn every line of one opening', cz:'学完一个开局的所有变例', test:S=>S.byOp.some(a=>a.every(x=>x.r>=1))},
  {id:'opening_bishops', t:'s', en:'Sharpened Set', zh:'全线升象', ce:'Every line of one opening at ♝+', cz:'一个开局的所有变例达到 ♝', test:S=>S.byOp.some(a=>a.every(x=>x.r>=3))},
  {id:'opening_crowned', t:'g', en:'Crowned Opening', zh:'加冕开局', ce:'Every line of one opening at ♛', cz:'一个开局的所有变例升为 ♛', test:S=>S.byOp.some(a=>a.every(x=>x.r>=5))},
  {id:'half_board', t:'s', en:'Half the Board', zh:'半壁江山', ce:'Learn every line of one color', cz:'学完某一方的全部变例', test:S=>['w','b'].some(c=>S.lines.filter(x=>x.side===c).every(x=>x.r>=1))},
  {id:'whole_book', t:'s', en:'The Whole Book', zh:'全书在握', ce:'Learn all 37 lines', cz:'学完全部 37 条变例', test:S=>S.lines.every(x=>x.r>=1)},
- {id:'all_queens', t:'g', en:'All Queens', zh:'满盘皆后', ce:'Crown every line in the app', cz:'全部变例升为 ♛', test:S=>S.lines.every(x=>x.r>=5)},
+ {id:'all_queens', t:'g', series:'queens', goal:37, en:'All Queens', zh:'满盘皆后', ce:'Crown every line in the app', cz:'全部变例升为 ♛', test:S=>S.lines.every(x=>x.r>=5)},
  {id:'grand_tour', t:'s', en:'Grand Tour', zh:'博览群局', ce:'Start lines in 8 different openings', cz:'在 8 个开局中开始学习', test:S=>S.byOp.filter(a=>a.some(x=>x.r>=1)).length>=8},
  {id:'both_sides', t:'b', en:'Play Both Sides', zh:'执黑执白', ce:'Learn a White line and a Black line', cz:'白方与黑方变例各学一条', test:S=>['w','b'].every(c=>S.lines.some(x=>x.side===c&&x.r>=1))},
- {id:'streak3', t:'b', en:'Warming Up', zh:'渐入佳境', ce:'3-day training streak', cz:'连续训练 3 天', test:S=>S.streak>=3},
- {id:'streak7', t:'b', en:'One Solid Week', zh:'七日不辍', ce:'7-day training streak', cz:'连续训练 7 天', test:S=>S.streak>=7},
- {id:'streak30', t:'s', en:'The Habit', zh:'习惯成自然', ce:'30-day training streak', cz:'连续训练 30 天', test:S=>S.streak>=30},
- {id:'streak100', t:'g', en:'Centurion', zh:'百日筑基', ce:'100-day training streak', cz:'连续训练 100 天', test:S=>S.streak>=100},
- {id:'days30', t:'s', en:'Thirty Days In', zh:'累计三十天', ce:'30 total training days', cz:'累计训练 30 天', test:S=>S.totalDays>=30},
+ {id:'streak3', t:'b', series:'streak', goal:3, en:'Warming Up', zh:'渐入佳境', ce:'3-day training streak', cz:'连续训练 3 天', test:S=>S.streak>=3},
+ {id:'streak7', t:'b', series:'streak', goal:7, en:'One Solid Week', zh:'七日不辍', ce:'7-day training streak', cz:'连续训练 7 天', test:S=>S.streak>=7},
+ {id:'streak30', t:'s', series:'streak', goal:30, en:'The Habit', zh:'习惯成自然', ce:'30-day training streak', cz:'连续训练 30 天', test:S=>S.streak>=30},
+ {id:'streak100', t:'g', series:'streak', goal:100, en:'Centurion', zh:'百日筑基', ce:'100-day training streak', cz:'连续训练 100 天', test:S=>S.streak>=100},
+ {id:'streak365', t:'g', series:'streak', goal:365, en:'A Year of Openings', zh:'全年无休', ce:'365-day training streak', cz:'连续训练 365 天', test:S=>S.streak>=365},
+ {id:'days30', t:'s', series:'days', goal:30, en:'Thirty Days In', zh:'累计三十天', ce:'30 total training days', cz:'累计训练 30 天', test:S=>S.totalDays>=30},
+ {id:'days100', t:'g', series:'days', goal:100, en:'Hundred Days In', zh:'累计百日', ce:'100 total training days', cz:'累计训练 100 天', test:S=>S.totalDays>=100},
  {id:'comeback', t:'b', sec:1, en:'The Comeback', zh:'王者归来', ce:'Return after a week away', cz:'离开一周后回归训练', test:S=>S.comebackGap>=8},
- {id:'roll5', t:'s', en:'On a Roll', zh:'连战连捷', ce:'5 perfect drills in a row', cz:'连续 5 次全对操练', test:S=>S.ctr.roll>=5},
- {id:'roll15', t:'g', en:'Unstoppable', zh:'势不可挡', ce:'15 perfect drills in a row', cz:'连续 15 次全对操练', test:S=>S.ctr.roll>=15},
+ {id:'roll5', t:'s', series:'roll', goal:5, en:'On a Roll', zh:'连战连捷', ce:'5 perfect drills in a row', cz:'连续 5 次全对操练', test:S=>S.ctr.roll>=5},
+ {id:'roll15', t:'g', series:'roll', goal:15, en:'Unstoppable', zh:'势不可挡', ce:'15 perfect drills in a row', cz:'连续 15 次全对操练', test:S=>S.ctr.roll>=15},
  {id:'flawless_day', t:'s', en:'Flawless Day', zh:'完美一天', ce:'3+ drills today, all perfect', cz:'一天 3 次以上操练全部全对', test:S=>S.ctr.runsToday>=3&&S.ctr.perfToday===S.ctr.runsToday},
  {id:'deep_theory', t:'s', en:'Deep Theory', zh:'深谙棋理', ce:'Flawless on a 10-move-deep line', cz:'在 10 回合深的变例上零失误', test:S=>S.ev==='drill'&&S.d.clean&&S.d.lineLen>=20},
- {id:'reps10', t:'b', en:'Ten Reps', zh:'十次操练', ce:'10 drills', cz:'累计操练 10 次', test:S=>S.ctr.drills>=10},
- {id:'reps100', t:'s', en:'Century of Reps', zh:'百炼成钢', ce:'100 drills', cz:'累计操练 100 次', test:S=>S.ctr.drills>=100},
- {id:'reps500', t:'g', en:'Five Hundred Club', zh:'五百精修', ce:'500 drills', cz:'累计操练 500 次', test:S=>S.ctr.drills>=500},
- {id:'moves1000', t:'s', en:'Thousand Moves', zh:'千步之行', ce:'Recall 1000 book moves', cz:'凭记忆走出 1000 步棋', test:S=>S.ctr.moves>=1000},
+ {id:'reps10', t:'b', series:'reps', goal:10, en:'Ten Reps', zh:'十次操练', ce:'10 drills', cz:'累计操练 10 次', test:S=>S.ctr.drills>=10},
+ {id:'reps100', t:'s', series:'reps', goal:100, en:'Century of Reps', zh:'百炼成钢', ce:'100 drills', cz:'累计操练 100 次', test:S=>S.ctr.drills>=100},
+ {id:'reps500', t:'g', series:'reps', goal:500, en:'Five Hundred Club', zh:'五百精修', ce:'500 drills', cz:'累计操练 500 次', test:S=>S.ctr.drills>=500},
+ {id:'reps1000', t:'g', series:'reps', goal:1000, en:'Thousand-Rep Club', zh:'千锤百炼', ce:'1000 drills', cz:'累计操练 1000 次', test:S=>S.ctr.drills>=1000},
+ {id:'moves1000', t:'s', series:'moves', goal:1000, en:'Thousand Moves', zh:'千步之行', ce:'Recall 1000 book moves', cz:'凭记忆走出 1000 步棋', test:S=>S.ctr.moves>=1000},
+ {id:'moves10000', t:'g', series:'moves', goal:10000, en:'Ten Thousand Moves', zh:'万步成谱', ce:'Recall 10,000 book moves', cz:'凭记忆走出 10000 步棋', test:S=>S.ctr.moves>=10000},
  {id:'first_win', t:'b', en:'First Victory', zh:'首胜引擎', ce:'Beat the engine', cz:'战胜引擎', test:S=>S.ev==='play'&&S.d.result==='win'},
  {id:'prep_win', t:'s', en:'Prep Pays Off', zh:'背谱制胜', ce:'Win after 6+ of your book moves', cz:'走出 6 步以上谱着后取胜', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.free&&S.d.bookUserMoves>=6},
  {id:'giant', t:'g', en:'Giant Slayer', zh:'力克强敌', ce:'Beat the engine at 2000+ Elo', cz:'战胜 2000 分以上的引擎', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.elo>=2000},
@@ -954,6 +971,18 @@ const ach={
     return this._d; },
   save(){ try{ localStorage.setItem('otAch', JSON.stringify(this._d)); }catch(e){} },
   count(){ return Object.keys(this.load().unlocked).length; }
+};
+const MEDAL_METRICS={
+  streak: ()=>activity.streak(),
+  days:   ()=>Object.keys(activity.load()).length,
+  reps:   ()=>ach.load().ctr.drills,
+  moves:  ()=>ach.load().ctr.moves,
+  roll:   ()=>ach.load().ctr.roll,
+  queens: ()=>{ let n=0; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{ if(lineRank(oi,li)>=5) n++; })); return n; },
+  gap:    ()=>{ // live: the longest current rest among learned lines — climbs by itself each day
+    let g=0; const all=srs.load();
+    for(const k in all) g=Math.max(g, (Date.now()-all[k].last)/DAY_MS);
+    return Math.floor(g); },
 };
 function mName(m){ return zhOn()?m.zh:m.en; }
 function mCond(m){ return zhOn()?m.cz:m.ce; }
@@ -997,15 +1026,35 @@ function openMedals(){
     ov.onclick=e=>{ if(e.target===ov) closeMedals(); };
     document.body.appendChild(ov); }
   const A=ach.load();
+  // Chained medals render as ONE progressive row: earned tiers as dots, the next
+  // tier as the row's goal, and live progress toward it — always a next rung.
+  const rows=[]; const seen=new Set();
+  MEDALS.forEach(m=>{
+    if(!m.series){ rows.push({kind:'single', m}); return; }
+    if(seen.has(m.series)) return;
+    seen.add(m.series);
+    rows.push({kind:'series', chain: MEDALS.filter(x=>x.series===m.series)});
+  });
   ov.innerHTML=`<div class="medals-panel"><div class="medals-head"><b>${t('medalsTitle')}</b>
       <span class="medals-count">${ach.count()}/${MEDALS.length}</span>
       <button class="mini" onclick="closeMedals()">✕</button></div>
     <div class="medals-list">`+
-    MEDALS.map(m=>{
-      const got=!!A.unlocked[m.id];
-      const name=got||!m.sec ? mName(m) : '???';
-      const cond=got ? `${mCond(m)} · ${A.unlocked[m.id]}` : (m.sec?t('secretMedal'):mCond(m));
-      return `<div class="medal-row ${got?'got':''}"><span class="m-dot ${m.t}"></span><div class="m-txt"><b>${name}</b><span>${cond}</span></div></div>`;
+    rows.map(row=>{
+      if(row.kind==='single'){
+        const m=row.m, got=!!A.unlocked[m.id];
+        const name=got||!m.sec ? mName(m) : '???';
+        const cond=got ? `${mCond(m)} · ${A.unlocked[m.id]}` : (m.sec?t('secretMedal'):mCond(m));
+        return `<div class="medal-row ${got?'got':''}"><span class="m-dot ${m.t}"></span><div class="m-txt"><b>${name}</b><span>${cond}</span></div></div>`;
+      }
+      const chain=row.chain;
+      const next=chain.find(x=>!A.unlocked[x.id]);
+      const shown=next||chain[chain.length-1];
+      const anyGot=chain.some(x=>A.unlocked[x.id]);
+      const cur=Math.min(MEDAL_METRICS[shown.series] ? MEDAL_METRICS[shown.series]() : 0, shown.goal);
+      const dots=chain.map(x=>`<span class="m-dot ${x.t}${A.unlocked[x.id]?'':' off'}"></span>`).join('');
+      const prog=next?`<div class="m-prog"><div class="m-prog-fill" style="width:${Math.round(100*cur/shown.goal)}%"></div></div><span class="m-prog-n">${cur}/${shown.goal}</span>`:'';
+      return `<div class="medal-row series ${anyGot?'got':''}"><span class="m-dots">${dots}</span>
+        <div class="m-txt"><b>${mName(shown)}</b><span>${next?mCond(shown):`${mCond(shown)} · ${A.unlocked[shown.id]}`}</span>${prog}</div></div>`;
     }).join('')+`</div></div>`;
   ov.style.display='flex';
 }
@@ -1487,7 +1536,7 @@ const Engine = {
     });
   },
   // analyze a position; returns {bestmove, cp} where cp is from the side-to-move POV
-  analyse(fen, {movetime=500}={}){
+  analyse(fen, {movetime=500, onInfo=null}={}){
     if(!this.ready) return Promise.resolve(null);
     return this._run(()=> new Promise(resolve=>{
       this.send('setoption name Skill Level value 20');
@@ -1495,8 +1544,8 @@ const Engine = {
       let lastCp=0, mate=null;
       const to=setTimeout(()=>{ this._onLine=null; resolve({bestmove:null,cp:lastCp}); }, movetime+6000);
       this._onLine=line=>{
-        const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; }
-        const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; }
+        const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; if(onInfo) onInfo(lastCp,null); }
+        const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; if(onInfo) onInfo(null,mate); }
         if(line.startsWith('bestmove')){
           clearTimeout(to); this._onLine=null;
           const m=line.match(/^bestmove\s+(\S+)/);
@@ -2003,12 +2052,20 @@ async function updateEvalBar(){
   if(!(await Engine.load())){ setEvalBar(null); return; }
   const myseq=++evalSeq;
   const fen=toFEN(playWhite);
-  const r=await Engine.analyse(fen,{movetime:600});
+  const toYour = (cp,mateN)=>{   // engine POV (side to move) → your board-oriented perspective
+    const c = (mateN!==null && mateN!==undefined) ? (mateN>0?100000-mateN:-100000-mateN) : cp;
+    const whiteCp = playWhite ? c : -c;
+    return (playerSide==='w') ? whiteCp : -whiteCp;
+  };
+  // Stream depth-by-depth updates so the bar settles live like chess.com's,
+  // and search longer — latency is invisible once updates stream in.
+  const r=await Engine.analyse(fen,{movetime:1200, onInfo:(cp,mateN)=>{
+    if(myseq!==evalSeq || mode!=='play' || !showEvalBar) return;
+    setEvalBar(toYour(cp,mateN));
+  }});
   if(myseq!==evalSeq || mode!=='play') return;   // a newer position superseded this
   if(!r){ setEvalBar(null); return; }
-  const whiteCp = playWhite ? r.cp : -r.cp;                 // engine eval → White's perspective
-  const yourCp  = (playerSide==='w') ? whiteCp : -whiteCp;  // → your perspective (board-oriented)
-  setEvalBar(yourCp);
+  setEvalBar(toYour(r.cp,null));
 }
 
 function userTurnInPlay(){ return playWhite === (playerSide==='w'); }
@@ -2316,12 +2373,26 @@ async function engineExplain(wrongU, expected, reveal, atPly){
   else if(loss < 90) verdict = t('engInacc',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
   else if(loss < 250) verdict = t('engMistake',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
   else verdict = t('engBlunder',{loss:lossP, pl:fmt(playedCp), best:fmt(bestCp)});
-  const enginePick = bestSan ? t('engTop',{san:bestSan}) : '';
-  const want = reveal
-    ? `<br><br><b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}`
-    : `<br><br><span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
-  document.getElementById('comment').innerHTML =
-    `<span style="color:var(--accent2)">${t('engineSays')}</span> ${verdict}${enginePick}${want}`;
+  // This is a THEORY trainer: on reveal, the book move leads and the engine's
+  // verdict on the user's move follows. The engine's own favourite move is
+  // deliberately not shown — it often differs from the book move and teaching
+  // two different "right answers" at once confuses beginners.
+  if(reveal){
+    document.getElementById('comment').innerHTML =
+      `<b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}` +
+      `<br><br><span style="color:var(--accent2)">${t('engineSays')}</span> ${verdict}`;
+  } else {
+    document.getElementById('comment').innerHTML =
+      `<span style="color:var(--accent2)">${t('engineSays')}</span> ${verdict}` +
+      `<br><br>${pieceCueFor(expected)} <span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
+  }
+}
+// A hint that narrows the search without giving the move away.
+function pieceCueFor(expected){
+  if(expected.san.startsWith('O')) return t('cueCastle');
+  const c=expected.san[0];
+  const piece={N:t('pieceKnight'),B:t('pieceBishop'),R:t('pieceRook'),Q:t('pieceQueen'),K:t('pieceKing')}[c]||t('piecePawn');
+  return t('pieceCue',{piece});
 }
 
 /* Analyze a wrong move and explain why, plus what the line wants. */
@@ -2351,10 +2422,9 @@ function explainWrong(wrongU, expected, reveal){
   } else {
     note = t('legalNotTheory');
   }
-  const want = reveal
-    ? `<br><br><b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}`
-    : `<br><br><span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
-  return note + want;
+  if(reveal)
+    return `<b>${t('theLinePlays',{san:expected.san})}</b> ${mvC(expected)}<br><br>${note}`;
+  return `${note}<br><br>${pieceCueFor(expected)} <span style="color:var(--dim)">${t('tryAgainHint')}</span>`;
 }
 
 function giveHint(){
