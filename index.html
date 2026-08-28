@@ -80,7 +80,6 @@ header p { color:var(--dim); font-size:.9rem; }
   padding:9px 14px; margin-top:6px; cursor:pointer; font-size:.88rem; font-family:inherit; transition:border-color .15s; }
 .line-btn:hover { border-color:var(--accent); }
 .line-btn .stat { font-size:.75rem; color:var(--dim); white-space:nowrap; margin-left:8px; }
-.line-btn .stat.mastered { color:#a9bb8a; }
 .side-tag { font-size:.7rem; padding:2px 9px; border-radius:999px; margin-left:6px; vertical-align:middle; }
 .side-w { background:#f0e5d3; color:#33281a; } .side-b { background:#1c1610; color:#d8c9b0; border:1px solid var(--line); }
 .summary-bar { display:flex; gap:18px; flex-wrap:wrap; background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4);
@@ -185,10 +184,49 @@ button.act.primary:hover { background:#bb6f36; }
 .op-prog-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
 .op-prog { flex:1; height:6px; background:#453623; border:none; border-radius:999px; overflow:hidden; }
 .op-prog-fill { height:100%; background:var(--accent2); border-radius:999px; transition:width .3s; }
-.op-prog-n { font-size:.7rem; color:var(--dim); letter-spacing:1px; white-space:nowrap; }
+.op-prog-n { font-size:.85rem; color:var(--dim); letter-spacing:1px; white-space:nowrap; }
 .op-prog-fill.full { background:#f2cf9a; }
 .rank-chip { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px;
-  background:#453623; color:#c9bba3; white-space:nowrap; }
+  background:#453623; color:#c9bba3; white-space:nowrap; border:1px solid var(--line); }
+.rank-chip.rusty { opacity:.55; }
+.tier-count b { display:inline; font-size:inherit; color:inherit; margin-left:3px; }
+.rank-legend { flex-basis:100%; color:var(--dim); font-size:.72rem; opacity:.8; letter-spacing:.3px; }
+.mature-pip { font-size:.7rem; color:var(--dim); background:#3f3222; border-radius:999px; padding:2px 8px; white-space:nowrap; }
+.prove-chip { font-size:.7rem; font-weight:700; color:#c3d1a6; background:#333d26; border-radius:999px; padding:2px 8px;
+  white-space:nowrap; box-shadow:0 0 8px rgba(163,182,128,.3); }
+.deep-note { opacity:.85; }
+.rest-note { color:var(--dim); font-size:.85rem; }
+.rail-title { font-weight:700; font-size:.85rem; margin:14px 0 6px; color:#a9bb8a; }
+.rail-row { display:flex; justify-content:space-between; align-items:center; gap:10px; width:100%; text-align:left;
+  background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:14px;
+  padding:8px 12px; margin-top:6px; cursor:pointer; font-size:.85rem; font-family:inherit; }
+.rail-row:hover { border-color:var(--accent); }
+.rail-payoff { color:var(--dim); font-size:.75rem; white-space:nowrap; }
+.rail-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.medal-btn { display:inline-flex; align-items:center; gap:5px; background:var(--panel2); color:#e0a878;
+  border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer; font-size:.8rem; font-family:inherit; }
+.medal-btn:hover { border-color:var(--accent); }
+.medal-btn b { display:inline; font-size:inherit; color:inherit; }
+.m-dot { width:12px; height:12px; border-radius:999px; flex:0 0 auto; display:inline-block; }
+.m-dot.b { background:#a97b50; } .m-dot.s { background:#c9c2b5; } .m-dot.g { background:#f2cf9a; box-shadow:0 0 6px rgba(242,207,154,.5); }
+#medalToast { position:fixed; top:14px; left:50%; transform:translate(-50%,-80px); z-index:60;
+  display:flex; align-items:center; gap:9px; background:var(--panel); color:var(--text);
+  border:1px solid var(--line); border-radius:999px; padding:9px 18px; box-shadow:0 6px 20px rgba(0,0,0,.5);
+  transition:transform .35s ease; pointer-events:none; }
+#medalToast.show { transform:translate(-50%,0); }
+#medalToast .m-sub { color:var(--dim); font-size:.78rem; }
+#medalsOverlay { position:fixed; inset:0; z-index:50; background:rgba(12,8,4,.6); display:flex;
+  align-items:center; justify-content:center; padding:18px; }
+.medals-panel { background:var(--panel); border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,.6);
+  max-width:480px; width:100%; max-height:82vh; display:flex; flex-direction:column; overflow:hidden; }
+.medals-head { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); }
+.medals-head b { font-size:1.05rem; }
+.medals-count { color:var(--dim); margin-left:auto; }
+.medals-list { overflow-y:auto; padding:8px 18px 16px; }
+.medal-row { display:flex; align-items:center; gap:11px; padding:8px 0; opacity:.45; }
+.medal-row.got { opacity:1; }
+.medal-row .m-txt { display:flex; flex-direction:column; min-width:0; }
+.medal-row .m-txt span { color:var(--dim); font-size:.78rem; }
 .rank-chip.r2 { color:#d8c9b0; background:#4a3b27; }
 .rank-chip.r3 { color:#a9bb8a; background:#39412a; }
 .rank-chip.r4 { color:#e0a878; background:#4d3a20; }
@@ -224,7 +262,6 @@ button.act.primary:hover { background:#bb6f36; }
 .ln-info { flex:1 1 130px; min-width:0; display:flex; flex-direction:column; gap:2px; }
 .line-row .nm { overflow-wrap:anywhere; line-height:1.3; }
 .line-row .stat { font-size:.72rem; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.line-row .stat.mastered { color:#a9bb8a; }
 .ln-btns { display:flex; gap:6px; flex:0 0 auto; margin-left:auto; }
 button.mini { background:var(--panel); border:1px solid var(--line); color:#c9bba3; border-radius:999px;
   padding:4px 0; min-width:56px; text-align:center; cursor:pointer; font-size:.78rem; font-family:inherit;
@@ -360,6 +397,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <div id="doneMsg"></div>
         <p id="doneStats"></p>
         <div id="donePlan"></div>
+        <div id="readyRail"></div>
         <div class="btn-row" style="justify-content:center">
           <button class="act primary" data-i18n="drillAgain" onclick="startDrill(curOp,curLine,playerSide)">Drill Again</button>
           <button class="act" data-i18n="playVsEngine" onclick="startPlay(curOp,curLine,playerSide)">♟ Play vs Engine</button>
@@ -508,20 +546,33 @@ Object.assign(I18N_EN, {
   drawRepetition:'½–½ Draw — the same position occurred three times (threefold repetition).',
   drawFifty:'½–½ Draw — 50 moves passed without a pawn move or a capture.',
   gameOverDraw:'Game over — draw',
-  rank1:'Learned', rank2:'Drilled', rank3:'Mastered', rank4:'Solid', rank5:'Cold',
-  rank1Tip:'You walked through this line in Learn mode.',
+  rank1:'Pawn', rank2:'Knight', rank3:'Bishop', rank4:'Rook', rank5:'Queen',
+  rank1Tip:'You\'ve been through this line.',
   rank2Tip:'First perfect drill from memory.',
-  rank3Tip:'Three perfect drills in a row.',
-  rank4Tip:'Two-week memory — reviews keep succeeding.',
-  rank5Tip:'Month-deep memory. You know it cold.',
-  rankUp:'Rank up! {line} is now {rank}.',
-  learnedBadge:'♙ Learned! This line joins your drills.',
-  repStrength:'repertoire strength',
-  rankBarTip:'Each line climbs ♙→♘→♗→♖→♕',
-  toRank2:'A perfect drill earns ♘.',
-  toRank3:'{n} more perfect in a row earns ♗.',
-  toRank4:'Keep acing reviews — ♖ comes with a two-week memory.',
-  toRank5:'Keep going — ♕ comes with a month-deep memory.'
+  rank3Tip:'Perfect drills on three separate days.',
+  rank4Tip:'Recalled perfectly after a two-week break.',
+  rank5Tip:'Recalled perfectly after a month away. You know it cold.',
+  rustyTip:'Earned — currently rusty. A review will polish it.',
+  rankUp:'Promoted! “{line}” is now a {rank}.',
+  learnedBadgeRest:'This line joins your drills.',
+  repStrength:'strength',
+  startedWord:'lines started',
+  rankBarTip:'Each line climbs ♟→♞→♝→♜→♛',
+  toRank2:'A perfect drill promotes it to ♞ Knight.',
+  toRank3:'Perfect on {n} more day(s) promotes it to ♝ Bishop.',
+  toRank4:'Let it rest — recall it after 14+ days to promote it to ♜ Rook.',
+  toRank5:'Recall it after a month away to crown it ♛ Queen.',
+  deepening:'deepening {d}/{t}',
+  readyProve:'ready — recall it now',
+  readyNowTitle:'Earn progress right now',
+  restNote:'Resting toward {icon}: day {d} of {t}. Drilling now restarts that clock.',
+  payoffProve:'Recall now → promotes to {icon}',
+  payoffDay:'Perfect today → day {d} of 3 toward ♝',
+  payoffLearn:'New line → earns ♟',
+  deepCount:'{n} deepening',
+  medalsTitle:'Medals',
+  medalEarned:'Medal earned',
+  secretMedal:'??? — a secret medal'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -556,20 +607,33 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   drawRepetition:'½–½ 和棋——同一局面第三次出现（三次重复）。',
   drawFifty:'½–½ 和棋——连续 50 回合没有兵着或吃子。',
   gameOverDraw:'对局结束——和棋',
-  rank1:'已学会', rank2:'已操练', rank3:'已精通', rank4:'很扎实', rank5:'滚瓜烂熟',
-  rank1Tip:'已在学习模式走完本线。',
+  rank1:'兵', rank2:'马', rank3:'象', rank4:'车', rank5:'后',
+  rank1Tip:'你已走完本线。',
   rank2Tip:'首次凭记忆全对操练。',
-  rank3Tip:'连续三次全对操练。',
-  rank4Tip:'记忆保持两周以上——复习持续成功。',
-  rank5Tip:'记忆超过一个月，烂熟于心。',
-  rankUp:'升级！{line} 现在是「{rank}」。',
-  learnedBadge:'♙ 已学会！本线加入你的操练列表。',
-  repStrength:'开局库强度',
-  rankBarTip:'每条线沿 ♙→♘→♗→♖→♕ 升级',
-  toRank2:'一次全对操练即可获得 ♘。',
-  toRank3:'再连续全对 {n} 次即可获得 ♗。',
-  toRank4:'保持复习全对——记忆满两周获得 ♖。',
-  toRank5:'继续保持——记忆满一个月获得 ♕。'
+  rank3Tip:'在三个不同的日子全对操练。',
+  rank4Tip:'相隔两周后仍然全对。',
+  rank5Tip:'相隔一个月后仍然全对——烂熟于心。',
+  rustyTip:'已获得——最近有些生疏，复习即可恢复。',
+  rankUp:'升变！「{line}」升为「{rank}」。',
+  learnedBadgeRest:'本线加入你的操练列表。',
+  repStrength:'强度',
+  startedWord:'条线已开始',
+  rankBarTip:'每条线沿 ♟→♞→♝→♜→♛ 升级',
+  toRank2:'一次全对操练即可升为 ♞ 马。',
+  toRank3:'再在 {n} 个不同日子全对即可升为 ♝ 象。',
+  toRank4:'让它休息——相隔 14 天以上仍全对即可升为 ♜ 车。',
+  toRank5:'相隔一个月后仍能全对，即可加冕为 ♛ 后。',
+  deepening:'巩固中 {d}/{t}',
+  readyProve:'可以验证了——现在回忆',
+  readyNowTitle:'现在就能推进',
+  restNote:'正在向 {icon} 巩固：第 {d}/{t} 天。现在操练会重新计时。',
+  payoffProve:'现在回忆——升为 {icon}',
+  payoffDay:'今天全对——三天进度 {d}/3',
+  payoffLearn:'学新线——获得 ♟',
+  deepCount:'{n} 条巩固中',
+  medalsTitle:'奖章',
+  medalEarned:'获得奖章',
+  secretMedal:'??? —— 隐藏奖章'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -741,8 +805,17 @@ const store = {
   get(oi,li){ const s=this.load(); return s[this.key(oi,li)] || {runs:0,perfect:0,streak:0}; },
   record(oi,li,perfect){ const s=this.load(); const k=this.key(oi,li);
     const v=s[k]||{runs:0,perfect:0,streak:0};
-    v.runs++; if(perfect){ v.perfect++; v.streak++; } else v.streak=0;
-    s[k]=v; this.save(s); return v; },
+    const firstToday = v.lastRunDay!==activity.key();
+    v.lastRunDay=activity.key();
+    v.runs++;
+    if(perfect){
+      v.perfect++;
+      const today=activity.key();
+      if(v.lastPerfDay!==today){ v.streak++; v.lastPerfDay=today; }   // ♝ takes 3 separate days, not one sitting
+    } else { v.streak=0; v.lastPerfDay=null; }
+    s[k]=v; this.save(s);
+    v.firstRunToday=firstToday;   // transient, not persisted meaningfully
+    return v; },
   markLearned(oi,li){ const s=this.load(); const k=this.key(oi,li);
     const v=s[k]||{runs:0,perfect:0,streak:0};
     if(!v.learned){ v.learned=true; s[k]=v; this.save(s); } return v; }
@@ -755,26 +828,70 @@ const store = {
    NEVER go back down — the badge is a ratchet; only the review schedule
    reacts to slips. */
 const RANKS=[null,
-  {icon:'♙'},{icon:'♘'},{icon:'♗'},{icon:'♖'},{icon:'♕'}];
+  {icon:'♟'},{icon:'♞'},{icon:'♝'},{icon:'♜'},{icon:'♛'}];
 function computeRank(st, sv, prior){
   let r = prior||0;
   if(st.learned || st.runs>0) r=Math.max(r,1);
   if(st.perfect>0) r=Math.max(r,2);
   if(st.streak>=3) r=Math.max(r,3);
-  if(r>=3 && sv && (sv.reps||0)>=4 && sv.s>=14) r=Math.max(r,4);
-  if(r>=4 && sv && (sv.reps||0)>=5 && sv.s>=30) r=Math.max(r,5);
+  // top tiers are earned by SURVIVING a real break — crammer-proof, and the labels stay true
+  if(r>=3 && sv && (sv.gap||0)>=14) r=Math.max(r,4);
+  if(r>=4 && sv && (sv.gap||0)>=30) r=Math.max(r,5);
   return r;
 }
 function lineRank(oi,li){ const st=store.get(oi,li); return computeRank(st, srs.get(oi,li), st.rank||0); }
-function persistRank(oi,li){   // ratchet the stored badge to whatever is earned now
+function persistRank(oi,li,floor){   // ratchet the stored badge; floor covers legacy records whose rank was only ever computed live
   const s=store.load(), k=store.key(oi,li);
   const v=s[k]||{runs:0,perfect:0,streak:0};
-  const r=computeRank(v, srs.get(oi,li), v.rank||0);
+  const r=Math.max(floor||0, computeRank(v, srs.get(oi,li), v.rank||0));
   if(r>(v.rank||0)){ v.rank=r; s[k]=v; store.save(s); }
   return r;
 }
-function rankChipHTML(r){
-  return r ? `<span class="rank-chip r${r}" title="${t('rank'+r+'Tip')}">${RANKS[r].icon} ${t('rank'+r)}</span>` : '';
+function rankRusty(r, sv){ return r>=4 && !!sv && sv.s < (r===5?30:14); }   // earned, but current memory has slipped below the tier bar
+function rankChipHTML(r, rusty){
+  if(!r) return '';
+  return `<span class="rank-chip r${r}${rusty?' rusty':''}" title="${rusty?t('rustyTip'):t('rank'+r+'Tip')}">${RANKS[r].icon} ${t('rank'+r)}</span>`;
+}
+/* Resting progress toward ♜/♛: elapsed days since the last graded rep, shown as
+   passive 'deepening' progress. Any graded rep restarts the clock — disclosed
+   up front, because that is exactly how the honest gap is measured. */
+function matureInfo(oi,li){
+  const r=lineRank(oi,li); if(r!==3 && r!==4) return null;
+  const sv=srs.get(oi,li); if(!sv) return null;
+  const target=r===3?14:30;
+  const days=Math.floor((Date.now()-sv.last)/DAY_MS);
+  return {target, days:Math.min(days,target), ready:days>=target, icon:RANKS[r+1].icon};
+}
+/* Up to `limit` honest next actions: due reviews, matured lines ready to prove,
+   lines that can advance their distinct-day streak today, then fresh lines. */
+function readyNow(limit, excludeKey){
+  const out=[], today=activity.key(), seen=new Set();
+  const push=(oi,li,mode,payoff)=>{
+    const k=oi+':'+li;
+    if(seen.has(k) || k===excludeKey || out.length>=limit) return;
+    seen.add(k);
+    out.push({oi,li,mode,payoff,name:`${opName(DATA.openings[oi])} — ${lnName(DATA.openings[oi].lines[li])}`});
+  };
+  srs.dueList().slice(0,limit).forEach(x=>push(x.oi,x.li,'drill',t('dueTag')));
+  DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{
+    const mi=matureInfo(oi,li);
+    if(mi && mi.ready && store.get(oi,li).lastRunDay!==today) push(oi,li,'drill',t('payoffProve',{icon:mi.icon}));
+  }));
+  DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{
+    const st=store.get(oi,li), r=lineRank(oi,li);
+    if(r>=1 && r<3 && st.lastPerfDay!==today) push(oi,li,'drill',t('payoffDay',{d:Math.min(3,st.streak+1)}));
+  }));
+  DATA.openings.forEach((op,oi)=>{
+    if(!op.lines.some((_,li)=>lineRank(oi,li)>=1)) return;
+    op.lines.forEach((l,li)=>{ if(lineRank(oi,li)===0) push(oi,li,'learn',t('payoffLearn')); });
+  });
+  return out;
+}
+function readyRailHTML(items){
+  if(!items.length) return '';
+  return `<div class="rail-title">${t('readyNowTitle')}</div>` + items.map(it=>
+    `<button class="rail-row" onclick="${it.mode==='learn'?'startLearn':'startDrill'}(${it.oi},${it.li},DATA.openings[${it.oi}].side)">
+       <span class="rail-name">${it.name}</span><span class="rail-payoff">${it.payoff}</span></button>`).join('');
 }
 function nextRankHint(oi,li){
   const r=lineRank(oi,li), st=store.get(oi,li);
@@ -785,6 +902,115 @@ function nextRankHint(oi,li){
   return t('toRank5');
 }
 
+/* ================= MEDAL CABINET =================
+   One-time achievements. Strictly read-only over app state: a medal can
+   celebrate effort, patience, breadth, or wit — retention claims remain the
+   rank ladder's job. Unlocks ratchet forever; toasts never interrupt a board. */
+const MEDALS=[
+ {id:'first_steps', t:'b', en:'First Steps', zh:'第一步', ce:'Finish your first line', cz:'走完第一条线', test:S=>S.lines.some(x=>x.r>=1)},
+ {id:'clean_sheet', t:'b', en:'Clean Sheet', zh:'零失误', ce:'A perfect drill with no hints', cz:'不用提示，全对操练一次', test:S=>S.ev==='drill'&&S.d.clean},
+ {id:'first_rook', t:'s', en:'First Rook', zh:'首个车', ce:'Promote any line to ♜', cz:'任一条线升为 ♜', test:S=>S.lines.some(x=>x.r>=4)},
+ {id:'first_queen', t:'g', en:'First Queen', zh:'首个后', ce:'Crown any line ♛', cz:'任一条线加冕为 ♛', test:S=>S.lines.some(x=>x.r>=5)},
+ {id:'gap14', t:'s', en:'Two Weeks Strong', zh:'两周不忘', ce:'Perfect recall after a 14-day break', cz:'相隔 14 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=14},
+ {id:'gap30', t:'g', en:'Iron Memory', zh:'三十天铁记', ce:'Perfect recall after a 30-day break', cz:'相隔 30 天仍然全对', test:S=>S.ev==='drill'&&S.d.perfect&&S.d.gapDays>=30},
+ {id:'opening_read', t:'b', en:'Cover to Cover', zh:'读完一册', ce:'Learn every line of one opening', cz:'学完一个开局的所有变例', test:S=>S.byOp.some(a=>a.every(x=>x.r>=1))},
+ {id:'opening_bishops', t:'s', en:'Sharpened Set', zh:'全线升象', ce:'Every line of one opening at ♝+', cz:'一个开局的所有变例达到 ♝', test:S=>S.byOp.some(a=>a.every(x=>x.r>=3))},
+ {id:'opening_crowned', t:'g', en:'Crowned Opening', zh:'加冕开局', ce:'Every line of one opening at ♛', cz:'一个开局的所有变例升为 ♛', test:S=>S.byOp.some(a=>a.every(x=>x.r>=5))},
+ {id:'half_board', t:'s', en:'Half the Board', zh:'半壁江山', ce:'Learn every line of one color', cz:'学完某一方的全部变例', test:S=>['w','b'].some(c=>S.lines.filter(x=>x.side===c).every(x=>x.r>=1))},
+ {id:'whole_book', t:'s', en:'The Whole Book', zh:'全书在握', ce:'Learn all 37 lines', cz:'学完全部 37 条变例', test:S=>S.lines.every(x=>x.r>=1)},
+ {id:'all_queens', t:'g', en:'All Queens', zh:'满盘皆后', ce:'Crown every line in the app', cz:'全部变例升为 ♛', test:S=>S.lines.every(x=>x.r>=5)},
+ {id:'grand_tour', t:'s', en:'Grand Tour', zh:'博览群局', ce:'Start lines in 8 different openings', cz:'在 8 个开局中开始学习', test:S=>S.byOp.filter(a=>a.some(x=>x.r>=1)).length>=8},
+ {id:'both_sides', t:'b', en:'Play Both Sides', zh:'执黑执白', ce:'Learn a White line and a Black line', cz:'白方与黑方变例各学一条', test:S=>['w','b'].every(c=>S.lines.some(x=>x.side===c&&x.r>=1))},
+ {id:'streak3', t:'b', en:'Warming Up', zh:'渐入佳境', ce:'3-day training streak', cz:'连续训练 3 天', test:S=>S.streak>=3},
+ {id:'streak7', t:'b', en:'One Solid Week', zh:'七日不辍', ce:'7-day training streak', cz:'连续训练 7 天', test:S=>S.streak>=7},
+ {id:'streak30', t:'s', en:'The Habit', zh:'习惯成自然', ce:'30-day training streak', cz:'连续训练 30 天', test:S=>S.streak>=30},
+ {id:'streak100', t:'g', en:'Centurion', zh:'百日筑基', ce:'100-day training streak', cz:'连续训练 100 天', test:S=>S.streak>=100},
+ {id:'days30', t:'s', en:'Thirty Days In', zh:'累计三十天', ce:'30 total training days', cz:'累计训练 30 天', test:S=>S.totalDays>=30},
+ {id:'comeback', t:'b', sec:1, en:'The Comeback', zh:'王者归来', ce:'Return after a week away', cz:'离开一周后回归训练', test:S=>S.comebackGap>=8},
+ {id:'roll5', t:'s', en:'On a Roll', zh:'连战连捷', ce:'5 perfect drills in a row', cz:'连续 5 次全对操练', test:S=>S.ctr.roll>=5},
+ {id:'roll15', t:'g', en:'Unstoppable', zh:'势不可挡', ce:'15 perfect drills in a row', cz:'连续 15 次全对操练', test:S=>S.ctr.roll>=15},
+ {id:'flawless_day', t:'s', en:'Flawless Day', zh:'完美一天', ce:'3+ drills today, all perfect', cz:'一天 3 次以上操练全部全对', test:S=>S.ctr.runsToday>=3&&S.ctr.perfToday===S.ctr.runsToday},
+ {id:'deep_theory', t:'s', en:'Deep Theory', zh:'深谙棋理', ce:'Flawless on a 10-move-deep line', cz:'在 10 回合深的变例上零失误', test:S=>S.ev==='drill'&&S.d.clean&&S.d.lineLen>=20},
+ {id:'reps10', t:'b', en:'Ten Reps', zh:'十次操练', ce:'10 drills', cz:'累计操练 10 次', test:S=>S.ctr.drills>=10},
+ {id:'reps100', t:'s', en:'Century of Reps', zh:'百炼成钢', ce:'100 drills', cz:'累计操练 100 次', test:S=>S.ctr.drills>=100},
+ {id:'reps500', t:'g', en:'Five Hundred Club', zh:'五百精修', ce:'500 drills', cz:'累计操练 500 次', test:S=>S.ctr.drills>=500},
+ {id:'moves1000', t:'s', en:'Thousand Moves', zh:'千步之行', ce:'Recall 1000 book moves', cz:'凭记忆走出 1000 步棋', test:S=>S.ctr.moves>=1000},
+ {id:'first_win', t:'b', en:'First Victory', zh:'首胜引擎', ce:'Beat the engine', cz:'战胜引擎', test:S=>S.ev==='play'&&S.d.result==='win'},
+ {id:'prep_win', t:'s', en:'Prep Pays Off', zh:'背谱制胜', ce:'Win after 6+ of your book moves', cz:'走出 6 步以上谱着后取胜', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.free&&S.d.bookUserMoves>=6},
+ {id:'giant', t:'g', en:'Giant Slayer', zh:'力克强敌', ce:'Beat the engine at 2000+ Elo', cz:'战胜 2000 分以上的引擎', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.elo>=2000},
+ {id:'miniature', t:'g', sec:1, en:'Miniature', zh:'袖珍杀局', ce:'Checkmate in 20 moves or fewer', cz:'20 回合内将杀', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.reason==='checkmate'&&S.d.plies<=40},
+ {id:'deja_vu', t:'s', sec:1, en:'Déjà Vu', zh:'似曾相识', ce:'Draw the engine by repetition', cz:'与引擎三次重复成和', test:S=>S.ev==='play'&&S.d.reason==='repetition'},
+ {id:'new_queen', t:'b', sec:1, en:'A New Queen', zh:'小兵升变', ce:'Promote a pawn in a game', cz:'对局中实现升变', test:S=>S.ev==='play'&&!!S.d.flags.promoted},
+ {id:'long_castle', t:'b', sec:1, en:'The Long Castle', zh:'长易位', ce:'Castle queenside in a game', cz:'对局中完成长易位', test:S=>S.ev==='play'&&!!S.d.flags.longCastle},
+ {id:'en_passant', t:'b', sec:1, en:'In Passing', zh:'吃过路兵', ce:'Capture en passant in a game', cz:'对局中吃过路兵', test:S=>S.ev==='play'&&!!S.d.flags.enPassant},
+ {id:'triple', t:'b', en:'Triple Threat', zh:'三管齐下', ce:'Use Learn, Drill and Play', cz:'三种模式都用过', test:S=>S.ctr.modes.length>=3},
+ {id:'bilingual', t:'b', sec:1, en:'Bilingual Student', zh:'双语棋手', ce:'Train in both languages', cz:'用两种语言训练', test:S=>S.ctr.langs.length>=2},
+ {id:'safekeeper', t:'b', en:'Safekeeper', zh:'有备无患', ce:'Export a progress backup', cz:'导出一次进度备份', test:S=>S.ev==='export'},
+];
+const ach={
+  _d:null,
+  load(){ if(!this._d){ try{ this._d=JSON.parse(localStorage.getItem('otAch')||'null'); }catch(e){}
+    if(!this._d||!this._d.ctr) this._d={v:1,unlocked:{},pending:[],ctr:{drills:0,roll:0,moves:0,modes:[],langs:[],dayKey:'',runsToday:0,perfToday:0}}; }
+    return this._d; },
+  save(){ try{ localStorage.setItem('otAch', JSON.stringify(this._d)); }catch(e){} },
+  count(){ return Object.keys(this.load().unlocked).length; }
+};
+function mName(m){ return zhOn()?m.zh:m.en; }
+function mCond(m){ return zhOn()?m.cz:m.ce; }
+function achCheck(ev, d={}){
+  const A=ach.load(), c=A.ctr, today=activity.key();
+  if(!c.langs.includes(LANG)) c.langs.push(LANG);
+  if((ev==='drill'||ev==='learn'||ev==='play') && !c.modes.includes(ev)) c.modes.push(ev);
+  if(ev==='drill' && d.firstToday){
+    c.drills++;
+    if(c.dayKey!==today){ c.dayKey=today; c.runsToday=0; c.perfToday=0; }
+    c.runsToday++;
+    if(d.perfect){ c.perfToday++; c.roll++; } else c.roll=0;
+  }
+  if((ev==='drill'||ev==='learn') && d.playerMoves) c.moves+=d.playerMoves;
+  const lines=[]; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>lines.push({oi,li,side:op.side,r:lineRank(oi,li)})));
+  const act=activity.load(); const keys=Object.keys(act).sort();
+  let comebackGap=0;
+  if(act[today]){ const prev=keys.filter(k=>k<today).pop();
+    if(prev) comebackGap=Math.round((new Date(today)-new Date(prev))/DAY_MS); }
+  const S={ev, d, ctr:c, lines, byOp:DATA.openings.map((op,oi)=>lines.filter(x=>x.oi===oi)),
+           streak:activity.streak(), totalDays:keys.length, comebackGap};
+  MEDALS.forEach(m=>{ try{ if(!A.unlocked[m.id] && m.test(S)){ A.unlocked[m.id]=today; A.pending.push(m.id); } }catch(e){} });
+  ach.save();
+}
+function flushMedals(){
+  const A=ach.load(); if(!A.pending || !A.pending.length) return;
+  const show=A.pending.splice(0,2); ach.save();
+  show.forEach((id,i)=>{ const m=MEDALS.find(x=>x.id===id); if(m) setTimeout(()=>medalToast(m), 300+i*2000); });
+}
+function medalToast(m){
+  let el=document.getElementById('medalToast');
+  if(!el){ el=document.createElement('div'); el.id='medalToast'; document.body.appendChild(el); }
+  el.innerHTML=`<span class="m-dot ${m.t}"></span><b>${mName(m)}</b><span class="m-sub">${t('medalEarned')}</span>`;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  SFX.medal();
+  clearTimeout(el._hid); el._hid=setTimeout(()=>el.classList.remove('show'), 3400);
+}
+function openMedals(){
+  let ov=document.getElementById('medalsOverlay');
+  if(!ov){ ov=document.createElement('div'); ov.id='medalsOverlay';
+    ov.onclick=e=>{ if(e.target===ov) closeMedals(); };
+    document.body.appendChild(ov); }
+  const A=ach.load();
+  ov.innerHTML=`<div class="medals-panel"><div class="medals-head"><b>${t('medalsTitle')}</b>
+      <span class="medals-count">${ach.count()}/${MEDALS.length}</span>
+      <button class="mini" onclick="closeMedals()">✕</button></div>
+    <div class="medals-list">`+
+    MEDALS.map(m=>{
+      const got=!!A.unlocked[m.id];
+      const name=got||!m.sec ? mName(m) : '???';
+      const cond=got ? `${mCond(m)} · ${A.unlocked[m.id]}` : (m.sec?t('secretMedal'):mCond(m));
+      return `<div class="medal-row ${got?'got':''}"><span class="m-dot ${m.t}"></span><div class="m-txt"><b>${name}</b><span>${cond}</span></div></div>`;
+    }).join('')+`</div></div>`;
+  ov.style.display='flex';
+}
+function closeMedals(){ const ov=document.getElementById('medalsOverlay'); if(ov) ov.style.display='none'; }
+
 /* ================= SPACED REPETITION (FSRS-4.5) =================
    Free Spaced Repetition Scheduler with default weights (open-spaced-repetition
    project). Models memory per line: difficulty D, stability S (days until recall
@@ -794,8 +1020,8 @@ const FSRS = {
   w:[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.031,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.587,0.2272,2.8755],
   R_TARGET:0.9, DECAY:-0.5, FACTOR:19/81,
   retrievability(days,s){ return Math.pow(1+this.FACTOR*days/s, this.DECAY); },
-  interval(s){ return Math.max(1, Math.round(s/this.FACTOR*(Math.pow(this.R_TARGET,1/this.DECAY)-1))); },
-  initDifficulty(g){ return Math.min(10,Math.max(1,this.w[4]-Math.exp(this.w[5]*(g-1))+1)); },
+  interval(s){ return Math.min(60, Math.max(1, Math.round(s/this.FACTOR*(Math.pow(this.R_TARGET,1/this.DECAY)-1)))); },   // 60d cap: openings deserve periodic refresh
+  initDifficulty(g){ return Math.min(10,Math.max(1,this.w[4]-(g-3)*this.w[5])); },   // FSRS-4.5 linear form (the exponential form belongs to FSRS-5 weights)
   initStability(g){ return Math.max(.1,this.w[g-1]); },
   nextDifficulty(d,g){
     const nd=d-this.w[6]*(g-3);
@@ -815,9 +1041,13 @@ const srs = {
   grade(oi,li,g){
     const all=this.load(), k=lineKey(oi,li), now=Date.now();
     let v=all[k];
+    // Same-day repeats never re-grade: the day's first result stands, so 'Drill
+    // Again' can no longer distort the schedule and gap clocks stay honest.
+    if(v && activity.key(new Date(v.last))===activity.key()) return v;
     if(!v){ v={d:FSRS.initDifficulty(g), s:FSRS.initStability(g), last:now, reps:1}; }
     else {
       const days=Math.max(0,(now-v.last)/DAY_MS);
+      if(days>=1 && g>=3) v.gap=Math.max(v.gap||0, days);   // longest break survived with a good recall
       const r=FSRS.retrievability(days,v.s);
       v.s=FSRS.nextStability(v.d,v.s,r,g);
       v.d=FSRS.nextDifficulty(v.d,g);
@@ -868,6 +1098,7 @@ function exportProgress(){
   a.download='debut-progress-'+activity.key()+'.json';
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  achCheck('export'); flushMedals();
 }
 function importProgress(){ const el=document.getElementById('importFile'); if(el) el.click(); }
 (function(){
@@ -937,6 +1168,7 @@ const SFX = {
   error(){ this.tone(170,.1,{vol:.07}); this.tone(136,.14,{vol:.055,delay:.055}); },
   success(){ [392,494,587].forEach((f,i)=>this.tone(f,.16,{vol:.09,delay:i*.08})); },
   rankUp(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.16,{vol:.11,delay:i*.07})); this.tone(1568,.4,{vol:.05,delay:.34}); },
+  medal(){ this.tone(659,.14,{vol:.07}); this.tone(988,.24,{vol:.06,delay:.09}); },
   perfect(){ [392,494,587,784].forEach((f,i)=>this.tone(f,.18,{vol:.09,delay:i*.08})); this.tone(784,.45,{vol:.045,delay:.38}); }
 };
 const ICON_ON = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>';
@@ -1376,7 +1608,9 @@ function renderAnnotBtn(){
   const b=document.getElementById('annotBtn'); if(b) b.textContent=t(showAnnots?'arrowsOn':'arrowsOff');
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
-let learnCredited=false;  // one ♙/streak credit per learn run, guarded against Back/Next refires
+let learnCredited=false;  // one ♟/streak credit per learn run, guarded against Back/Next refires
+let learnBadgeEarned=false; // keeps the badge note visible across Back/Next refires within the run
+let hintsThisRun=0, revealedThisRun=false, recalledThisRun=0;   // medal-integrity trackers
 let userShapes=[];     // right-click marks: {from,to} arrows and {sq} highlights
 let rcFrom=null;       // square where a right-button drag started
 function drawAnnots(){
@@ -1435,7 +1669,7 @@ function showMenu(){
   if(q || menuSort!=='group'){
     let members=DATA.openings.map((op,oi)=>({op,oi}))
       .filter(x=>matchOp(x.op) || x.op.lines.some(l=>matchLine(x.op,l)));
-    const doneFrac = x => x.op.lines.reduce((s,_,li)=>s+(store.get(x.oi,li).streak>=3?1:0),0)/x.op.lines.length;
+    const doneFrac = x => x.op.lines.reduce((s,_,li)=>s+lineRank(x.oi,li),0)/(x.op.lines.length*5);
     const runsOf   = x => x.op.lines.reduce((s,_,li)=>s+store.get(x.oi,li).runs,0);
     const earliestDue = x => Math.min(...x.op.lines.map((_,li)=>{ const v=srs.get(x.oi,li); return v?v.due:Infinity; }));
     if(menuSort==='az') members.sort((a,b)=>opName(a.op).localeCompare(opName(b.op), LANG==='zh'?'zh':'en'));
@@ -1478,7 +1712,7 @@ function showMenu(){
     const star=`<button class="fav-btn${isFav?' on':''}" title="${t(isFav?'favRemove':'favAdd')}" aria-label="${t(isFav?'favRemove':'favAdd')}">${isFav?'★':'☆'}</button>`;
     const ranks=op.lines.map((_,li2)=>lineRank(oi,li2));
     const rankSum=ranks.reduce((a,b)=>a+b,0), rankMax=op.lines.length*5;
-    const icons=ranks.map(r=>r?RANKS[r].icon:'·').join(' ');
+    const icons=ranks.map(r=>r?RANKS[r].icon:'○').join(' ');
     const prog=`<div class="op-prog-row"><div class="op-prog"><div class="op-prog-fill${rankSum===rankMax?' full':''}" style="width:${Math.round(100*rankSum/rankMax)}%"></div></div><span class="op-prog-n" title="${t('rankBarTip')}">${icons}</span></div>`;
     card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}${star}</h2>${prog}<div class="desc">${opDesc(op)}</div>`;
     const fb=card.querySelector('.fav-btn');
@@ -1490,7 +1724,11 @@ function showMenu(){
       const sv=srs.get(oi,li);
       const r=lineRank(oi,li);
       const dueTag = (sv && sv.due<=Date.now()) ? ` <span class="due-tag">${t('dueTag')}</span>` : '';
-      const stat = (r ? rankChipHTML(r) : `<span class="stat">${t('newWord')}</span>`) + dueTag;
+      const mi=matureInfo(oi,li);
+      let tail=dueTag;
+      if(mi && mi.ready) tail=` <span class="prove-chip">✦ ${t('readyProve')}</span>`;
+      else if(mi && !dueTag) tail=` <span class="mature-pip">${t('deepening',{d:mi.days,t:mi.target})}</span>`;
+      const stat = (r ? rankChipHTML(r, rankRusty(r, sv)) : `<span class="stat">${t('newWord')}</span>`) + tail;
       const isLF=lineFavs.has(op,line);
       const row=document.createElement('div'); row.className='line-row'+(isLF?' faved':'');
       row.innerHTML=`<button class="ln-fav${isLF?' on':''}" title="${t(isLF?'favRemove':'favAdd')}" aria-label="${t(isLF?'favRemove':'favAdd')}">${isLF?'★':'☆'}</button><div class="ln-info"><span class="nm">${lnName(line)}</span><span class="stat-row">${stat}</span></div>`;
@@ -1510,13 +1748,17 @@ function showMenu(){
     });
     return card;
   }
-  const strength=Math.round(100*rankSum/(totalLines*5));
+  const started=tierCounts.slice(1).reduce((a,b)=>a+b,0);
+  const strength=started?Math.round(100*rankSum/(started*5)):0;
   const tiers=[1,2,3,4,5].map(r=>`<span class="tier-count r${r}" title="${t('rank'+r)} — ${t('rank'+r+'Tip')}">${RANKS[r].icon}<b>${tierCounts[r]}</b></span>`).join('');
+  const legend=[1,2,3,4,5].map(r=>`${RANKS[r].icon} ${t('rank'+r)}`).join(' · ');
   document.getElementById('summaryBar').innerHTML=
-    `<div class="rep-strength"><b>${strength}%</b>${t('repStrength')}</div><div class="tier-counts">${tiers}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
-     <div style="margin-left:auto;align-self:center">${t('pickLine')}</div>`;
+    `<div class="rep-strength"><b>${strength}%</b>${t('repStrength')}</div><div><b>${started}/${totalLines}</b>${t('startedWord')}</div><div class="tier-counts">${tiers}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
+     <button class="medal-btn" onclick="openMedals()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> <b>${ach.count()}</b>/${MEDALS.length}</button>
+     <div class="rank-legend">${legend}</div>`;
   renderTodayBar();
   renderHeatmap();
+  achCheck('menu'); flushMedals();
 }
 
 /* "Today" bar: review queue, streak, and continue-where-you-left-off. */
@@ -1527,10 +1769,13 @@ function renderTodayBar(){
   const lastOp = last && DATA.openings[last.oi];
   const lastOk = lastOp && lastOp.lines[last.li];
   el.style.display='flex';
+  let deepN=0; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{ const mi=matureInfo(oi,li); if(mi&&!mi.ready) deepN++; }));
+  const ready = due.length ? [] : readyNow(1);
   el.innerHTML=
-    `<div class="tb-stats">${dayStreak?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d08348" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> <b>${dayStreak}</b>${t('dayStreak')} · `:''}${due.length?`<b>${due.length}</b> ${t('dueShort')}`:t('noneDue')}</div>
+    `<div class="tb-stats">${dayStreak?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d08348" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> <b>${dayStreak}</b>${t('dayStreak')} · `:''}${due.length?`<b>${due.length}</b> ${t('dueShort')}`:t('noneDue')}${deepN?` · <span class="deep-note">${t('deepCount',{n:deepN})}</span>`:''}</div>
      <div class="tb-btns">
        ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:''}
+       ${!due.length&&ready.length?`<button class="review-btn" onclick="${ready[0].mode==='learn'?'startLearn':'startDrill'}(${ready[0].oi},${ready[0].li},DATA.openings[${ready[0].oi}].side)">▸ ${ready[0].name}</button>`:''}
        ${lastOk?`<button class="mini tb-cont" onclick="resumeLast()">${t('continueWord')}: ${opName(lastOp)} — ${lnName(lastOp.lines[last.li])}</button>`:''}
      </div>`;
 }
@@ -1563,7 +1808,7 @@ function renderHeatmap(){
    first unmastered line; Learn mode if it's never been practiced, otherwise Drill. */
 function quickStart(oi){
   const op=DATA.openings[oi];
-  let li=op.lines.findIndex((l,i)=>store.get(oi,i).streak<3);
+  let li=op.lines.findIndex((l,i)=>lineRank(oi,i)<3);
   if(li<0) li=0;
   if(store.get(oi,li).runs===0) startLearn(oi,li,op.side);
   else startDrill(oi,li,op.side);
@@ -1574,6 +1819,7 @@ function startDrill(oi,li,side){
   rememberLast(oi,li,'drill');
   curOp=oi; curLine=li; playerSide=side; mode='drill';
   board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
+  hintsThisRun=0; revealedThisRun=false; recalledThisRun=0;
   document.getElementById('menu').style.display='none';
   document.getElementById('drill').style.display='flex';
   document.getElementById('doneBox').style.display='none';
@@ -1589,8 +1835,12 @@ function startDrill(oi,li,side){
   const op=DATA.openings[oi], line=op.lines[li];
   document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small>${lnName(line)} — ${side==='w'?t('white'):t('black')}</small>`;
   const st=store.get(oi,li);
-  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
-  document.getElementById('comment').innerHTML = `${lnIntro(line)}`;
+  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>`:'';
+  const mi=matureInfo(oi,li);
+  const svd=srs.get(oi,li);
+  const restIsResting = mi && !mi.ready && !(svd && svd.due<=Date.now());
+  document.getElementById('comment').innerHTML = `${lnIntro(line)}` +
+    (restIsResting?`<br><br><span class="rest-note">${t('restNote',{icon:mi.icon, d:mi.days, t:mi.target})}</span>`:'');
   syncLineSel();
   updateMoveList(); updateProgress(); render();
   Engine.load(); // warm up engine in the background for explanations
@@ -1778,7 +2028,8 @@ function resumePlay(){
 /* ---- draw detection (play mode): threefold repetition, 50-move rule, dead material ---- */
 let playPosCounts={}, playHalfmoveClock=0;
 function posKey(whiteToMove){ return toFEN(whiteToMove).split(' ').slice(0,4).join(' '); }  // placement+side+castling+ep
-function resetDrawTracking(){ playPosCounts={}; playHalfmoveClock=0; const k=posKey(playWhite); playPosCounts[k]=1; }
+let playFlags={};
+function resetDrawTracking(){ playPosCounts={}; playHalfmoveClock=0; playFlags={}; const k=posKey(playWhite); playPosCounts[k]=1; }
 function insufficientMaterial(){
   const pieces=[];
   for(let r=0;r<8;r++)for(let f=0;f<8;f++){
@@ -1819,7 +2070,10 @@ function playUserMove(u){
   }
   // auto-queen promotion
   const [r1,f1]=sqRC(from); const p=board[r1][f1];
-  if(p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')) u=from+to+'q';
+  const [r2,f2]=sqRC(to);
+  if(p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')){ u=from+to+'q'; playFlags.promoted=true; }
+  if(p.toUpperCase()==='K' && (u==='e1c1'||u==='e8c8')) playFlags.longCastle=true;
+  if(p.toUpperCase()==='P' && from[0]!==to[0] && !board[r2][f2]) playFlags.enPassant=true;
   locked=true;
   buzz(15);
   makePlayMove(u);
@@ -1916,17 +2170,30 @@ function showCapTrays(on){
   const t=document.getElementById('capTop'), b=document.getElementById('capBottom');
   if(t) t.style.display=d; if(b) b.style.display=d;
 }
+function countBookUserMoves(){   // user plies inside the longest matching repertoire prefix
+  let best=0;
+  DATA.openings.forEach(op=>op.lines.forEach(l=>{
+    let m=0; while(m<l.moves.length && m<playHist.length && l.moves[m].u===playHist[m].u) m++;
+    let mine=0; for(let j=0;j<m;j++){ if((j%2===0)===(playerSide==='w')) mine++; }
+    best=Math.max(best,mine);
+  }));
+  return best;
+}
 function finishPlay(status){
   playOver=true; locked=true;
-  let msg;
+  let msg, userLost=false;
   if(status==='checkmate'){
-    const loserWhite=playWhite; const userLost = (loserWhite===(playerSide==='w'));
+    const loserWhite=playWhite; userLost = (loserWhite===(playerSide==='w'));
     if(userLost) SFX.mateLose(); else SFX.mateWin();
     msg = userLost ? t('checkmateLose') : t('checkmateWin');
   } else {
     SFX.success();
     msg = t(status==='stalemate'?'stalemate' : status==='material'?'drawMaterial' : status==='repetition'?'drawRepetition' : 'drawFifty');
   }
+  achCheck('play', {result: status==='checkmate' ? (userLost?'loss':'win') : 'draw', reason: status,
+    elo: playElo, free: freeMode, plies: playHist.length, flags: playFlags,
+    bookUserMoves: freeMode ? countBookUserMoves() : 0});
+  flushMedals();
   setPrompt(status==='checkmate'?t('gameOverMate') : status==='stalemate'?t('gameOverStale') : t('gameOverDraw'), status==='checkmate'?'bad':'');
   document.getElementById('comment').innerHTML = msg + t('restartHint');
 }
@@ -1993,7 +2260,7 @@ function plyLastU(){ return ply>0 ? lineMoves()[ply-1].u : null; }
 function attemptMove(u){
   const expected = lineMoves()[ply];
   if(u===expected.u.slice(0,4)){
-    misses=0; selSq=null; aimSet=null; buzz(15);
+    misses=0; selSq=null; aimSet=null; buzz(15); recalledThisRun++;
     const cap=isCapture(expected.u);
     applyMove(expected.u); ply++;
     playMoveSound(expected,cap);
@@ -2009,6 +2276,7 @@ function attemptMove(u){
     boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
     render(plyLastU());
     const reveal = misses>=2;
+    if(reveal) revealedThisRun=true;
     setPrompt(reveal ? t('notQuite') : t('notTheLine'),'bad');
     document.getElementById('comment').innerHTML = explainWrong(u, expected, reveal);
     if(reveal) highlightSq(expected.u.slice(0,2));
@@ -2090,6 +2358,7 @@ function explainWrong(wrongU, expected, reveal){
 }
 
 function giveHint(){
+  hintsThisRun++;
   if(locked || ply>=lineMoves().length || !isPlayerTurn()) return;
   mistakesThisRun++; // hints cost the perfect run
   const exp=lineMoves()[ply];
@@ -2109,8 +2378,10 @@ function finishLine(){
   activity.log();
   // FSRS grade: perfect on an established streak = easy, perfect = good, 1-2 slips = hard, more = again
   const g = perfect ? (st.streak>=3?4:3) : (mistakesThisRun<=2?2:1);
+  const sv0=srs.get(curOp,curLine);
+  const gapDays = sv0 ? Math.floor((Date.now()-sv0.last)/DAY_MS) : 0;
   const sv=srs.grade(curOp,curLine,g);
-  const newRank = persistRank(curOp,curLine);
+  const newRank = persistRank(curOp,curLine,preRank);
   const rankedUp = newRank>preRank;
   if(rankedUp) SFX.rankUp(); else if(perfect) SFX.perfect(); else SFX.success();
   const inDays=Math.max(1,Math.round((sv.due-Date.now())/DAY_MS));
@@ -2120,7 +2391,7 @@ function finishLine(){
   if(banner){
     banner.className='r'+newRank;
     banner.style.display = rankedUp ? 'block' : 'none';
-    if(rankedUp) banner.innerHTML = `${RANKS[newRank].icon} ${t('rankUp',{line: lnName(DATA.openings[curOp].lines[curLine]), rank: t('rank'+newRank)})}`;
+    if(rankedUp) banner.innerHTML = `${RANKS[newRank].icon} ${t('rankUp',{line: '<b>'+lnName(DATA.openings[curOp].lines[curLine])+'</b>', rank: t('rank'+newRank)})}`;
   }
   document.getElementById('doneMsg').innerHTML = perfect
     ? t('perfectRun')
@@ -2128,11 +2399,16 @@ function finishLine(){
   const revLeft = (reviewQueue&&reviewQueue.length) ? ` · ${t('reviewsLeft',{n:reviewQueue.length})}` : '';
   const hint = nextRankHint(curOp,curLine);
   document.getElementById('doneStats').innerHTML =
-    `${rankChipHTML(newRank)} ${t('runsPerfect',{p:st.perfect,r:st.runs})} · ${t('nextReview',{d:inDays})}${revLeft}` +
+    `${rankChipHTML(newRank, rankRusty(newRank, sv))} ${t('runsPerfect',{p:st.perfect,r:st.runs})} · ${t('nextReview',{d:inDays})}${revLeft}` +
     (hint?`<br><span class="next-rank-hint">${hint}</span>`:'');
   document.getElementById('donePlan').innerHTML =
     `<b>${t('whatHappensAfter')}</b> ${lnPlan(DATA.openings[curOp].lines[curLine])}`;
-  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>${st.streak>=3?t('masteredTag'):''}`:'';
+  const rail=document.getElementById('readyRail');
+  if(rail) rail.innerHTML = (reviewQueue&&reviewQueue.length) ? '' : readyRailHTML(readyNow(3, curOp+':'+curLine));
+  document.getElementById('streakInfo').innerHTML = st.streak?`${t('perfectStreak')}<b>${st.streak}</b>`:'';
+  achCheck('drill', {perfect, clean: perfect&&hintsThisRun===0&&!revealedThisRun, firstToday: !!st.firstRunToday,
+    gapDays, lineLen: lineMoves().length, playerMoves: recalledThisRun});
+  flushMedals();
 }
 
 function nextLine(){
@@ -2181,7 +2457,7 @@ function updateProgress(){
 /* ================= LEARN MODE ================= */
 function startLearn(oi,li,side){
   rememberLast(oi,li,'learn');
-  learnCredited=false;
+  learnCredited=false; learnBadgeEarned=false; recalledThisRun=0;
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
@@ -2224,13 +2500,15 @@ function learnShowStep(){
     showComment(mv);
     if(learnPly===moves.length){
       setPrompt(`✓ ${mv.san} — ${t('lineComplete')}`,'good');
-      let learnedNote='';
       if(!learnCredited){
         learnCredited=true;
         const pre=lineRank(curOp,curLine);
         store.markLearned(curOp,curLine); activity.log();
-        if(persistRank(curOp,curLine)>pre) learnedNote=`<br><br><span class="rank-chip r1">${t('learnedBadge')}</span>`;
+        if(persistRank(curOp,curLine,pre)>pre) learnBadgeEarned=true;
+        achCheck('learn', {playerMoves: recalledThisRun});
+        flushMedals();
       }
+      const learnedNote = learnBadgeEarned ? `<br><br><span class="rank-chip r1">${RANKS[1].icon} ${t('rank1')}</span> ${t('learnedBadgeRest')}` : '';
       document.getElementById('comment').innerHTML += `${learnedNote}<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
     } else {
       const p=document.getElementById('prompt');
@@ -2266,7 +2544,7 @@ function learnTryMove(u){
   const expected=lineMoves()[learnPly];
   selSq=null; aimSet=null;
   if(u===expected.u.slice(0,4)){
-    buzz(15);
+    buzz(15); recalledThisRun++;
     nextStep();   // correct → advance with the explanation
   } else {
     boardEl.classList.remove('shake'); void boardEl.offsetWidth; boardEl.classList.add('shake');
