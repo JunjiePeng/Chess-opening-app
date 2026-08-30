@@ -44,13 +44,15 @@ header p { color:var(--dim); font-size:.9rem; }
 #backupRow .linklike { background:none; border:none; color:var(--dim); cursor:pointer; font-size:.72rem;
   opacity:.8; text-decoration:underline dotted; padding:2px 4px; }
 #backupRow .linklike:hover { color:#e0a878; opacity:1; }
-#freePlayCard { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
-  background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4); border-radius:24px;
-  padding:14px 20px; margin-bottom:16px; }
-#freePlayCard .fp-text { display:flex; align-items:center; gap:12px; font-size:.95rem; }
-#freePlayCard .fp-emoji { width:42px; height:42px; border-radius:999px; background:#333d26; color:#c3d1a6;
+#freePlayCard { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  background:var(--panel); border:none; box-shadow:0 1px 4px rgba(10,6,2,.35); border-radius:16px;
+  padding:8px 14px; margin-bottom:14px; }
+#freePlayCard .fp-text { display:flex; align-items:center; gap:10px; font-size:.88rem; }
+#freePlayCard .fp-emoji { width:30px; height:30px; border-radius:999px; background:#333d26; color:#c3d1a6;
   display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
-#freePlayCard .fp-sub { color:var(--dim); font-size:.82rem; }
+#freePlayCard .fp-emoji svg { width:15px; height:15px; }
+#freePlayCard .fp-sub { color:var(--dim); font-size:.75rem; }
+#freePlayCard .act { padding:6px 14px; font-size:.85rem; }
 #freePlayCard .fp-btns { display:flex; gap:8px; }
 #findRow { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
 #searchBox { flex:1; min-width:170px; background:var(--panel); border:1px solid var(--line); border-radius:999px;
@@ -240,6 +242,9 @@ button.act.primary:hover { background:#bb6f36; }
 .rank-chip.r5 { color:#f2cf9a; background:#553f1d; box-shadow:0 0 8px rgba(242,207,154,.25); }
 .stat-row .due-tag { margin-left:4px; }
 .next-rank-hint { color:var(--dim); font-size:.8rem; }
+.next-strip { margin-top:12px; padding:8px 12px; border-left:3px solid var(--accent2);
+  background:rgba(163,182,128,.08); border-radius:4px 12px 12px 4px; color:var(--dim); font-size:.9rem; }
+.next-strip b { color:var(--text); }
 .tier-counts { display:flex; gap:10px; align-items:center; }
 .tier-count { font-size:.85rem; color:var(--dim); }
 .tier-count b { margin-left:3px; }
@@ -581,7 +586,8 @@ Object.assign(I18N_EN, {
   medalEarned:'Medal earned',
   secretMedal:'??? — a secret medal',
   pieceCue:'Hint: the line plays a {piece} move.',
-  cueCastle:'Hint: the line castles here.'
+  cueCastle:'Hint: the line castles here.',
+  orPlayBlack:'♚ Play as Black instead'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -644,7 +650,8 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   medalEarned:'获得奖章',
   secretMedal:'??? —— 隐藏奖章',
   pieceCue:'提示：本线这步走的是{piece}。',
-  cueCastle:'提示：本线在这里易位。'
+  cueCastle:'提示：本线在这里易位。',
+  orPlayBlack:'♚ 改执黑'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -1460,7 +1467,15 @@ const Engine = {
   worker:null, ready:false, tried:false, _buf:[], _onLine:null, _seq:0,
   STATUS:'idle',
   async load(){
-    if(this.tried) return this.ready;
+    if(this.ready) return true;
+    if(this._loading) return this._loading;   // join an in-flight load instead of reporting failure
+    if(this.tried) return false;
+    this._loading=this._doLoad();
+    const ok=await this._loading.catch(()=>false);
+    this._loading=null;
+    return ok;
+  },
+  async _doLoad(){
     this.tried=true; this.STATUS='loading'; updateEngineBadge();
     // A worker is allowed to importScripts() cross-origin (no CORS preflight needed),
     // unlike fetch(). We try several single-file (asm.js) Stockfish builds in order.
@@ -1524,6 +1539,7 @@ const Engine = {
     if(!this.ready) return Promise.resolve(null);
     return this._run(async()=>{
       this.setStrength(skill);
+      this.send('setoption name Contempt value 24');
       this.send('ucinewgame');
       // With the move list the engine knows the real history (repetitions, 50-move
       // clock); both play modes start from the standard position, so this is exact.
@@ -1540,12 +1556,14 @@ const Engine = {
     if(!this.ready) return Promise.resolve(null);
     return this._run(()=> new Promise(resolve=>{
       this.send('setoption name Skill Level value 20');
+      this.send('setoption name Contempt value 0');   // neutral analysis — SF10's default 24 inflates the mover's eval
       this.send('ucinewgame'); this.send('position fen '+fen);
       let lastCp=0, mate=null;
       const to=setTimeout(()=>{ this._onLine=null; resolve({bestmove:null,cp:lastCp}); }, movetime+6000);
       this._onLine=line=>{
-        const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; if(onInfo) onInfo(lastCp,null); }
-        const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; if(onInfo) onInfo(null,mate); }
+        const dm=line.match(/\bdepth (\d+)/); const depth=dm?+dm[1]:0;
+        const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; if(onInfo && depth>=8) onInfo(lastCp,null); }
+        const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; if(onInfo && depth>=8) onInfo(null,mate); }
         if(line.startsWith('bestmove')){
           clearTimeout(to); this._onLine=null;
           const m=line.match(/^bestmove\s+(\S+)/);
@@ -1975,26 +1993,18 @@ function startPlay(oi,li,side){
   resumePlay();
 }
 // Entry point from the menu card: open the play screen first, choose a side there.
+let freeChooserShown=false;
 function enterFreePlay(){
-  curOp=null; curLine=null; playerSide='w'; mode='play'; freeMode=true;
-  board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
-  playHist=[]; playWhite=true; playOver=true;      // nothing playable until a side is chosen
-  resetDrawTracking();
-  playSetupUI('w');
-  document.getElementById('playRestartBtn').onclick=enterFreePlay;
-  document.getElementById('playDrillBtn').style.display='none';
-  document.getElementById('lineTitle').innerHTML=`${t('fullGame')}<small id="openingName">${t('chooseSide')}</small>`;
-  const sel=document.getElementById('lineSel'); if(sel) sel.value='';
-  updatePlayList(); updateEval(); updateEvalBar();
-  render(null);
-  setPrompt(t('chooseSide'),'');
+  // The game is live as White immediately — just move a piece to start.
+  // Choosing Black is the one-tap alternative shown alongside.
+  startFreePlay('w');
+  freeChooserShown=true;
   document.getElementById('comment').innerHTML =
-    `<div class="btn-row" style="margin-top:4px">
-       <button class="act primary" onclick="startFreePlay('w')">${t('freePlayAsWhite')}</button>
-       <button class="act" onclick="startFreePlay('b')">${t('freePlayAsBlack')}</button>
-     </div>`;
+    `${t('playFromStart')}<div class="btn-row" style="margin-top:10px">
+       <button class="act" onclick="startFreePlay('b')">${t('orPlayBlack')}</button></div>`;
 }
 function startFreePlay(side){
+  freeChooserShown=false;
   curOp=null; curLine=null; playerSide=side; mode='play'; freeMode=true;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
   playHist=[]; playWhite=true; playOver=false;
@@ -2034,7 +2044,7 @@ function setEvalBar(cp){
   if(cp===null){ fill.style.height='50%'; num.textContent='…'; return; }
   let pct;
   if(Math.abs(cp)>=99000) pct = cp>0?100:0;
-  else pct = 100/(1+Math.pow(10, -cp/400));     // win-probability sigmoid, like chess.com/Lichess
+  else pct = 50 + 50*(2/(1+Math.exp(-0.00368208*cp)) - 1);   // lichess's win-probability curve
   fill.style.height=Math.max(3,Math.min(97,pct))+'%';
   const txt = Math.abs(cp)>=99000 ? ('M'+(100000-Math.abs(cp))) : Math.abs(cp/100).toFixed(1);
   num.textContent = (cp>=0?'+':'−')+txt;
@@ -2133,6 +2143,7 @@ function playUserMove(u){
   if(p.toUpperCase()==='P' && from[0]!==to[0] && !board[r2][f2]) playFlags.enPassant=true;
   locked=true;
   buzz(15);
+  if(freeChooserShown){ freeChooserShown=false; document.getElementById('comment').innerHTML=t('playFromStart'); }
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return true; }
@@ -2547,22 +2558,22 @@ function startLearn(oi,li,side){
   learnShowStep();
   render();
 }
-function learnNextHint(){
-  // announce the next move so the learner can follow along; the "why" appears after they play it
+// The next-move cue renders BELOW the explanation, so the reading order is:
+// what happened → why it matters → what to play next. The green guide arrow on
+// the board is still immediate for learners who just want to follow along.
+function learnNextStrip(){
   const moves=lineMoves();
   if(learnPly>=moves.length) return '';
   const mv=moves[learnPly], num=Math.floor(learnPly/2)+1, isW=learnPly%2===0;
-  return ` <span style="color:var(--dim)">${t('playNext',{mv:`<b style="color:var(--text)">${num}${isW?'.':'…'}${mv.san}</b>`})}</span>`;
+  return `<div class="next-strip">${t('playNext',{mv:`<b>${num}${isW?'.':'…'}${mv.san}</b>`})}</div>`;
 }
 function learnShowStep(){
   const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
   learnGuide = learnPly<moves.length ? moves[learnPly].u.slice(0,4) : null;   // green guide arrow for the announced move
   if(learnPly===0){
-    // single <span> child: #prompt is a flex box, and multiple inline children
-    // would be laid out as separate centered columns instead of flowing text
-    document.getElementById('prompt').innerHTML = '<span>'+t('overview')+learnNextHint()+'</span>';
+    document.getElementById('prompt').innerHTML = '<span>'+t('overview')+'</span>';
     document.getElementById('prompt').className='';
-    document.getElementById('comment').innerHTML = lnIntro(line);
+    document.getElementById('comment').innerHTML = lnIntro(line) + learnNextStrip();
     curAnnot=null; drawAnnots();
   } else {
     const mv=moves[learnPly-1];
@@ -2581,8 +2592,9 @@ function learnShowStep(){
       const learnedNote = learnBadgeEarned ? `<br><br><span class="rank-chip r1">${RANKS[1].icon} ${t('rank1')}</span> ${t('learnedBadgeRest')}` : '';
       document.getElementById('comment').innerHTML += `${learnedNote}<br><br><b>${t('whatNext')}</b> ${lnPlan(line)}<br><br>${t('tryDrill')}`;
     } else {
+      document.getElementById('comment').innerHTML += learnNextStrip();
       const p=document.getElementById('prompt');
-      p.innerHTML = `<span>✓ ${num}${isW?'.':'...'}${mv.san}` + learnNextHint() + '</span>';
+      p.innerHTML = `<span>✓ ${num}${isW?'.':'...'}${mv.san}</span>`;
       p.className='good';
     }
   }
