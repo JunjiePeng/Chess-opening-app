@@ -44,16 +44,25 @@ header p { color:var(--dim); font-size:.9rem; }
 #backupRow .linklike { background:none; border:none; color:var(--dim); cursor:pointer; font-size:.72rem;
   opacity:.8; text-decoration:underline dotted; padding:2px 4px; }
 #backupRow .linklike:hover { color:#e0a878; opacity:1; }
-#freePlayCard { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-  background:var(--panel); border:none; box-shadow:0 1px 4px rgba(10,6,2,.35); border-radius:16px;
-  padding:8px 14px; margin-bottom:14px; }
-#freePlayCard .fp-text { display:flex; align-items:center; gap:10px; font-size:.88rem; }
-#freePlayCard .fp-emoji { width:30px; height:30px; border-radius:999px; background:#333d26; color:#c3d1a6;
-  display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto; }
-#freePlayCard .fp-emoji svg { width:15px; height:15px; }
-#freePlayCard .fp-sub { color:var(--dim); font-size:.75rem; }
-#freePlayCard .act { padding:6px 14px; font-size:.85rem; }
-#freePlayCard .fp-btns { display:flex; gap:8px; }
+/* Duolingo-style daily hero: streak front and center, actions beside it,
+   engine play folded in as a compact side button. */
+.today-hero { display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  background:#333d26; border:none; border-radius:20px; padding:13px 18px; margin-bottom:14px; }
+.th-streak { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+.th-streak svg { width:34px; height:34px; flex:0 0 auto; }
+.th-streak.zero { opacity:.7; }
+.th-streak.zero svg { stroke:#8a9a74; }
+.th-num b { display:block; font-size:1.7rem; line-height:1; color:#f6ead2; }
+.th-num span { color:#c3d1a6; font-size:.72rem; }
+.th-main { flex:1; min-width:200px; display:flex; flex-direction:column; gap:7px; }
+.th-stats { color:#c3d1a6; font-size:.88rem; }
+.th-stats b { color:#f6ead2; }
+.th-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.th-btns .tb-cont { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.th-engine { display:inline-flex; align-items:center; gap:7px; flex:0 0 auto;
+  background:rgba(20,26,14,.35); color:#d8c9b0; border:1px solid rgba(240,225,200,.16); border-radius:999px;
+  padding:8px 14px; cursor:pointer; font-size:.85rem; font-family:inherit; transition:border-color .15s; }
+.th-engine:hover { border-color:var(--accent); color:var(--text); }
 #findRow { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
 #searchBox { flex:1; min-width:170px; background:var(--panel); border:1px solid var(--line); border-radius:999px;
   padding:9px 16px; color:var(--text); font-size:.95rem; font-family:inherit; }
@@ -345,12 +354,6 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div id="todayBar" class="today-bar" style="display:none"></div>
-    <div id="freePlayCard">
-      <div class="fp-text"><span class="fp-emoji"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="4"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span><span><b data-i18n="freePlayTitle">Test your opening against the engine!</b><br><span class="fp-sub" data-i18n="freePlaySub">Start from move 1 — I'll name your opening as you go</span></span></div>
-      <div class="fp-btns">
-        <button class="act primary" data-i18n="freePlayGo" onclick="enterFreePlay()">Play →</button>
-      </div>
-    </div>
     <div id="findRow">
       <input id="searchBox" type="search" autocomplete="off" data-i18n-ph="searchPh">
       <div class="sort-seg" id="sortSeg">
@@ -587,7 +590,10 @@ Object.assign(I18N_EN, {
   secretMedal:'??? — a secret medal',
   pieceCue:'Hint: the line plays a {piece} move.',
   cueCastle:'Hint: the line castles here.',
-  orPlayBlack:'♚ Play as Black instead'
+  orPlayBlack:'♚ Play as Black instead',
+  vsEngine:'vs Engine',
+  streakWord:'day streak',
+  startStreak:'start your streak today'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -651,7 +657,10 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   secretMedal:'??? —— 隐藏奖章',
   pieceCue:'提示：本线这步走的是{piece}。',
   cueCastle:'提示：本线在这里易位。',
-  orPlayBlack:'♚ 改执黑'
+  orPlayBlack:'♚ 改执黑',
+  vsEngine:'人机对弈',
+  streakWord:'天连续训练',
+  startStreak:'今天开始连续训练'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -1838,13 +1847,20 @@ function renderTodayBar(){
   el.style.display='flex';
   let deepN=0; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{ const mi=matureInfo(oi,li); if(mi&&!mi.ready) deepN++; }));
   const ready = due.length ? [] : readyNow(1);
+  const flame=`<svg viewBox="0 0 24 24" fill="none" stroke="#d08348" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`;
+  const robot=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="4"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>`;
+  el.className='today-hero';
   el.innerHTML=
-    `<div class="tb-stats">${dayStreak?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d08348" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> <b>${dayStreak}</b>${t('dayStreak')} · `:''}${due.length?`<b>${due.length}</b> ${t('dueShort')}`:t('noneDue')}${deepN?` · <span class="deep-note">${t('deepCount',{n:deepN})}</span>`:''}</div>
-     <div class="tb-btns">
-       ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:''}
-       ${!due.length&&ready.length?`<button class="review-btn" onclick="${ready[0].mode==='learn'?'startLearn':'startDrill'}(${ready[0].oi},${ready[0].li},DATA.openings[${ready[0].oi}].side)">▸ ${ready[0].name}</button>`:''}
-       ${lastOk?`<button class="mini tb-cont" onclick="resumeLast()">${t('continueWord')}: ${opName(lastOp)} — ${lnName(lastOp.lines[last.li])}</button>`:''}
-     </div>`;
+    `<div class="th-streak${dayStreak?'':' zero'}">${flame}<div class="th-num"><b>${dayStreak}</b><span>${dayStreak?t('streakWord'):t('startStreak')}</span></div></div>
+     <div class="th-main">
+       <div class="th-stats">${due.length?`<b>${due.length}</b> ${t('dueShort')}`:t('noneDue')}${deepN?` · <span class="deep-note">${t('deepCount',{n:deepN})}</span>`:''}</div>
+       <div class="th-btns">
+         ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:''}
+         ${!due.length&&ready.length?`<button class="review-btn" onclick="${ready[0].mode==='learn'?'startLearn':'startDrill'}(${ready[0].oi},${ready[0].li},DATA.openings[${ready[0].oi}].side)">▸ ${ready[0].name}</button>`:''}
+         ${lastOk?`<button class="mini tb-cont" onclick="resumeLast()">${t('continueWord')}: ${opName(lastOp)} — ${lnName(lastOp.lines[last.li])}</button>`:''}
+       </div>
+     </div>
+     <button class="th-engine" onclick="enterFreePlay()" title="${t('freePlayTitle')} ${t('freePlaySub')}">${robot}<span>${t('vsEngine')}</span></button>`;
 }
 function rememberLast(oi,li,mode){ try{ localStorage.setItem('otLast',JSON.stringify({oi,li,mode})); }catch(e){} }
 function resumeLast(){
