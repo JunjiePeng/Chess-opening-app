@@ -60,9 +60,10 @@ header p { color:var(--dim); font-size:.9rem; }
 .th-btns { display:flex; gap:8px; flex-wrap:wrap; }
 .th-btns .tb-cont { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .th-engine { display:inline-flex; align-items:center; gap:7px; flex:0 0 auto;
-  background:rgba(20,26,14,.35); color:#d8c9b0; border:1px solid rgba(240,225,200,.16); border-radius:999px;
-  padding:8px 14px; cursor:pointer; font-size:.85rem; font-family:inherit; transition:border-color .15s; }
-.th-engine:hover { border-color:var(--accent); color:var(--text); }
+  background:rgba(208,131,72,.16); color:#ecc39a; border:1px solid rgba(208,131,72,.55); border-radius:999px;
+  padding:9px 16px; cursor:pointer; font-size:.88rem; font-weight:700; font-family:inherit;
+  transition:background .15s, border-color .15s; }
+.th-engine:hover { background:rgba(208,131,72,.3); border-color:var(--accent); color:#fbf3e4; }
 #findRow { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
 #searchBox { flex:1; min-width:170px; background:var(--panel); border:1px solid var(--line); border-radius:999px;
   padding:9px 16px; color:var(--text); font-size:.95rem; font-family:inherit; }
@@ -912,6 +913,19 @@ function readyNow(limit, excludeKey){
     if(!op.lines.some((_,li)=>lineRank(oi,li)>=1)) return;
     op.lines.forEach((l,li)=>{ if(lineRank(oi,li)===0) push(oi,li,'learn',t('payoffLearn')); });
   });
+  if(!out.length){
+    // fallback: pick up where the user left off (this replaces the old Continue chip)
+    try{ const last=JSON.parse(localStorage.getItem('otLast')||'null');
+      if(last && DATA.openings[last.oi] && DATA.openings[last.oi].lines[last.li]){
+        const r=lineRank(last.oi,last.li);
+        push(last.oi,last.li, r===0?'learn':'drill', r===0?t('payoffLearn'):t('payoffDay',{d:Math.min(3,store.get(last.oi,last.li).streak+1)}));
+      } }catch(e){}
+  }
+  if(!out.length){
+    outer: for(let oi=0;oi<DATA.openings.length;oi++)
+      for(let li=0;li<DATA.openings[oi].lines.length;li++)
+        if(lineRank(oi,li)===0){ push(oi,li,'learn',t('payoffLearn')); break outer; }
+  }
   return out;
 }
 function readyRailHTML(items){
@@ -1841,9 +1855,6 @@ function showMenu(){
 function renderTodayBar(){
   const el=document.getElementById('todayBar'); if(!el) return;
   const due=srs.dueList(), dayStreak=activity.streak();
-  let last=null; try{ last=JSON.parse(localStorage.getItem('otLast')||'null'); }catch(e){}
-  const lastOp = last && DATA.openings[last.oi];
-  const lastOk = lastOp && lastOp.lines[last.li];
   el.style.display='flex';
   let deepN=0; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>{ const mi=matureInfo(oi,li); if(mi&&!mi.ready) deepN++; }));
   const ready = due.length ? [] : readyNow(1);
@@ -1857,7 +1868,6 @@ function renderTodayBar(){
        <div class="th-btns">
          ${due.length?`<button class="review-btn" onclick="startReview()">${t('startReview',{n:due.length})}</button>`:''}
          ${!due.length&&ready.length?`<button class="review-btn" onclick="${ready[0].mode==='learn'?'startLearn':'startDrill'}(${ready[0].oi},${ready[0].li},DATA.openings[${ready[0].oi}].side)">▸ ${ready[0].name}</button>`:''}
-         ${lastOk?`<button class="mini tb-cont" onclick="resumeLast()">${t('continueWord')}: ${opName(lastOp)} — ${lnName(lastOp.lines[last.li])}</button>`:''}
        </div>
      </div>
      <button class="th-engine" onclick="enterFreePlay()" title="${t('freePlayTitle')} ${t('freePlaySub')}">${robot}<span>${t('vsEngine')}</span></button>`;
