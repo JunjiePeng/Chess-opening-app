@@ -58,7 +58,7 @@ header p { color:var(--dim); font-size:.9rem; }
 .th-stats { color:#c3d1a6; font-size:.88rem; }
 .th-stats b { color:#f6ead2; }
 .th-btns { display:flex; gap:8px; flex-wrap:wrap; }
-.th-btns .tb-cont { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.th-btns .review-btn { max-width:min(72vw, 360px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .th-engine { display:inline-flex; align-items:center; gap:7px; flex:0 0 auto;
   background:rgba(208,131,72,.16); color:#ecc39a; border:1px solid rgba(208,131,72,.55); border-radius:999px;
   padding:9px 16px; cursor:pointer; font-size:.88rem; font-weight:700; font-family:inherit;
@@ -213,32 +213,36 @@ button.act.primary:hover { background:#bb6f36; }
   background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:14px;
   padding:8px 12px; margin-top:6px; cursor:pointer; font-size:.85rem; font-family:inherit; }
 .rail-row:hover { border-color:var(--accent); }
-.rail-payoff { color:var(--dim); font-size:.75rem; white-space:nowrap; }
-.rail-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rail-payoff { color:var(--dim); font-size:.75rem; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rail-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .medal-btn { display:inline-flex; align-items:center; gap:5px; background:var(--panel2); color:#e0a878;
   border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer; font-size:.8rem; font-family:inherit; }
 .medal-btn:hover { border-color:var(--accent); }
 .medal-btn b { display:inline; font-size:inherit; color:inherit; }
 .m-dot { width:12px; height:12px; border-radius:999px; flex:0 0 auto; display:inline-block; }
 .m-dot.b { background:#a97b50; } .m-dot.s { background:#c9c2b5; } .m-dot.g { background:#f2cf9a; box-shadow:0 0 6px rgba(242,207,154,.5); }
-#medalToast { position:fixed; top:14px; left:50%; transform:translate(-50%,-80px); z-index:60;
+#medalToast { position:fixed; top:max(14px, env(safe-area-inset-top, 0px)); left:50%; transform:translate(-50%,-110px); z-index:60;
+  width:max-content; max-width:min(92vw, 420px);
   display:flex; align-items:center; gap:9px; background:var(--panel); color:var(--text);
   border:1px solid var(--line); border-radius:999px; padding:9px 18px; box-shadow:0 6px 20px rgba(0,0,0,.5);
   transition:transform .35s ease; pointer-events:none; }
 #medalToast.show { transform:translate(-50%,0); }
 #medalToast .m-sub { color:var(--dim); font-size:.78rem; }
 #medalsOverlay { position:fixed; inset:0; z-index:50; background:rgba(12,8,4,.6); display:flex;
-  align-items:center; justify-content:center; padding:18px; }
+  align-items:center; justify-content:center; padding:18px; overscroll-behavior:contain; }
 .medals-panel { background:var(--panel); border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,.6);
   max-width:480px; width:100%; max-height:82vh; display:flex; flex-direction:column; overflow:hidden; }
 .medals-head { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); }
 .medals-head b { font-size:1.05rem; }
 .medals-count { color:var(--dim); margin-left:auto; }
-.medals-list { overflow-y:auto; padding:8px 18px 16px; }
-.medal-row { display:flex; align-items:center; gap:11px; padding:8px 0; opacity:.45; }
-.medal-row.got { opacity:1; }
+.medals-list { overflow-y:auto; padding:8px 18px 16px; overscroll-behavior:contain; }
+.medal-row { display:flex; align-items:center; gap:11px; padding:8px 0; }
 .medal-row .m-txt { display:flex; flex-direction:column; min-width:0; }
-.medal-row .m-txt span { color:var(--dim); font-size:.78rem; }
+.medal-row .m-txt b { color:#9c8f7c; }
+.medal-row .m-txt span { color:#8a7e6d; font-size:.78rem; }
+.medal-row:not(.got) .m-dot { opacity:.35; }
+.medal-row.got .m-txt b { color:var(--text); }
+.medal-row.got .m-txt span { color:var(--dim); }
 .medal-row.series { opacity:1; }
 .medal-row.series:not(.got) .m-txt { opacity:.6; }
 .m-dots { display:flex; gap:3px; flex:0 0 auto; align-items:center; }
@@ -294,7 +298,8 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 #lineSel:hover { border-color:var(--accent); }
 #donePlan { text-align:left; color:var(--dim); font-size:.85rem; line-height:1.5; margin-bottom:12px; }
 #donePlan b { color:#e0a878; }
-.eng-badge { font-size:.74rem; color:var(--dim); padding:3px 10px; border-radius:999px; }
+.eng-badge { font-size:.74rem; color:var(--dim); padding:3px 10px; border-radius:999px;
+  background:none; border:none; cursor:pointer; font-family:inherit; }
 .eng-badge.ready { color:#a9bb8a; }
 .eng-badge.loading { color:#e0a878; }
 .eng-badge.unavailable { color:var(--bad); cursor:pointer; }
@@ -344,11 +349,11 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 </head>
 <body>
 <header>
-  <h1 id="logo" onclick="showMenu()" title="Back to main menu">♞ De<span>but</span></h1>
+  <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu">♞ De<span>but</span></h1>
   <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
-  <span id="engineBadge" class="eng-badge" onclick="retryEngine()" title="Engine status — click to retry"></span>
+  <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
   <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
-  <button id="muteBtn" onclick="toggleMute()" title="Toggle sound"></button>
+  <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
 </header>
 
 <div class="layout">
@@ -392,15 +397,15 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
         <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
           <select id="lineSel" onchange="onLineSel(this.value)"></select>
-          <button class="mini" id="annotBtn" onclick="toggleAnnots()" title="Show or hide arrows and key-square markers"></button>
-          <button class="mini" id="aimBtn" onclick="toggleAims()" title="Show or hide legal-move dots when you select a piece"></button>
+          <button class="mini" id="annotBtn" onclick="toggleAnnots()" data-i18n-title="tipArrows" title="Show or hide arrows and key-square markers"></button>
+          <button class="mini" id="aimBtn" onclick="toggleAims()" data-i18n-title="tipDots" title="Show or hide legal-move dots when you select a piece"></button>
         </div>
         <div id="strengthRow" style="display:none;margin-top:10px">
           <label style="font-size:.78rem;color:var(--dim);display:flex;justify-content:space-between">
             <span data-i18n="engineStrength">Engine strength</span><span id="eloLabel"></span>
           </label>
           <input type="range" id="eloSlider" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
-          <button class="mini" id="evalBtn" onclick="toggleEvalBar()" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
+          <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
         </div>
       </div>
       <div class="panel-box" id="promptBox">
@@ -440,7 +445,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <button class="act" data-i18n="lines" onclick="backToLines()">← Lines</button>
       </div>
       <div class="btn-row" id="playNav" style="display:none">
-        <button class="act" id="engMoveBtn" data-i18n="engineMove" onclick="engineMoveNow()" title="Let the engine move for you">↻ Engine move</button>
+        <button class="act" id="engMoveBtn" data-i18n="engineMove" onclick="engineMoveNow()" data-i18n-title="tipEngMove" title="Let the engine move for you">↻ Engine move</button>
         <button class="act" id="playRestartBtn" data-i18n="restartGame">↺ Restart game</button>
         <button class="act" id="playDrillBtn" data-i18n="backToDrill" onclick="startDrill(curOp,curLine,playerSide)">Back to Drill</button>
         <button class="act" data-i18n="menu" onclick="showMenu()">← Menu</button>
@@ -594,7 +599,15 @@ Object.assign(I18N_EN, {
   orPlayBlack:'♚ Play as Black instead',
   vsEngine:'vs Engine',
   streakWord:'day streak',
-  startStreak:'start your streak today'
+  startStreak:'start your streak today',
+  movesHere:'Moves will appear here.',
+  tipMenu:'Back to main menu',
+  tipEngine:'Engine status — click to retry',
+  tipSound:'Toggle sound',
+  tipArrows:'Show or hide arrows and key-square markers',
+  tipDots:'Show or hide legal-move dots when you select a piece',
+  tipEval:'Show or hide the engine evaluation bar',
+  tipEngMove:'Let the engine move for you'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   oppReplying:'对手应招中…',
@@ -661,7 +674,15 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   orPlayBlack:'♚ 改执黑',
   vsEngine:'人机对弈',
   streakWord:'天连续训练',
-  startStreak:'今天开始连续训练'
+  startStreak:'今天开始连续训练',
+  movesHere:'走过的棋会显示在这里。',
+  tipMenu:'返回主菜单',
+  tipEngine:'引擎状态——点击重试',
+  tipSound:'声音开关',
+  tipArrows:'显示或隐藏箭头与关键格标记',
+  tipDots:'选中棋子时显示或隐藏落点提示',
+  tipEval:'显示或隐藏引擎评估条',
+  tipEngMove:'让引擎替你走这一步'
 });
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
@@ -696,12 +717,26 @@ function setLang(l){
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
   renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge();
-  showMenu();
+  buildLineSel();
+  const inBoard = document.getElementById('drill').style.display!=='none';
+  if(!inBoard){ showMenu(); return; }
+  // Re-render the open session in place instead of abandoning it.
+  if(curOp!==null){
+    syncLineSel();
+    const op=DATA.openings[curOp], line=op.lines[curLine];
+    if(mode==='learn')
+      document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small>${lnName(line)} — ${t('learn')}</small>`;
+    else if(mode==='drill')
+      document.getElementById('lineTitle').innerHTML=`${op.icon} ${opName(op)}<small>${lnName(line)} — ${playerSide==='w'?t('white'):t('black')}</small>`;
+  }
+  if(mode==='learn') learnShowStep();
+  updateMoveList();
 }
 function applyStaticI18n(){
   if(!document.querySelectorAll) return;   // headless/test stub has no querySelectorAll
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n')); });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-i18n-ph')); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.getAttribute('data-i18n-title')); });
   if(document.documentElement) document.documentElement.lang = LANG==='zh'?'zh':'en';
 }
 
@@ -764,7 +799,7 @@ function toggleAims(){
   renderAimBtn();
   if(!showAims) aimSet=null;
   else if(selSq) aimSet=new Set(legalTargetNames(selSq));
-  if(curOp!==null) render(curLastU());
+  if(curOp!==null || mode==='play') render(curLastU());
 }
 function renderAimBtn(){
   const b=document.getElementById('aimBtn'); if(b) b.textContent=t(showAims?'dotsOn':'dotsOff');
@@ -785,6 +820,11 @@ const lineFavs = {
   has(op,l){ return this.load().indexOf(this.key(op,l))>=0; },
   toggle(op,l){ const a=this.load(); const k=this.key(op,l); const i=a.indexOf(k); if(i>=0) a.splice(i,1); else a.push(k); this.save(a); }
 };
+/* One monotonically-increasing run generation. Every mode entry bumps it, and
+   every timer/async continuation captures it at schedule time and bails if the
+   world moved on — no stale opponent replies, engine moves, or explanations. */
+let runGen=0;
+
 /* Menu search + sort state. Query is transient; sort choice persists. */
 let menuQuery='';
 let menuSort=(typeof localStorage!=='undefined' && localStorage.getItem('otSort'))||'group';
@@ -840,7 +880,7 @@ const store = {
       v.perfect++;
       const today=activity.key();
       if(v.lastPerfDay!==today){ v.streak++; v.lastPerfDay=today; }   // ♝ takes 3 separate days, not one sitting
-    } else { v.streak=0; v.lastPerfDay=null; }
+    } else if(v.lastPerfDay!==activity.key()){ v.streak=0; v.lastPerfDay=null; }   // the day's first result stands
     s[k]=v; this.save(s);
     v.firstRunToday=firstToday;   // transient, not persisted meaningfully
     return v; },
@@ -915,11 +955,11 @@ function readyNow(limit, excludeKey){
   });
   if(!out.length){
     // fallback: pick up where the user left off (this replaces the old Continue chip)
-    try{ const last=JSON.parse(localStorage.getItem('otLast')||'null');
-      if(last && DATA.openings[last.oi] && DATA.openings[last.oi].lines[last.li]){
-        const r=lineRank(last.oi,last.li);
-        push(last.oi,last.li, r===0?'learn':'drill', r===0?t('payoffLearn'):t('payoffDay',{d:Math.min(3,store.get(last.oi,last.li).streak+1)}));
-      } }catch(e){}
+    const last=resolveLast();
+    if(last){
+      const r=lineRank(last.oi,last.li);
+      push(last.oi,last.li, r===0?'learn':'drill', r===0?t('payoffLearn'):t('payoffDay',{d:Math.min(3,store.get(last.oi,last.li).streak+1)}));
+    }
   }
   if(!out.length){
     outer: for(let oi=0;oi<DATA.openings.length;oi++)
@@ -995,11 +1035,10 @@ const MEDALS=[
  {id:'safekeeper', t:'b', en:'Safekeeper', zh:'有备无患', ce:'Export a progress backup', cz:'导出一次进度备份', test:S=>S.ev==='export'},
 ];
 const ach={
-  _d:null,
-  load(){ if(!this._d){ try{ this._d=JSON.parse(localStorage.getItem('otAch')||'null'); }catch(e){}
-    if(!this._d||!this._d.ctr) this._d={v:1,unlocked:{},pending:[],ctr:{drills:0,roll:0,moves:0,modes:[],langs:[],dayKey:'',runsToday:0,perfToday:0}}; }
-    return this._d; },
-  save(){ try{ localStorage.setItem('otAch', JSON.stringify(this._d)); }catch(e){} },
+  load(){ let d=null; try{ d=JSON.parse(localStorage.getItem('otAch')||'null'); }catch(e){}
+    if(!d||!d.ctr) d={v:1,unlocked:{},pending:[],ctr:{drills:0,roll:0,moves:0,modes:[],langs:[],dayKey:'',runsToday:0,perfToday:0}};
+    return d; },   // fresh read every time — no stale cache across tabs or imports
+  save(d){ try{ localStorage.setItem('otAch', JSON.stringify(d)); }catch(e){} },
   count(){ return Object.keys(this.load().unlocked).length; }
 };
 const MEDAL_METRICS={
@@ -1035,11 +1074,11 @@ function achCheck(ev, d={}){
   const S={ev, d, ctr:c, lines, byOp:DATA.openings.map((op,oi)=>lines.filter(x=>x.oi===oi)),
            streak:activity.streak(), totalDays:keys.length, comebackGap};
   MEDALS.forEach(m=>{ try{ if(!A.unlocked[m.id] && m.test(S)){ A.unlocked[m.id]=today; A.pending.push(m.id); } }catch(e){} });
-  ach.save();
+  ach.save(A);
 }
 function flushMedals(){
   const A=ach.load(); if(!A.pending || !A.pending.length) return;
-  const show=A.pending.splice(0,2); ach.save();
+  const show=A.pending.splice(0,2); ach.save(A);
   show.forEach((id,i)=>{ const m=MEDALS.find(x=>x.id===id); if(m) setTimeout(()=>medalToast(m), 300+i*2000); });
 }
 function medalToast(m){
@@ -1054,6 +1093,7 @@ function openMedals(){
   let ov=document.getElementById('medalsOverlay');
   if(!ov){ ov=document.createElement('div'); ov.id='medalsOverlay';
     ov.onclick=e=>{ if(e.target===ov) closeMedals(); };
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ov.style.display!=='none') closeMedals(); });
     document.body.appendChild(ov); }
   const A=ach.load();
   // Chained medals render as ONE progressive row: earned tiers as dots, the next
@@ -1065,7 +1105,7 @@ function openMedals(){
     seen.add(m.series);
     rows.push({kind:'series', chain: MEDALS.filter(x=>x.series===m.series)});
   });
-  ov.innerHTML=`<div class="medals-panel"><div class="medals-head"><b>${t('medalsTitle')}</b>
+  ov.innerHTML=`<div class="medals-panel" role="dialog" aria-modal="true" aria-label="${t('medalsTitle')}"><div class="medals-head"><b>${t('medalsTitle')}</b>
       <span class="medals-count">${ach.count()}/${MEDALS.length}</span>
       <button class="mini" onclick="closeMedals()">✕</button></div>
     <div class="medals-list">`+
@@ -1086,9 +1126,16 @@ function openMedals(){
       return `<div class="medal-row series ${anyGot?'got':''}"><span class="m-dots">${dots}</span>
         <div class="m-txt"><b>${mName(shown)}</b><span>${next?mCond(shown):`${mCond(shown)} · ${A.unlocked[shown.id]}`}</span>${prog}</div></div>`;
     }).join('')+`</div></div>`;
+  ov.querySelector('.medals-list').setAttribute('tabindex','0');
   ov.style.display='flex';
+  document.body.style.overflow='hidden';
+  const x=ov.querySelector('.medals-head .mini'); if(x) x.focus();
 }
-function closeMedals(){ const ov=document.getElementById('medalsOverlay'); if(ov) ov.style.display='none'; }
+function closeMedals(){
+  const ov=document.getElementById('medalsOverlay'); if(ov) ov.style.display='none';
+  document.body.style.overflow='';
+  const b=document.querySelector('.medal-btn'); if(b) b.focus();
+}
 
 /* ================= SPACED REPETITION (FSRS-4.5) =================
    Free Spaced Repetition Scheduler with default weights (open-spaced-repetition
@@ -1167,6 +1214,7 @@ const activity = {
 const BUILD='G8';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
+  achCheck('export');   // Safekeeper lands in the file being written
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString()};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
@@ -1177,7 +1225,7 @@ function exportProgress(){
   a.download='debut-progress-'+activity.key()+'.json';
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-  achCheck('export'); flushMedals();
+  flushMedals();
 }
 function importProgress(){ const el=document.getElementById('importFile'); if(el) el.click(); }
 (function(){
@@ -1189,6 +1237,8 @@ function importProgress(){ const el=document.getElementById('importFile'); if(el
       try{
         const o=JSON.parse(rd.result);
         if(!o || o.__app!=='debut-progress') throw new Error('not a progress file');
+        // true restore: clear existing app keys first so old-build backups don't merge into a chimera
+        for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i); if(BACKUP_KEY_RE.test(k)) localStorage.removeItem(k); }
         let n=0;
         for(const k in o){ if(BACKUP_KEY_RE.test(k) && typeof o[k]==='string'){ localStorage.setItem(k,o[k]); n++; } }
         alert(t('importOk',{n}));
@@ -1499,6 +1549,8 @@ const Engine = {
     return ok;
   },
   async _doLoad(){
+    if(this.worker){ try{ this.worker.terminate(); }catch(e){} this.worker=null; }   // never leak a previous worker
+    this._q=null; this._onLine=null; this._drain=false;
     this.tried=true; this.STATUS='loading'; updateEngineBadge();
     // A worker is allowed to importScripts() cross-origin (no CORS preflight needed),
     // unlike fetch(). We try several single-file (asm.js) Stockfish builds in order.
@@ -1540,7 +1592,10 @@ const Engine = {
     }
   },
   send(cmd){ if(this.worker) this.worker.postMessage(cmd); },
-  _onMessage(line){ if(this._onLine) this._onLine(line); },
+  _onMessage(line){
+    if(this._drain){ if(line.startsWith('bestmove')) this._drain=false; return; }   // discard a timed-out search's late answer
+    if(this._onLine) this._onLine(line);
+  },
   _await(pred, ms){
     return new Promise((resolve,reject)=>{
       const to=setTimeout(()=>{ this._onLine=null; reject(new Error('engine timeout')); }, ms);
@@ -1569,7 +1624,7 @@ const Engine = {
       this.send(moves!==null ? 'position startpos'+(moves?' moves '+moves:'') : 'position fen '+fen);
       const p=this._await(l=>l.startsWith('bestmove'), movetime+6000);
       this.send('go movetime '+movetime);
-      let line; try { line=await p; } catch(e){ return null; }
+      let line; try { line=await p; } catch(e){ this.send('stop'); this._drain=true; return null; }
       const m=line.match(/^bestmove\s+(\S+)/);
       return m && m[1]!=='(none)' ? m[1] : null;
     });
@@ -1582,7 +1637,7 @@ const Engine = {
       this.send('setoption name Contempt value 0');   // neutral analysis — SF10's default 24 inflates the mover's eval
       this.send('ucinewgame'); this.send('position fen '+fen);
       let lastCp=0, mate=null;
-      const to=setTimeout(()=>{ this._onLine=null; resolve({bestmove:null,cp:lastCp}); }, movetime+6000);
+      const to=setTimeout(()=>{ this._onLine=null; this.send('stop'); this._drain=true; resolve({bestmove:null,cp:lastCp}); }, movetime+6000);
       this._onLine=line=>{
         const dm=line.match(/\bdepth (\d+)/); const depth=dm?+dm[1]:0;
         const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; if(onInfo && depth>=8) onInfo(lastCp,null); }
@@ -1605,7 +1660,7 @@ function updateEngineBadge(){
   el.className='eng-badge '+Engine.STATUS;
 }
 function retryEngine(){
-  if(Engine.STATUS==='loading') return;
+  if(Engine.STATUS==='loading' || Engine.STATUS==='ready') return;
   Engine.tried=false; Engine.ready=false;
   Engine.load();
 }
@@ -1734,6 +1789,7 @@ function drawAnnots(){
 
 /* ================= MENU ================= */
 function showMenu(){
+  runGen++;
   reviewQueue=null;
   document.getElementById('drill').style.display='none';
   document.getElementById('menu').style.display='block';
@@ -1872,10 +1928,22 @@ function renderTodayBar(){
      </div>
      <button class="th-engine" onclick="enterFreePlay()" title="${t('freePlayTitle')} ${t('freePlaySub')}">${robot}<span>${t('vsEngine')}</span></button>`;
 }
-function rememberLast(oi,li,mode){ try{ localStorage.setItem('otLast',JSON.stringify({oi,li,mode})); }catch(e){} }
-function resumeLast(){
+function rememberLast(oi,li,mode){ try{ localStorage.setItem('otLast',JSON.stringify({op:DATA.openings[oi].name, line:DATA.openings[oi].lines[li].name, mode})); }catch(e){} }
+function resolveLast(){   // accepts both the name shape and the legacy {oi,li} shape
   let last=null; try{ last=JSON.parse(localStorage.getItem('otLast')||'null'); }catch(e){}
-  if(!last || !DATA.openings[last.oi] || !DATA.openings[last.oi].lines[last.li]) return;
+  if(!last) return null;
+  if(last.op!==undefined){
+    for(let oi=0;oi<DATA.openings.length;oi++){ const op=DATA.openings[oi];
+      if(op.name!==last.op) continue;
+      for(let li=0;li<op.lines.length;li++) if(op.lines[li].name===last.line) return {oi,li,mode:last.mode};
+    }
+    return null;
+  }
+  if(DATA.openings[last.oi] && DATA.openings[last.oi].lines[last.li]) return {oi:last.oi, li:last.li, mode:last.mode};
+  return null;
+}
+function resumeLast(){
+  const last=resolveLast(); if(!last) return;
   const side=DATA.openings[last.oi].side;
   if(last.mode==='learn') startLearn(last.oi,last.li,side);
   else if(last.mode==='play') startPlay(last.oi,last.li,side);
@@ -1909,6 +1977,7 @@ function quickStart(oi){
 
 /* ================= DRILL ================= */
 function startDrill(oi,li,side){
+  runGen++;
   rememberLast(oi,li,'drill');
   curOp=oi; curLine=li; playerSide=side; mode='drill';
   board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
@@ -1949,8 +2018,8 @@ function buildLineSel(){
   const sel=document.getElementById('lineSel'); if(!sel) return;
   let html='';
   DATA.openings.forEach((op,oi)=>{
-    html+=`<optgroup label="${op.icon} ${op.name}">`;
-    op.lines.forEach((l,li)=>{ html+=`<option value="${oi}:${li}">${l.name}</option>`; });
+    html+=`<optgroup label="${op.icon} ${opName(op)}">`;
+    op.lines.forEach((l,li)=>{ html+=`<option value="${oi}:${li}">${lnName(l)}</option>`; });
     html+='</optgroup>';
   });
   sel.innerHTML=html;
@@ -2001,6 +2070,8 @@ function playSetupUI(side){
   Engine.load();
 }
 function startPlay(oi,li,side){
+  runGen++;
+  freeChooserShown=false;
   rememberLast(oi,li,'play');
   curOp=oi; curLine=li; playerSide=side; mode='play'; freeMode=false;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
@@ -2030,6 +2101,7 @@ function enterFreePlay(){
        <button class="act" onclick="startFreePlay('b')">${t('orPlayBlack')}</button></div>`;
 }
 function startFreePlay(side){
+  runGen++;
   freeChooserShown=false;
   curOp=null; curLine=null; playerSide=side; mode='play'; freeMode=true;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
@@ -2085,6 +2157,7 @@ async function updateEvalBar(){
   wrap.style.display='block';
   wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
   if(!showEvalBar) return;
+  if(mode==='play' && !playOver && !userTurnInPlay()) return;   // don't queue an eval ahead of the engine's reply
   if(!(await Engine.load())){ setEvalBar(null); return; }
   const myseq=++evalSeq;
   const fen=toFEN(playWhite);
@@ -2120,7 +2193,17 @@ function resumePlay(){
 }
 /* ---- draw detection (play mode): threefold repetition, 50-move rule, dead material ---- */
 let playPosCounts={}, playHalfmoveClock=0;
-function posKey(whiteToMove){ return toFEN(whiteToMove).split(' ').slice(0,4).join(' '); }  // placement+side+castling+ep
+function posKey(whiteToMove){  // placement+side+castling+ep (ep only when a capture is actually possible, per FIDE)
+  const parts=toFEN(whiteToMove).split(' ');
+  if(parts[3]!=='-'){
+    const f=parts[3].charCodeAt(0)-97, r=+parts[3][1]-1;
+    const capR = whiteToMove ? r-1 : r+1;                 // rank the capturing pawn would stand on
+    const pawn = whiteToMove ? 'P' : 'p';
+    const can = (f>0 && board[capR] && board[capR][f-1]===pawn) || (f<7 && board[capR] && board[capR][f+1]===pawn);
+    if(!can) parts[3]='-';   // (rare pinned-pawn case intentionally ignored)
+  }
+  return parts.slice(0,4).join(' ');
+}
 let playFlags={};
 function resetDrawTracking(){ playPosCounts={}; playHalfmoveClock=0; playFlags={}; const k=posKey(playWhite); playPosCounts[k]=1; }
 function insufficientMaterial(){
@@ -2169,14 +2252,14 @@ function playUserMove(u){
   if(p.toUpperCase()==='P' && from[0]!==to[0] && !board[r2][f2]) playFlags.enPassant=true;
   locked=true;
   buzz(15);
-  if(freeChooserShown){ freeChooserShown=false; document.getElementById('comment').innerHTML=t('playFromStart'); }
+  if(freeMode && freeChooserShown){ freeChooserShown=false; document.getElementById('comment').innerHTML=t('playFromStart'); }
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return true; }
   const d=playDrawStatus();
   if(d){ finishPlay(d); return true; }
   setPrompt(t('engineThinking'),'');
-  setTimeout(engineMove, 550);
+  { const g=runGen; setTimeout(()=>{ if(g===runGen && mode==='play') engineMove(); }, 550); }
   return true;
 }
 function pickFallbackMove(white){ // used only if engine unavailable
@@ -2189,6 +2272,7 @@ function pickFallbackMove(white){ // used only if engine unavailable
 }
 async function engineMove(){
   if(playOver) return;
+  const g=runGen;
   locked=true;
   const white=playWhite;
   const fen=toFEN(white);
@@ -2196,13 +2280,14 @@ async function engineMove(){
   const skill=eloToSkill(playElo), movetime=eloToMovetime(playElo);
   let u=null;
   if(await Engine.load()) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
+  if(g!==runGen || mode!=='play' || playOver) return;   // game restarted or left
+  if(u && !allLegalMoves(white).includes(u)) u=null;    // defense: a drained/stale engine answer never touches the board
   if(!u) u=pickFallbackMove(white); // graceful fallback
   if(!u){ finishPlay(gameStatus(white)); return; }
-  if(playOver) return;
   // ensure a minimum visible "thinking" beat even if the engine answers instantly
   const elapsed=Date.now()-t0, minThink=450;
   if(elapsed<minThink) await new Promise(r=>setTimeout(r, minThink-elapsed));
-  if(playOver) return;
+  if(g!==runGen || mode!=='play' || playOver) return;
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return; }
@@ -2214,15 +2299,20 @@ async function engineMove(){
 function engineMoveNow(){ // "Engine move" button: play the user's move for them (full strength)
   if(playOver || !userTurnInPlay() || locked) return;
   (async()=>{
+    const g=runGen;
     locked=true; setPrompt(t('engineChoosing'),'');
     const white=playWhite; const fen=toFEN(white);
     let u = await Engine.load() ? await Engine.bestMove(fen,{skill:20,movetime:600,moves:playHist.map(h=>h.u).join(' ')}) : pickFallbackMove(white);
+    if(g!==runGen || mode!=='play' || playOver) return;
+    if(u && !allLegalMoves(white).includes(u)) u=null;
     if(!u){ locked=false; return; }
     makePlayMove(u);
     const status=gameStatus(playWhite);
     if(status!=='ongoing'){ finishPlay(status); return; }
+    const d=playDrawStatus();
+    if(d){ finishPlay(d); return; }
     setPrompt(t('engineThinking'),'');
-    setTimeout(engineMove,180);
+    setTimeout(()=>{ if(g===runGen && mode==='play') engineMove(); },180);
   })();
 }
 function updatePlayList(){
@@ -2309,7 +2399,9 @@ function tick(){
   } else {
     locked=true;
     setPrompt(t('oppReplying'),'');
+    const g=runGen;
     setTimeout(()=>{
+      if(g!==runGen || mode!=='drill') return;   // run was left/restarted meanwhile
       const mv=moves[ply];
       const cap=isCapture(mv.u);
       applyMove(mv.u); ply++;
@@ -2362,7 +2454,9 @@ function attemptMove(u){
     setPrompt(`✓ ${expected.san} ${t('correctNow')}`,'good');
     showComment(expected);
     updateMoveList(); updateProgress();
-    setTimeout(tick, drillReplyDelay());
+    locked=true;   // no pre-moves while the opponent replies — tick unlocks on your turn
+    const g=runGen;
+    setTimeout(()=>{ if(g===runGen && mode==='drill') tick(); }, drillReplyDelay());
   } else {
     misses++; mistakesThisRun++; selSq=null; aimSet=null;
     buzz([12,40,12]);
@@ -2381,13 +2475,14 @@ function attemptMove(u){
 /* If the engine is loaded, replace the rule-based note with a real evaluation.
    Guarded by token (ply + comment snapshot) so a late result can't overwrite a newer state. */
 async function engineExplain(wrongU, expected, reveal, atPly){
+  const g=runGen;
   if(!(await Engine.load())) return;        // no engine → keep rule-based note
-  if(mode!=='drill' || ply!==atPly) return; // position moved on
+  if(g!==runGen || mode!=='drill' || ply!==atPly) return; // run or position moved on
   const white = playerSide==='w';
   const fenBefore = toFEN(white);
   // best line from current position (engine's top choice + eval, from mover's POV)
   const before = await Engine.analyse(fenBefore, {movetime:500});
-  if(!before || mode!=='drill' || ply!==atPly) return;
+  if(!before || g!==runGen || mode!=='drill' || ply!==atPly) return;
   // evaluate the position AFTER the user's wrong move (from opponent POV → negate)
   const wrong = wrongU.length>=4 ? wrongU.slice(0,4) : wrongU;
   let promo = '';
@@ -2398,7 +2493,7 @@ async function engineExplain(wrongU, expected, reveal, atPly){
   const fenAfter=toFEN(!white);
   board=sB;
   const after = await Engine.analyse(fenAfter, {movetime:500});
-  if(!after || mode!=='drill' || ply!==atPly) return;
+  if(!after || g!==runGen || mode!=='drill' || ply!==atPly) return;
   const playedCp = -after.cp;                 // back to our POV
   const bestCp = before.cp;
   const loss = bestCp - playedCp;             // centipawns thrown away
@@ -2465,8 +2560,8 @@ function explainWrong(wrongU, expected, reveal){
 }
 
 function giveHint(){
-  hintsThisRun++;
   if(locked || ply>=lineMoves().length || !isPlayerTurn()) return;
+  hintsThisRun++;
   mistakesThisRun++; // hints cost the perfect run
   const exp=lineMoves()[ply];
   highlightSq(exp.u.slice(0,2));
@@ -2554,7 +2649,7 @@ function updateMoveList(){
     if(i%2===0) html+=`<span class="num">${i/2+1}.</span>`;
     html+=`<span class="mv ${i===n-1?'cur':''}">${moves[i].san}</span> `;
   }
-  document.getElementById('movelist').innerHTML = html || '<span style="color:var(--dim)">Moves will appear here.</span>';
+  document.getElementById('movelist').innerHTML = html || `<span style="color:var(--dim)">${t('movesHere')}</span>`;
   const ml=document.getElementById('movelist'); ml.scrollTop=ml.scrollHeight;
 }
 function updateProgress(){
@@ -2563,6 +2658,7 @@ function updateProgress(){
 
 /* ================= LEARN MODE ================= */
 function startLearn(oi,li,side){
+  runGen++;
   rememberLast(oi,li,'learn');
   learnCredited=false; learnBadgeEarned=false; recalledThisRun=0;
   curOp=oi; curLine=li; playerSide=side; mode='learn';
