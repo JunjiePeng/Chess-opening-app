@@ -103,6 +103,14 @@ header p { color:var(--dim); font-size:.9rem; }
 #boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100vh - 170px), max(560px, calc(100vw - 470px)), 840px); }
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
+#promoPicker { position:absolute; top:0; display:none; flex-direction:column; z-index:12;
+  background:var(--panel); border-radius:10px; overflow:hidden; box-shadow:0 10px 28px rgba(0,0,0,.6); }
+.promo-btn { width:calc(var(--bsize)/8); height:calc(var(--bsize)/8); display:flex; align-items:center; justify-content:center;
+  background:var(--light-sq); border:none; cursor:pointer; font-size:calc(var(--bsize)/8*.8); padding:0; }
+.promo-btn:hover, .promo-btn:focus-visible { background:var(--accent); }
+.promo-cancel { height:calc(var(--bsize)/14); background:var(--panel2); border:none; color:var(--dim);
+  cursor:pointer; font-size:.8rem; }
+.promo-cancel:hover { color:var(--text); }
 #evalBarWrap { display:none; width:20px; height:var(--bsize); position:relative; flex:0 0 auto;
   background:#171006; border:2px solid rgba(0,0,0,.45); border-radius:6px; overflow:hidden; }
 #evalFill { position:absolute; left:0; right:0; bottom:0; height:50%; background:#f0e9da; transition:height .65s cubic-bezier(.22,.8,.36,1); }
@@ -1064,6 +1072,7 @@ const MEDALS=[
  {id:'miniature', t:'g', sec:1, en:'Miniature', zh:'袖珍杀局', ce:'Checkmate in 20 moves or fewer', cz:'20 回合内将杀', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.reason==='checkmate'&&S.d.plies<=40},
  {id:'deja_vu', t:'s', sec:1, en:'Déjà Vu', zh:'似曾相识', ce:'Draw the engine by repetition', cz:'与引擎三次重复成和', test:S=>S.ev==='play'&&S.d.reason==='repetition'},
  {id:'new_queen', t:'b', sec:1, en:'A New Queen', zh:'小兵升变', ce:'Promote a pawn in a game', cz:'对局中实现升变', test:S=>S.ev==='play'&&!!S.d.flags.promoted},
+ {id:'knight_shift', t:'g', sec:1, en:'Knight Shift', zh:'偏要升马', ce:'Promote a pawn to a knight', cz:'升变时偏要选马', test:S=>S.ev==='play'&&S.d.flags.promoPiece==='n'},
  {id:'long_castle', t:'b', sec:1, en:'The Long Castle', zh:'长易位', ce:'Castle queenside in a game', cz:'对局中完成长易位', test:S=>S.ev==='play'&&!!S.d.flags.longCastle},
  {id:'en_passant', t:'b', sec:1, en:'In Passing', zh:'吃过路兵', ce:'Capture en passant in a game', cz:'对局中吃过路兵', test:S=>S.ev==='play'&&!!S.d.flags.enPassant},
  {id:'triple', t:'b', en:'Triple Threat', zh:'三管齐下', ce:'Use Learn, Drill and Play', cz:'三种模式都用过', test:S=>S.ctr.modes.length>=3},
@@ -2135,6 +2144,8 @@ function playSetupUI(side){
   document.getElementById('streakInfo').innerHTML='';
   document.getElementById('progFill').style.width='0%';
   setPrompt('','');
+  promoPending=null;
+  { const pk=document.getElementById('promoPicker'); if(pk) pk.style.display='none'; }
   const slider=document.getElementById('eloSlider'); if(slider) slider.value=playElo;
   onEloInput(playElo);
   Engine.load();
@@ -2312,16 +2323,23 @@ function makePlayMove(u){
   render(u); updatePlayList(); updateEval(); updateOpeningName(); updateEvalBar();
 }
 function playUserMove(u){
-  const from=u.slice(0,2);
-  let targets=legalTargetNames(from);
-  const to=u.slice(2,4);
-  if(!targets.includes(to)){ // illegal — ignore quietly, reselect handled by caller
+  const from=u.slice(0,2), to=u.slice(2,4);
+  if(!legalTargetNames(from).includes(to)){ // illegal — ignore quietly, reselect handled by caller
     return false;
   }
-  // auto-queen promotion
+  const [r1,f1]=sqRC(from); const p=board[r1][f1];
+  if(p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')){
+    openPromoPicker(from,to);   // the player picks the piece; commit follows from the picker
+    return true;
+  }
+  commitUserMove(u);
+  return true;
+}
+function commitUserMove(u){
+  const from=u.slice(0,2), to=u.slice(2,4);
   const [r1,f1]=sqRC(from); const p=board[r1][f1];
   const [r2,f2]=sqRC(to);
-  if(p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')){ u=from+to+'q'; playFlags.promoted=true; }
+  if(u.length===5){ playFlags.promoted=true; playFlags.promoPiece=u[4]; }
   if(p.toUpperCase()==='K' && (u==='e1c1'||u==='e8c8')) playFlags.longCastle=true;
   if(p.toUpperCase()==='P' && from[0]!==to[0] && !board[r2][f2]) playFlags.enPassant=true;
   locked=true;
@@ -2329,12 +2347,49 @@ function playUserMove(u){
   if(freeMode && freeChooserShown){ freeChooserShown=false; document.getElementById('comment').innerHTML=t('playFromStart'); }
   makePlayMove(u);
   const status=gameStatus(playWhite);
-  if(status!=='ongoing'){ finishPlay(status); return true; }
+  if(status!=='ongoing'){ finishPlay(status); return; }
   const d=playDrawStatus();
-  if(d){ finishPlay(d); return true; }
+  if(d){ finishPlay(d); return; }
   setPrompt(t('engineThinking'),'');
   { const g=runGen; setTimeout(()=>{ if(g===runGen && mode==='play') engineMove(); }, 550); }
-  return true;
+}
+
+/* ---- promotion picker (lichess-style column over the promotion square) ---- */
+let promoPending=null;
+function openPromoPicker(from,to){
+  promoPending={from,to,g:runGen};
+  locked=true;   // board frozen until a piece is chosen or the pick is cancelled
+  const wrap=document.querySelector('.board-wrap');
+  let pk=document.getElementById('promoPicker');
+  if(!pk){
+    pk=document.createElement('div'); pk.id='promoPicker';
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && promoPending) cancelPromoPicker(); });
+    wrap.appendChild(pk);
+  }
+  const white = playerSide==='w';
+  const f = to.charCodeAt(0)-97;
+  const vf = (playerSide==='b') ? 7-f : f;
+  const names={q:'pieceQueen',n:'pieceKnight',r:'pieceRook',b:'pieceBishop'};
+  pk.innerHTML = ['q','n','r','b'].map(pc=>
+      `<button class="promo-btn" data-p="${pc}" aria-label="${t(names[pc])}">${pieceSVG(white?pc.toUpperCase():pc)}</button>`).join('')
+    + `<button class="promo-cancel" aria-label="${t('closeWord')}">✕</button>`;
+  pk.style.left = `calc(${vf} * var(--bsize) / 8)`;
+  pk.style.display='flex';
+  pk.querySelectorAll('.promo-btn').forEach(b=>{ b.onclick=e=>{ e.stopPropagation(); choosePromo(b.dataset.p); }; });
+  pk.querySelector('.promo-cancel').onclick=e=>{ e.stopPropagation(); cancelPromoPicker(); };
+  pk.querySelector('.promo-btn').focus();
+}
+function choosePromo(pc){
+  if(!promoPending) return;
+  const pend=promoPending; promoPending=null;
+  const pk=document.getElementById('promoPicker'); if(pk) pk.style.display='none';
+  if(pend.g!==runGen || mode!=='play' || playOver) return;   // the game moved on while choosing
+  commitUserMove(pend.from+pend.to+pc);
+}
+function cancelPromoPicker(){
+  promoPending=null;
+  const pk=document.getElementById('promoPicker'); if(pk) pk.style.display='none';
+  if(mode==='play' && !playOver){ locked=false; selSq=null; aimSet=null; render(curLastU()); }
 }
 function pickFallbackMove(white){ // used only if engine unavailable
   const moves=allLegalMoves(white);
@@ -2355,7 +2410,8 @@ async function engineMove(){
   let u=null;
   if(await Engine.load()) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
   if(g!==runGen || mode!=='play' || playOver) return;   // game restarted or left
-  if(u && !allLegalMoves(white).includes(u)) u=null;    // defense: a drained/stale engine answer never touches the board
+  if(u){ const legal=allLegalMoves(white);
+    if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }   // stale/foreign answers never touch the board
   if(!u) u=pickFallbackMove(white); // graceful fallback
   if(!u){ finishPlay(gameStatus(white)); return; }
   // ensure a minimum visible "thinking" beat even if the engine answers instantly
@@ -2378,7 +2434,8 @@ function engineMoveNow(){ // "Engine move" button: play the user's move for them
     const white=playWhite; const fen=toFEN(white);
     let u = await Engine.load() ? await Engine.bestMove(fen,{skill:20,movetime:600,moves:playHist.map(h=>h.u).join(' ')}) : pickFallbackMove(white);
     if(g!==runGen || mode!=='play' || playOver) return;
-    if(u && !allLegalMoves(white).includes(u)) u=null;
+    if(u){ const legal=allLegalMoves(white);
+      if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }
     if(!u){ locked=false; return; }
     makePlayMove(u);
     const status=gameStatus(playWhite);
