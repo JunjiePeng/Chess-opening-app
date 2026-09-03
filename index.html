@@ -24,22 +24,26 @@
   --hl: rgba(224,164,84,.55); --hl-last: rgba(224,164,84,.35);
   --panelw: 330px;      /* side panel width */
   --reserveh: 118px;    /* header + paddings above/below the board */
+  --page-gutter: 24px;  /* shared by the header and main content */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-header { padding:max(18px, env(safe-area-inset-top, 0px)) 24px 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.page-shell { width:100%; min-width:0;
+  padding-left:max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
+header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
 header h1 { font-family:'Caprasimo',serif; font-weight:400; font-size:1.55rem; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
 header h1:hover { opacity:.8; }
 header h1 span { color:var(--accent); }
 header p { color:var(--dim); font-size:.9rem; }
-.layout { display:flex; gap:20px; padding:10px 24px 30px; flex-wrap:wrap; align-items:flex-start; justify-content:center; }
+.layout { display:flex; gap:20px; padding-block:10px 30px; flex-wrap:wrap; align-items:flex-start; justify-content:center; }
 
 /* ---- menu ---- */
-#menu { max-width:1000px; width:100%; }
-.op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:14px; }
+#menu { width:100%; min-width:0; }
+.op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr)); gap:14px; }
 #buildTag { text-align:center; color:var(--dim); font-size:.72rem; margin-top:22px; opacity:.7; }
 #buildTag b { color:var(--accent); }
 #backupRow { text-align:center; margin-top:4px; }
@@ -338,14 +342,19 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 #muteBtn:hover { opacity:1; }
 #muteBtn svg { width:20px; height:20px; display:block; stroke:currentColor; fill:none;
   stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-@media (max-width:900px){ .layout{padding:10px 12px 24px} .side-panel{width:min(82vw,520px)} }
+@media (max-width:900px){
+  :root { --page-gutter:12px; }
+  .layout { padding-block:10px 24px; }
+  .side-panel { width:min(82vw,520px); }
+}
 
 /* ---- phone layout: keep board + prompt + primary buttons on one screen ---- */
 @media (max-width:760px){
-  header { padding:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 14px 6px; gap:8px; }
+  :root { --page-gutter:8px; }
+  header { padding-block:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 6px; gap:8px; }
   header h1 { font-size:1.2rem; }
   header p { display:none; }
-  .layout { padding:6px 8px 16px; gap:10px; }
+  .layout { padding-block:6px 16px; gap:10px; }
   #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
   #drill { gap:8px; }
   #boardCol { --bsize:min(100vw, calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }
@@ -374,7 +383,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 }
 /* ---- landscape phones & short wide windows: board owns the height, panel beside it ---- */
 @media (max-height:520px) and (min-width:600px){
-  header { padding:6px 14px 4px; }
+  header { padding-block:6px 4px; }
   header p { display:none; }
   #drill.layout { flex-wrap:nowrap; padding:4px 10px 8px; gap:12px; align-items:flex-start; }
   #boardCol { --bsize:calc(100dvh - 72px); }
@@ -388,7 +397,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 </style>
 </head>
 <body>
-<header>
+<header class="page-shell">
   <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu">♞ De<span>but</span></h1>
   <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
   <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
@@ -396,7 +405,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
 </header>
 
-<div class="layout">
+<div class="layout page-shell">
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div id="todayBar" class="today-bar" style="display:none"></div>
@@ -412,7 +421,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G9</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G10</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1311,7 +1320,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G9';
+const BUILD='G10';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
