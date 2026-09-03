@@ -25,13 +25,14 @@
   --panelw: 330px;      /* side panel width */
   --reserveh: 118px;    /* header + paddings above/below the board */
   --page-gutter: 24px;  /* shared by the header and main content */
+  --page-max-width: 1920px; /* center the app on ultrawide screens */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-.page-shell { width:100%; min-width:0;
+.page-shell { width:100%; max-width:var(--page-max-width); min-width:0; margin-inline:auto;
   padding-left:max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
 header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
@@ -106,7 +107,7 @@ header p { color:var(--dim); font-size:.9rem; }
 
 /* ---- drill ---- */
 #drill { display:none; }
-#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100dvh - var(--reserveh)), max(560px, calc(100vw - var(--panelw) - 110px)), 2000px); }
+#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100dvh - var(--reserveh)), max(560px, calc(min(100vw, var(--page-max-width)) - var(--panelw) - 110px)), 2000px); }
 #drill.play { --reserveh:162px; }   /* capture trays above and below the board */
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
@@ -421,7 +422,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G10</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G11</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1320,7 +1321,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G10';
+const BUILD='G11';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
