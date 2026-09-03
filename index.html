@@ -22,6 +22,8 @@
   --text: #f0e5d3; --dim: #b3a48e; --accent: #d08348; --accent2: #97a878;
   --bad: #d4715c; --light-sq: #e8d3ae; --dark-sq: #9a6b43;
   --hl: rgba(224,164,84,.55); --hl-last: rgba(224,164,84,.35);
+  --panelw: 330px;      /* side panel width */
+  --reserveh: 118px;    /* header + paddings above/below the board */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
@@ -100,7 +102,8 @@ header p { color:var(--dim); font-size:.9rem; }
 
 /* ---- drill ---- */
 #drill { display:none; }
-#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100vh - 170px), max(560px, calc(100vw - 470px)), 840px); }
+#boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100dvh - var(--reserveh)), max(560px, calc(100vw - var(--panelw) - 110px)), 2000px); }
+#drill.play { --reserveh:162px; }   /* capture trays above and below the board */
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
 #promoPicker { position:absolute; top:0; display:none; flex-direction:column; z-index:12;
@@ -126,6 +129,12 @@ header p { color:var(--dim); font-size:.9rem; }
   width:var(--bsize); height:var(--bsize);
   border:0; border-radius:16px; overflow:hidden; user-select:none;
   box-shadow:0 6px 20px rgba(0,0,0,.45); }
+#board { touch-action:none; }   /* dragging a piece must not scroll the page */
+#dragGhost { position:absolute; left:0; top:0; width:calc(var(--bsize)/8); height:calc(var(--bsize)/8);
+  display:none; align-items:center; justify-content:center; pointer-events:none; z-index:20;
+  transform:translate(-50%,-50%) scale(1.12); font-size:calc(var(--bsize)/8*.80); line-height:1;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.5)); }
+.sq.drag-over::after { content:''; position:absolute; inset:0; z-index:0; box-shadow:inset 0 0 0 4px rgba(240,225,200,.75); }
 .sq { position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
   font-size:calc(var(--bsize)/8*.80); line-height:1; min-width:0; min-height:0; }
 .sq.anim-top { z-index:3; }
@@ -150,7 +159,8 @@ header p { color:var(--dim); font-size:.9rem; }
 .flash-bad { animation:flashbad .4s; }
 @keyframes flashbad { 0%{background:var(--bad)} 100%{} }
 
-.side-panel { width:330px; max-width:92vw; min-width:0; display:flex; flex-direction:column; gap:12px; }
+.side-panel { width:var(--panelw); max-width:92vw; min-width:0; display:flex; flex-direction:column; gap:12px; }
+@media (min-width:1700px){ :root { --panelw:390px; } }   /* roomier text on big monitors */
 #drill { max-width:100%; min-width:0; }
 #lineSel { max-width:100%; }
 .panel-box { background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4); border-radius:22px; padding:14px 18px; }
@@ -336,9 +346,11 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   header h1 { font-size:1.2rem; }
   header p { display:none; }
   .layout { padding:6px 8px 16px; gap:10px; }
+  #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
   #drill { gap:8px; }
-  #boardCol { --bsize:min(96vw, calc(100dvh - 286px - env(safe-area-inset-top, 0px))); }
-  .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; }
+  #boardCol { --bsize:min(100vw, calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }
+  #board { border-radius:12px; }
+  .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; padding:0 10px; box-sizing:border-box; }
   .panel-box { padding:10px 14px; }
   #promptBox { order:1; max-height:30vh; overflow:auto; }
   #doneBox   { order:1; }
@@ -356,8 +368,21 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .toggle { flex:1 1 100%; }
   .toggle button { flex:1; }
 }
+/* ---- tablets in portrait / narrow windows: the panel wraps below anyway, so the board takes the width ---- */
+@media (min-width:761px) and (max-width:999px){
+  #boardCol { --bsize:min(92vw, calc(100dvh - 150px)); }
+}
+/* ---- landscape phones & short wide windows: board owns the height, panel beside it ---- */
+@media (max-height:520px) and (min-width:600px){
+  header { padding:6px 14px 4px; }
+  header p { display:none; }
+  #drill.layout { flex-wrap:nowrap; padding:4px 10px 8px; gap:12px; align-items:flex-start; }
+  #boardCol { --bsize:calc(100dvh - 72px); }
+  .side-panel { width:min(44vw, 380px); max-width:none; }
+  #promptBox { max-height:38vh; overflow:auto; }
+}
 @media (max-width:760px) and (max-height:680px){
-  #boardCol { --bsize:min(86vw, calc(100dvh - 276px - env(safe-area-inset-top, 0px))); }
+  #boardCol { --bsize:min(100vw, calc(100dvh - 236px - env(safe-area-inset-top, 0px))); }  /* shorter phones */
   #promptBox { max-height:24vh; }
 }
 </style>
@@ -387,7 +412,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G8 · Organic</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G9</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1286,7 +1311,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G8';
+const BUILD='G9';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
@@ -1831,7 +1856,6 @@ function render(lastU){
     if(lastU && (name===lastU.slice(0,2)||name===lastU.slice(2,4))) sq.classList.add('last');
     if(selSq===name) sq.classList.add('sel');
     if(aimSet && aimSet.has(name)) sq.classList.add(board[r][f] ? 'cp' : 'mv');
-    sq.onclick = ()=>onSquare(name);
     boardEl.appendChild(sq);
   }
   if(hintSq && mode==='drill') highlightSq(hintSq);   // hint glow survives re-renders
@@ -2079,7 +2103,7 @@ function startDrill(oi,li,side){
   board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
   hintsThisRun=0; revealedThisRun=false; recalledThisRun=0; hintPly=-1; hintSq=null;
   document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex';
+  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='flex';
@@ -2154,7 +2178,7 @@ function onEloInput(v){
 }
 function playSetupUI(side){
   document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex';
+  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='none';
@@ -2572,33 +2596,109 @@ function tick(){
   }
 }
 
+/* Whose piece can be picked up right now, per mode. */
+function isMine(name){
+  if(locked) return false;
+  const [r,f]=sqRC(name); const p=board[r][f];
+  if(!p) return false;
+  if(mode==='play') return (p===p.toUpperCase())===playWhite && userTurnInPlay();
+  if(mode==='learn'){
+    if(learnPly>=lineMoves().length) return false;      // line finished: nothing to play
+    return (p===p.toUpperCase())===(learnPly%2===0);     // whose move is next in the line
+  }
+  return (p===p.toUpperCase()) === (playerSide==='w');
+}
+function selectSquare(sq){ selSq=sq; aimSet = (sq&&showAims) ? new Set(legalTargetNames(sq)) : null; if(sq) buzz(8); render(curLastU()); }
 function onSquare(name){
   if(locked) return;
-  const [r,f]=sqRC(name); const p=board[r][f];
-  let mine;
-  if(mode==='play'){
-    mine = p && (p===p.toUpperCase())===playWhite && userTurnInPlay();
-  } else if(mode==='learn'){
-    if(learnPly>=lineMoves().length) return;          // line finished: nothing to play
-    const moverWhite = learnPly%2===0;                // whose move is next in the line
-    mine = p && (p===p.toUpperCase())===moverWhite;
-  } else {
-    mine = p && ((p===p.toUpperCase()) === (playerSide==='w'));
-  }
-  const select = sq=>{ selSq=sq; aimSet = (sq&&showAims) ? new Set(legalTargetNames(sq)) : null; if(sq) buzz(8); render(curLastU()); };
+  if(mode==='learn' && learnPly>=lineMoves().length) return;
+  const mine=isMine(name);
   if(selSq===null){
-    if(mine) select(name);
+    if(mine) selectSquare(name);
     return;
   }
-  if(name===selSq){ select(null); return; }
-  if(mine){ select(name); return; } // reselect own piece
+  if(name===selSq){ selectSquare(null); return; }
+  if(mine){ selectSquare(name); return; } // reselect own piece
   if(mode==='play'){
-    if(!playUserMove(selSq+name)){ select(null); } // illegal target: deselect
+    if(!playUserMove(selSq+name)){ selectSquare(null); } // illegal target: deselect
     return;
   }
   if(mode==='learn'){ learnTryMove(selSq+name); return; }
   attemptMove(selSq+name);
 }
+
+/* ---- drag & drop, chess.com-style (pointer events: mouse + touch; taps still work) ----
+   Press selects the piece and shows its moves; move past a small threshold to lift it
+   as a ghost that follows the pointer; release on a legal square to play, on its own
+   square to keep it selected, anywhere illegal to snap back. */
+let drag=null;
+function sqFromPoint(x,y){
+  const r=boardEl.getBoundingClientRect(), s=r.width/8;
+  const vf=Math.floor((x-r.left)/s), vr=Math.floor((y-r.top)/s);
+  if(vf<0||vf>7||vr<0||vr>7) return null;
+  const flip=playerSide==='b';
+  return String.fromCharCode(97+(flip?7-vf:vf))+((flip?vr:7-vr)+1);
+}
+function sqEl(name){ return [...boardEl.children].find(s=>s.dataset.sq===name); }
+function startGhost(from){
+  const src=sqEl(from); const pc=src && src.querySelector('.pc'); if(!pc) return;
+  let g=document.getElementById('dragGhost');
+  if(!g){ g=document.createElement('div'); g.id='dragGhost'; document.querySelector('.board-wrap').appendChild(g); }
+  g.innerHTML=pc.outerHTML; g.style.display='flex';
+  pc.style.visibility='hidden';
+}
+function moveGhost(x,y){
+  const g=document.getElementById('dragGhost'); if(!g) return;
+  const r=document.querySelector('.board-wrap').getBoundingClientRect();
+  g.style.left=(x-r.left)+'px'; g.style.top=(y-r.top)+'px';
+  const over=sqFromPoint(x,y);
+  boardEl.querySelectorAll('.sq.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(over){ const el=sqEl(over); if(el) el.classList.add('drag-over'); }
+}
+function endGhost(){
+  const g=document.getElementById('dragGhost'); if(g) g.style.display='none';
+  boardEl.querySelectorAll('.sq.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  boardEl.querySelectorAll('.pc').forEach(pc=>{ pc.style.visibility=''; });
+}
+(function initDrag(){
+  boardEl.addEventListener('pointerdown', e=>{
+    if(e.button!==0 || locked) return;
+    const el=e.target.closest('.sq'); if(!el) return;
+    const name=el.dataset.sq;
+    const wasSelected = selSq===name;
+    const mine=isMine(name);
+    drag={from:name, x:e.clientX, y:e.clientY, moved:false, mine, selectedOnPress:false, pid:e.pointerId, gen:runGen};
+    if(mine && !wasSelected){ selectSquare(name); drag.selectedOnPress=true; }
+    try{ boardEl.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  boardEl.addEventListener('pointermove', e=>{
+    if(!drag || !drag.mine) return;
+    if(!drag.moved){
+      if(Math.hypot(e.clientX-drag.x, e.clientY-drag.y) < 6) return;
+      drag.moved=true; startGhost(drag.from);
+    }
+    moveGhost(e.clientX, e.clientY);
+  });
+  const finish = e=>{
+    if(!drag) return;
+    const d=drag; drag=null;
+    try{ boardEl.releasePointerCapture(d.pid); }catch(_){}
+    if(d.moved){
+      endGhost();
+      if(d.gen!==runGen || locked){ render(curLastU()); return; }
+      const to=sqFromPoint(e.clientX, e.clientY);
+      if(!to){ selectSquare(null); return; }                       // dropped off the board
+      if(to===d.from){ render(curLastU()); return; }               // put back: stays selected
+      if(!legalTargetNames(d.from).includes(to)){ render(curLastU()); return; }   // illegal drop: silent snap-back
+      onSquare(to);                                                 // selSq===from → the normal move path
+    } else {
+      if(d.selectedOnPress) return;   // the press already selected it; a tap keeps it selected
+      if(!locked && d.gen===runGen) onSquare(d.from);
+    }
+  };
+  boardEl.addEventListener('pointerup', finish);
+  boardEl.addEventListener('pointercancel', ()=>{ if(drag){ drag=null; endGhost(); render(curLastU()); } });
+})();
 function plyLastU(){ return ply>0 ? lineMoves()[ply-1].u : null; }
 
 function attemptMove(u){
@@ -2841,7 +2941,7 @@ function startLearn(oi,li,side){
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex';
+  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='none';
