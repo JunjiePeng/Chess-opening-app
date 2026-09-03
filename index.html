@@ -32,9 +32,11 @@ body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI'
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-.page-shell { width:100%; max-width:var(--page-max-width); min-width:0; margin-inline:auto;
+.page-shell { width:100%; max-width:min(100%,var(--page-max-width)); min-width:0; margin-inline:auto;
   padding-left:max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
+.page-shell.board-view { width:fit-content; }
+.page-shell.board-view > header { contain:inline-size; }
 header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
 header h1 { font-family:'Caprasimo',serif; font-weight:400; font-size:1.55rem; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
 header h1:hover { opacity:.8; }
@@ -44,7 +46,14 @@ header p { color:var(--dim); font-size:.9rem; }
 
 /* ---- menu ---- */
 #menu { width:100%; min-width:0; }
-.op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr)); gap:14px; }
+.op-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; container:openings / inline-size; }
+/* Keep partially filled rows centered without stretching the cards. */
+.op-grid > .op-card { flex:0 0 100%; min-width:0; }
+@container openings (min-width:594px){ .op-grid > .op-card { flex-basis:calc((100% - 14px) / 2); } }
+@container openings (min-width:898px){ .op-grid > .op-card { flex-basis:calc((100% - 28px) / 3); } }
+@container openings (min-width:1202px){ .op-grid > .op-card { flex-basis:calc((100% - 42px) / 4); } }
+@container openings (min-width:1506px){ .op-grid > .op-card { flex-basis:calc((100% - 56px) / 5); } }
+@container openings (min-width:1810px){ .op-grid > .op-card { flex-basis:calc((100% - 70px) / 6); } }
 #buildTag { text-align:center; color:var(--dim); font-size:.72rem; margin-top:22px; opacity:.7; }
 #buildTag b { color:var(--accent); }
 #backupRow { text-align:center; margin-top:4px; }
@@ -80,8 +89,8 @@ header p { color:var(--dim); font-size:.9rem; }
 .sort-seg button { background:transparent; color:var(--dim); border:none; padding:8px 13px; cursor:pointer; font-size:.8rem; font-family:inherit; }
 .sort-seg button:hover { color:var(--text); }
 .sort-seg button.on { background:var(--accent); color:#fbf3e4; font-weight:700; }
-.no-results { grid-column:1 / -1; text-align:center; color:var(--dim); padding:26px 0; font-size:.95rem; }
-.group-head { grid-column:1 / -1; font-size:.78rem; font-weight:700; letter-spacing:.1em;
+.no-results { flex:0 0 100%; text-align:center; color:var(--dim); padding:26px 0; font-size:.95rem; }
+.group-head { flex:0 0 100%; text-align:center; font-size:.78rem; font-weight:700; letter-spacing:.1em;
   color:#a9bb8a; text-transform:uppercase; margin:10px 0 -4px; padding-left:2px; }
 .group-head:first-child { margin-top:0; }
 .op-card { background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4); border-radius:24px; padding:18px; }
@@ -108,7 +117,7 @@ header p { color:var(--dim); font-size:.9rem; }
 /* ---- drill ---- */
 #drill { display:none; }
 #boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100dvh - var(--reserveh)), max(560px, calc(min(100vw, var(--page-max-width)) - var(--panelw) - 110px)), 2000px); }
-#drill.play { --reserveh:162px; }   /* capture trays above and below the board */
+#drill.play { --reserveh:162px; --board-extra:28px; }   /* capture trays and evaluation bar */
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
 #promoPicker { position:absolute; top:0; display:none; flex-direction:column; z-index:12;
@@ -352,13 +361,15 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 /* ---- phone layout: keep board + prompt + primary buttons on one screen ---- */
 @media (max-width:760px){
   :root { --page-gutter:8px; }
+  .page-shell { container-type:inline-size; }
+  .page-shell.board-view { width:100%; }
   header { padding-block:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 6px; gap:8px; }
   header h1 { font-size:1.2rem; }
   header p { display:none; }
   .layout { padding-block:6px 16px; gap:10px; }
   #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
   #drill { gap:8px; }
-  #boardCol { --bsize:min(100vw, calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }
+  #boardCol { --bsize:min(calc(100cqw - var(--board-extra, 0px)), calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }
   #board { border-radius:12px; }
   .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; padding:0 10px; box-sizing:border-box; }
   .panel-box { padding:10px 14px; }
@@ -392,13 +403,14 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   #promptBox { max-height:38vh; overflow:auto; }
 }
 @media (max-width:760px) and (max-height:680px){
-  #boardCol { --bsize:min(100vw, calc(100dvh - 236px - env(safe-area-inset-top, 0px))); }  /* shorter phones */
+  #boardCol { --bsize:min(calc(100cqw - var(--board-extra, 0px)), calc(100dvh - 236px - env(safe-area-inset-top, 0px))); }  /* shorter phones */
   #promptBox { max-height:24vh; }
 }
 </style>
 </head>
 <body>
-<header class="page-shell">
+<div id="appShell" class="page-shell">
+<header>
   <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu">♞ De<span>but</span></h1>
   <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
   <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
@@ -406,7 +418,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
 </header>
 
-<div class="layout page-shell">
+<div class="layout">
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div id="todayBar" class="today-bar" style="display:none"></div>
@@ -422,7 +434,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G11</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G12</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -511,6 +523,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
       <div class="streak" id="streakInfo"></div>
     </div>
   </div>
+</div>
 </div>
 
 <script>
@@ -1321,7 +1334,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G11';
+const BUILD='G12';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
@@ -1918,11 +1931,16 @@ function drawAnnots(){
 }
 
 /* ================= MENU ================= */
+function showAppView(view){
+  const inBoard = view==='board';
+  document.getElementById('appShell').classList.toggle('board-view', inBoard);
+  document.getElementById('menu').style.display=inBoard?'none':'block';
+  document.getElementById('drill').style.display=inBoard?'flex':'none';
+}
 function showMenu(){
   runGen++; Engine.abort();
   reviewQueue=null;
-  document.getElementById('drill').style.display='none';
-  document.getElementById('menu').style.display='block';
+  showAppView('menu');
   const grid=document.getElementById('opGrid'); grid.innerHTML='';
   // summary stats over all openings (computed here, not per card, since favorites duplicate cards)
   let totalLines=0, totalRuns=0, rankSum=0; const tierCounts=[0,0,0,0,0,0];
@@ -2112,8 +2130,8 @@ function startDrill(oi,li,side){
   curOp=oi; curLine=li; playerSide=side; mode='drill';
   board=initBoard(); ply=0; selSq=null; aimSet=null; misses=0; mistakesThisRun=0; locked=false; curAnnot=null;
   hintsThisRun=0; revealedThisRun=false; recalledThisRun=0; hintPly=-1; hintSq=null;
-  document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
+  showAppView('board');
+  document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='flex';
@@ -2187,8 +2205,8 @@ function onEloInput(v){
   if(Engine.ready) Engine.setStrength(eloToSkill(playElo));
 }
 function playSetupUI(side){
-  document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
+  showAppView('board');
+  document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='none';
@@ -2950,8 +2968,8 @@ function startLearn(oi,li,side){
   learnCredited=false; learnBadgeEarned=false; recalledThisRun=0;
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
-  document.getElementById('menu').style.display='none';
-  document.getElementById('drill').style.display='flex'; document.getElementById('drill').classList.toggle('play', mode==='play');
+  showAppView('board');
+  document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
   document.getElementById('promptBox').style.display='block';
   document.getElementById('drillNav').style.display='none';
