@@ -763,6 +763,10 @@ function setLang(l){
     updateOpeningName();
     updatePlayList();
     if(!playOver && userTurnInPlay() && !locked) setPrompt(t('yourMove'),'');
+    if(!playOver){   // the standing intro text is static per mode — re-issue it in the new language
+      document.getElementById('comment').innerHTML = freeMode ? t('playFromStart')
+        : (curOp!==null ? t('playPosition',{name:lnName(DATA.openings[curOp].lines[curLine])}) : '');
+    }
     return;
   }
   if(curOp!==null){
