@@ -25,7 +25,7 @@
   --panelw: 330px;      /* side panel width */
   --reserveh: 118px;    /* header + paddings above/below the board */
   --page-gutter: 24px;  /* shared by the header and main content */
-  --page-max-width: 1920px; /* center the app on ultrawide screens */
+  --page-max-width: 1600px; /* keep the whole section central on large screens */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; }
@@ -46,14 +46,8 @@ header p { color:var(--dim); font-size:.9rem; }
 
 /* ---- menu ---- */
 #menu { width:100%; min-width:0; }
-.op-grid { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; container:openings / inline-size; }
-/* Keep partially filled rows centered without stretching the cards. */
-.op-grid > .op-card { flex:0 0 100%; min-width:0; }
-@container openings (min-width:594px){ .op-grid > .op-card { flex-basis:calc((100% - 14px) / 2); } }
-@container openings (min-width:898px){ .op-grid > .op-card { flex-basis:calc((100% - 28px) / 3); } }
-@container openings (min-width:1202px){ .op-grid > .op-card { flex-basis:calc((100% - 42px) / 4); } }
-@container openings (min-width:1506px){ .op-grid > .op-card { flex-basis:calc((100% - 56px) / 5); } }
-@container openings (min-width:1810px){ .op-grid > .op-card { flex-basis:calc((100% - 70px) / 6); } }
+.op-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(290px,100%),1fr)); gap:14px; }
+.op-grid > .op-card { min-width:0; }
 #buildTag { text-align:center; color:var(--dim); font-size:.72rem; margin-top:22px; opacity:.7; }
 #buildTag b { color:var(--accent); }
 #backupRow { text-align:center; margin-top:4px; }
@@ -89,8 +83,8 @@ header p { color:var(--dim); font-size:.9rem; }
 .sort-seg button { background:transparent; color:var(--dim); border:none; padding:8px 13px; cursor:pointer; font-size:.8rem; font-family:inherit; }
 .sort-seg button:hover { color:var(--text); }
 .sort-seg button.on { background:var(--accent); color:#fbf3e4; font-weight:700; }
-.no-results { flex:0 0 100%; text-align:center; color:var(--dim); padding:26px 0; font-size:.95rem; }
-.group-head { flex:0 0 100%; text-align:center; font-size:.78rem; font-weight:700; letter-spacing:.1em;
+.no-results { grid-column:1 / -1; text-align:center; color:var(--dim); padding:26px 0; font-size:.95rem; }
+.group-head { grid-column:1 / -1; text-align:left; font-size:.78rem; font-weight:700; letter-spacing:.1em;
   color:#a9bb8a; text-transform:uppercase; margin:10px 0 -4px; padding-left:2px; }
 .group-head:first-child { margin-top:0; }
 .op-card { background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4); border-radius:24px; padding:18px; }
@@ -434,7 +428,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G12</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G13</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1334,7 +1328,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G12';
+const BUILD='G13';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
