@@ -218,6 +218,11 @@ button.act.primary:hover { background:#bb6f36; }
   white-space:nowrap; box-shadow:0 0 8px rgba(163,182,128,.3); }
 .deep-note { opacity:.85; }
 .rest-note { color:var(--dim); font-size:.85rem; }
+.color-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.color-label { font-size:.78rem; color:var(--dim); }
+.color-seg button { padding:4px 10px; display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+.color-seg button .pc svg, .color-seg button > svg { width:22px; height:22px; display:block; }
+.color-seg button.on { background:var(--accent); }
 .rail-title { font-weight:700; font-size:.85rem; margin:14px 0 6px; color:#a9bb8a; }
 .rail-row { display:flex; justify-content:space-between; align-items:center; gap:10px; width:100%; text-align:left;
   background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:14px;
@@ -416,6 +421,14 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
           </label>
           <input type="range" id="eloSlider" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
+          <div id="colorRow" class="color-row" style="display:none">
+            <span class="color-label" data-i18n="youPlay">You play</span>
+            <span class="toggle color-seg">
+              <button data-side="w" data-i18n-title="playWhite" title="Play White" onclick="chooseColor('w')"></button>
+              <button data-side="r" data-i18n-title="randomColor" title="Random color" onclick="chooseColor('r')"><svg viewBox="0 0 20 20" width="20" height="20"><circle cx="10" cy="10" r="8.5" fill="#f0e5d3"/><path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="#2b2117"/><circle cx="10" cy="10" r="8.5" fill="none" stroke="#2b2117" stroke-width="1.2"/></svg></button>
+              <button data-side="b" data-i18n-title="playBlack" title="Play Black" onclick="chooseColor('b')"></button>
+            </span>
+          </div>
         </div>
       </div>
       <div class="panel-box" id="promptBox">
@@ -606,7 +619,9 @@ Object.assign(I18N_EN, {
   secretMedal:'??? — a secret medal',
   pieceCue:'Hint: the line plays a {piece} move.',
   cueCastle:'Hint: the line castles here.',
-  orPlayBlack:'♚ Play as Black instead',
+  youPlay:'You play',
+  randomColor:'Random color',
+  pickOpening:'Play from an opening…',
   vsEngine:'vs Engine',
   streakWord:'day streak',
   startStreak:'start your streak today',
@@ -682,7 +697,9 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   secretMedal:'??? —— 隐藏奖章',
   pieceCue:'提示：本线这步走的是{piece}。',
   cueCastle:'提示：本线在这里易位。',
-  orPlayBlack:'♚ 改执黑',
+  youPlay:'你执',
+  randomColor:'随机颜色',
+  pickOpening:'从某个开局局面开始…',
   vsEngine:'人机对弈',
   streakWord:'天连续训练',
   startStreak:'今天开始连续训练',
@@ -2091,7 +2108,8 @@ function switchSide(s){
 /* ---- in-board line switcher ---- */
 function buildLineSel(){
   const sel=document.getElementById('lineSel'); if(!sel) return;
-  let html='';
+  // placeholder shows whenever no line is active (free play): the control's job is legible, not blank
+  let html=`<option value="" disabled>${t('pickOpening')}</option>`;
   DATA.openings.forEach((op,oi)=>{
     html+=`<optgroup label="${op.icon} ${opName(op)}">`;
     op.lines.forEach((l,li)=>{ html+=`<option value="${oi}:${li}">${lnName(l)}</option>`; });
@@ -2152,8 +2170,8 @@ function playSetupUI(side){
 }
 function startPlay(oi,li,side){
   runGen++; Engine.abort();
-  freeChooserShown=false;
   rememberLast(oi,li,'play');
+  document.getElementById('colorRow').style.display='none';
   curOp=oi; curLine=li; playerSide=side; mode='play'; freeMode=false;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
   playHist=[]; playWhite=true; playOver=false;
@@ -2171,27 +2189,32 @@ function startPlay(oi,li,side){
   resumePlay();
 }
 // Entry point from the menu card: open the play screen first, choose a side there.
-let freeChooserShown=false;
-function enterFreePlay(){
-  // The game is live as White immediately — just move a piece to start.
-  // Choosing Black is the one-tap alternative shown alongside.
-  startFreePlay('w');
-  freeChooserShown=true;
-  document.getElementById('comment').innerHTML =
-    `${t('playFromStart')}<div class="btn-row" style="margin-top:10px">
-       <button class="act" onclick="startFreePlay('b')">${t('orPlayBlack')}</button></div>`;
+/* Color choice, chess.com-style: a three-way white / random / black selector in the
+   setup panel, remembered between games, switchable any time (a switch starts a
+   fresh game as that color). Random re-rolls on every new game. */
+let playColorPref = (typeof localStorage!=='undefined' && localStorage.getItem('otPlayColor')) || 'w';
+if(!['w','r','b'].includes(playColorPref)) playColorPref='w';
+function resolveColor(pref){ return pref==='r' ? (Math.random()<.5?'w':'b') : pref; }
+function chooseColor(c){
+  playColorPref=c; try{ localStorage.setItem('otPlayColor',c); }catch(e){}
+  startFreePlay(resolveColor(c));
 }
+function renderColorSeg(){
+  document.querySelectorAll('#colorRow button').forEach(b=>b.classList.toggle('on', b.dataset.side===playColorPref));
+}
+function enterFreePlay(){ startFreePlay(resolveColor(playColorPref)); }   // live immediately in your remembered color
 function startFreePlay(side){
   runGen++; Engine.abort();
-  freeChooserShown=false;
   curOp=null; curLine=null; playerSide=side; mode='play'; freeMode=true;
   board=initBoard(); selSq=null; aimSet=null; locked=true; curAnnot=null;
   playHist=[]; playWhite=true; playOver=false;
   gameMinElo=playElo;
   resetDrawTracking();
   playSetupUI(side);
-  document.getElementById('playRestartBtn').onclick=()=>startFreePlay(playerSide);
+  document.getElementById('playRestartBtn').onclick=()=>startFreePlay(resolveColor(playColorPref));
   document.getElementById('playDrillBtn').style.display='none';   // no "back to drill" in a free game
+  document.getElementById('colorRow').style.display='flex';
+  renderColorSeg();
   document.getElementById('lineTitle').innerHTML=`${t('fullGame')}<small id="openingName">${t('makeFirstMove',{side: side==='w'?t('white'):t('black')})}</small>`;
   const sel=document.getElementById('lineSel'); if(sel) sel.value='';
   updatePlayList(); updateEval(); updateEvalBar();
@@ -2344,7 +2367,6 @@ function commitUserMove(u){
   if(p.toUpperCase()==='P' && from[0]!==to[0] && !board[r2][f2]) playFlags.enPassant=true;
   locked=true;
   buzz(15);
-  if(freeMode && freeChooserShown){ freeChooserShown=false; document.getElementById('comment').innerHTML=t('playFromStart'); }
   makePlayMove(u);
   const status=gameStatus(playWhite);
   if(status!=='ongoing'){ finishPlay(status); return; }
@@ -2915,6 +2937,10 @@ function learnTryMove(u){
 }
 
 renderMuteBtn();
+(function initColorSeg(){
+  const w=document.querySelector('#colorRow [data-side="w"]'), b=document.querySelector('#colorRow [data-side="b"]');
+  if(w) w.innerHTML=pieceSVG('K'); if(b) b.innerHTML=pieceSVG('k');
+})();
 (function initFindRow(){
   const sb=document.getElementById('searchBox');
   if(sb) sb.addEventListener('input', ()=>{ menuQuery=sb.value.trim().toLowerCase(); refreshMenuKeepScroll(); });
