@@ -278,41 +278,116 @@ button.act.primary:hover { background:var(--accent-hover); }
 .rail-row:hover { border-color:var(--accent); }
 .rail-payoff { color:var(--dim); font-size:.8125rem; flex:0 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .rail-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.medal-btn { display:inline-flex; align-items:center; gap:5px; background:var(--panel2); color:#e0a878;
-  border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer; font-size:.8rem; font-family:inherit; }
+/* Achievement board: readable cards, permanent earned milestones, and related tiers. */
+.medal-btn { display:inline-flex; align-items:center; gap:7px; background:var(--panel2); color:var(--text);
+  border:1px solid var(--line); border-radius:999px; min-height:40px; padding:7px 14px; cursor:pointer; font-size:.875rem; font-family:inherit; }
 .medal-btn:hover { border-color:var(--accent); }
 .medal-btn b { display:inline; font-size:inherit; color:inherit; }
-.m-dot { width:12px; height:12px; border-radius:999px; flex:0 0 auto; display:inline-block; }
-.m-dot.b { background:#a97b50; } .m-dot.s { background:#c9c2b5; } .m-dot.g { background:#f2cf9a; box-shadow:0 0 6px rgba(242,207,154,.5); }
-#medalToast { position:fixed; top:max(14px, env(safe-area-inset-top, 0px)); left:50%; transform:translate(-50%,-110px); z-index:60;
-  width:max-content; max-width:min(92vw, 420px);
-  display:flex; align-items:center; gap:9px; background:var(--panel); color:var(--text);
-  border:1px solid var(--line); border-radius:999px; padding:9px 18px; box-shadow:0 6px 20px rgba(0,0,0,.5);
-  transition:transform .35s ease; pointer-events:none; }
+.medal-symbol { width:24px; height:24px; display:block; flex:0 0 auto; }
+.medal-emblem { position:relative; display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; flex:0 0 52px;
+  border:1px solid currentColor; border-radius:17px; color:#eab787; background:#483325; box-shadow:inset 0 0 0 4px rgba(0,0,0,.12); }
+.medal-emblem .medal-symbol { width:29px; height:29px; }
+.medal-emblem.s { color:#e5e0d4; background:#41403a; }
+.medal-emblem.g { color:#ffdc8f; background:#514022; }
+.medal-emblem.locked { color:var(--dim); background:var(--bg); border-color:var(--line); box-shadow:none; }
+.medal-level { position:absolute; right:-4px; bottom:-4px; min-width:20px; height:20px; padding:0 4px; border-radius:7px;
+  background:var(--bg); border:1px solid currentColor; font-size:.6875rem; font-weight:700; line-height:18px; text-align:center; }
+.achievement-entry { display:flex; align-items:center; gap:12px; width:100%; margin-bottom:16px; padding:12px 16px;
+  background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:18px; cursor:pointer; font-family:inherit; text-align:left; }
+.achievement-entry:hover { border-color:var(--accent); background:var(--panel2); }
+.achievement-entry > .medal-symbol { color:var(--accent); width:28px; height:28px; }
+.achievement-entry .ae-copy { display:flex; flex-direction:column; flex:1; min-width:0; }
+.ae-copy b { font-size:1rem; }
+.ae-copy span, .ae-link { font-size:.875rem; color:var(--dim); }
+.ae-link { display:flex; align-items:center; gap:8px; color:var(--accent); font-weight:700; }
+#medalToast { position:fixed; top:max(14px, env(safe-area-inset-top, 0px)); left:50%; transform:translate(-50%,-140px); z-index:60;
+  width:max-content; max-width:min(92vw,420px); display:flex; align-items:center; gap:12px; background:var(--panel); color:var(--text);
+  border:1px solid var(--accent); border-radius:20px; padding:12px 18px; box-shadow:0 6px 20px rgba(0,0,0,.5); transition:transform .35s ease; pointer-events:none; }
 #medalToast.show { transform:translate(-50%,0); }
-#medalToast .m-sub { color:var(--dim); font-size:.78rem; }
-#medalsOverlay { position:fixed; inset:0; z-index:50; background:rgba(12,8,4,.6); display:flex;
-  align-items:center; justify-content:center; padding:18px; overscroll-behavior:contain; }
-.medals-panel { background:var(--panel); border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,.6);
-  max-width:480px; width:100%; max-height:82vh; display:flex; flex-direction:column; overflow:hidden; }
-.medals-head { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); }
-.medals-head b { font-size:1.05rem; }
-.medals-count { color:var(--dim); margin-left:auto; }
-.medals-list { overflow-y:auto; padding:8px 18px 16px; overscroll-behavior:contain; }
-.medal-row { display:flex; align-items:center; gap:11px; padding:8px 0; }
-.medal-row .m-txt { display:flex; flex-direction:column; min-width:0; }
-.medal-row .m-txt b { color:var(--dim); }
-.medal-row .m-txt span { color:var(--dim); font-size:.875rem; }
-.medal-row:not(.got) .m-dot { opacity:.35; }
-.medal-row.got .m-txt b { color:var(--text); }
-.medal-row.got .m-txt span { color:var(--dim); }
-.medal-row.series { opacity:1; }
-.medal-row.series:not(.got) .m-txt { color:var(--dim); }
-.m-dots { display:flex; gap:3px; flex:0 0 auto; align-items:center; }
-.m-dot.off { opacity:.25; }
-.m-prog { height:4px; background:#3f3222; border-radius:999px; overflow:hidden; margin-top:4px; width:150px; }
-.m-prog-fill { height:100%; background:var(--accent); border-radius:999px; }
-.m-prog-n { color:var(--dim); font-size:.8125rem; margin-top:2px; }
+#medalToast .m-sub { display:block; color:var(--dim); font-size:.8125rem; }
+#medalsOverlay { position:fixed; inset:0; z-index:50; background:rgba(12,8,4,.78); display:flex;
+  align-items:center; justify-content:center; padding:24px; overscroll-behavior:contain; }
+.medals-panel { width:100%; max-width:1120px; max-height:calc(100dvh - 48px); min-height:0; display:flex; flex-direction:column;
+  background:var(--bg); border:1px solid var(--line); border-radius:26px; box-shadow:0 20px 80px rgba(0,0,0,.5); overflow:hidden; }
+.medals-head { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 24px; border-bottom:1px solid var(--line); }
+.medals-head h2 { font-family:'Caprasimo',serif; font-weight:400; font-size:1.65rem; }
+.medals-head p { color:var(--dim); font-size:.875rem; margin-top:3px; }
+.medals-head .ach-close { flex:0 0 auto; min-width:40px; min-height:40px; }
+.medals-list { min-height:0; overflow-y:auto; padding:24px; overscroll-behavior:contain; scrollbar-color:var(--accent) var(--panel); }
+.ach-overview { display:grid; grid-template-columns:1fr 1.2fr; gap:16px; margin-bottom:22px; }
+.ach-collection, .ach-next { background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:20px; }
+.ach-collection { display:flex; align-items:center; gap:20px; }
+.ach-ring { width:110px; height:110px; flex:0 0 110px; border-radius:50%; padding:7px;
+  background:conic-gradient(var(--accent) calc(var(--earned)*1%),var(--panel2) 0); }
+.ach-ring-inner { display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; border-radius:50%; background:var(--panel); }
+.ach-ring strong { font-size:2rem; line-height:1.1; }
+.ach-ring span { color:var(--dim); font-size:.8125rem; }
+.ach-collection h3 { font-size:1rem; margin-bottom:9px; }
+.ach-totals { display:flex; gap:6px 12px; flex-wrap:wrap; }
+.ach-metal { display:inline-flex; align-items:center; gap:5px; font-size:.8125rem; color:var(--dim); }
+.ach-metal::before { content:''; width:8px; height:8px; border-radius:50%; background:#d6a273; }
+.ach-metal.s::before { background:#d9d7ce; } .ach-metal.g::before { background:#f6cd79; }
+.ach-next { display:flex; gap:14px; align-items:flex-start; background:#343d29; border-color:rgba(178,195,145,.35); }
+.ach-next .ach-next-copy { flex:1; min-width:0; }
+.ach-eyebrow { color:#caddb0; font-size:.75rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.ach-next h3 { font-size:1.0625rem; margin:3px 0 5px; }
+.ach-next p { color:var(--dim); font-size:.875rem; line-height:1.5; }
+.ach-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+.ach-filter { border:1px solid var(--line); background:var(--panel); color:var(--dim); border-radius:999px; min-height:42px; padding:9px 16px; font:inherit; font-size:.875rem; cursor:pointer; }
+.ach-filter[aria-pressed="true"] { color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:700; }
+.ach-filter:hover { border-color:var(--accent); }
+.ach-results-count { color:var(--dim); font-size:.8125rem; margin-bottom:20px; }
+.ach-section + .ach-section { margin-top:26px; }
+.ach-section-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:12px; }
+.ach-section-head h3 { font-size:1rem; }
+.ach-section-head span { font-size:.8125rem; color:var(--dim); }
+.ach-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr)); gap:12px; }
+.ach-card { min-width:0; display:flex; flex-direction:column; background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:18px; }
+.ach-card.complete { border-color:rgba(178,195,145,.45); }
+.ach-card-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.ach-card-head > div { min-width:0; flex:1; }
+.ach-card h4 { font-size:1rem; line-height:1.4; overflow-wrap:break-word; }
+.ach-state { display:block; color:var(--dim); font-size:.75rem; margin-top:3px; }
+.ach-card.complete .ach-state { color:#caddb0; }
+.ach-condition { color:var(--dim); font-size:.875rem; line-height:1.6; }
+.ach-condition strong { color:var(--text); }
+.ach-progress { margin-top:14px; }
+.ach-progress-label { display:flex; justify-content:space-between; gap:10px; color:var(--dim); font-size:.8125rem; margin-bottom:6px; }
+.ach-progress-label b { color:var(--text); white-space:nowrap; }
+.ach-progress-track { height:6px; border-radius:999px; background:rgba(0,0,0,.25); overflow:hidden; }
+.ach-progress-track > span { display:block; height:100%; background:var(--accent); border-radius:inherit; }
+.ach-progress-note { margin-top:7px; font-size:.8125rem; line-height:1.5; color:var(--dim); }
+.ach-earned-date { margin-top:12px; color:#caddb0; font-size:.8125rem; }
+.ach-tiers { margin-top:16px; border-top:1px solid var(--line); padding-top:10px; }
+.ach-tiers summary { cursor:pointer; font-size:.8125rem; color:var(--text); padding:4px 0; }
+.ach-tiers summary:focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+.ach-tier { display:flex; gap:9px; padding-top:12px; font-size:.8125rem; }
+.ach-tier > span:first-child { width:20px; flex:0 0 20px; color:var(--accent); font-weight:700; }
+.ach-tier b { display:block; color:var(--text); }
+.ach-tier p { color:var(--dim); margin-top:2px; line-height:1.5; }
+.ach-tier time { display:block; color:#caddb0; margin-top:2px; }
+.ach-empty, .ach-mystery { text-align:center; color:var(--dim); padding:30px 24px; background:var(--panel); border:1px dashed var(--line); border-radius:18px; }
+.ach-empty h3, .ach-mystery h4 { color:var(--text); margin:10px 0 6px; font-size:1rem; }
+.ach-empty p, .ach-mystery p { font-size:.875rem; line-height:1.6; }
+.ach-empty > .medal-symbol, .ach-mystery > .medal-symbol { margin:auto; color:var(--accent); width:32px; height:32px; }
+.ach-footnote { margin-top:24px; font-size:.8125rem; line-height:1.5; color:var(--dim); }
+@media (max-width:700px){
+  #medalsOverlay { padding:8px; padding-top:max(8px,env(safe-area-inset-top)); padding-bottom:max(8px,env(safe-area-inset-bottom)); }
+  .medals-panel { max-height:100%; border-radius:20px; }
+  .medals-head { padding:16px; gap:10px; }
+  .medals-head h2 { font-size:1.35rem; }
+  .medals-head p { font-size:.8125rem; }
+  .medals-list { padding:16px; }
+  .ach-overview { grid-template-columns:1fr; gap:12px; margin-bottom:18px; }
+  .ach-collection, .ach-next { padding:16px; }
+  .ach-ring { width:90px; height:90px; flex-basis:90px; }
+  .ach-ring strong { font-size:1.75rem; }
+  .ach-collection { gap:16px; }
+  .ach-grid { grid-template-columns:1fr; }
+  .ach-filter { padding:8px 12px; }
+  .ae-link span { display:none; }
+}
+@media (prefers-reduced-motion:reduce){ #medalToast { transition:none; } }
 .rank-chip.r2 { color:#d8c9b0; background:#4a3b27; }
 .rank-chip.r3 { color:#a9bb8a; background:#39412a; }
 .rank-chip.r4 { color:#e0a878; background:#4d3a20; }
@@ -455,6 +530,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div id="todayBar" class="today-bar" style="display:none"></div>
+    <div id="achievementEntry"></div>
     <div id="findRow">
       <input id="searchBox" type="search" autocomplete="off" data-i18n-ph="searchPh">
       <div class="sort-seg" id="sortSeg">
@@ -467,7 +543,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G18</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G19</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -713,8 +789,60 @@ Object.assign(I18N_EN, {
   payoffDay:'Perfect today → day {d} of 3 toward ♝',
   payoffLearn:'New line → earns ♟',
   deepCount:'{n} deepening',
-  medalsTitle:'Medals',
-  medalEarned:'Medal earned',
+  medalsTitle:'Achievements',
+  achIntro:'Your progress, one milestone at a time.',
+  achLearning:'Opening collection',
+  achPractice:'Practice & precision',
+  achConsistency:'Consistency & patience',
+  achExploration:'Explore the game',
+  achPlay:'Against the engine',
+  achDiscoveries:'Discoveries',
+  achQueens:'Royal collection',
+  achGap:'Recall after a break',
+  achStreak:'Training streak',
+  achDays:'Days at the board',
+  achRoll:'Perfect-run streak',
+  achReps:'Drill milestones',
+  achMoves:'Moves recalled',
+  achProgress:'Progress',
+  achRestDays:'Days since last drill',
+  achCurrentStreak:'Current streak',
+  achBestOpening:'Lines in your closest opening',
+  achOneColor:'Lines in your closest color',
+  achLines:'Lines completed',
+  achRookLines:'Lines at Rook or higher',
+  achQueenLines:'Lines crowned Queen',
+  achDrills:'Drills completed',
+  achRecallMoves:'Moves recalled',
+  achPerfectDrills:'Current perfect-run streak',
+  achTrainingDays:'Training days',
+  achOpenings:'Openings explored',
+  achColors:'Colors explored',
+  achModes:'Modes completed',
+  achRestNote:'A perfect recall is still required. Keep following your review schedule.',
+  achEarned:'Earned',
+  achToEarn:'To earn',
+  achTiersEarned:'{n} of {total} milestones earned',
+  achViewTiers:'View all {n} milestones',
+  achMetalb:'Bronze',
+  achMetals:'Silver',
+  achMetalg:'Gold',
+  achEarnedOn:'Earned {date}',
+  achCollectionCount:'{n} / {total} milestones earned',
+  achViewBoard:'View board',
+  achNextMilestone:'Next milestone',
+  achKeepExploring:'Keep exploring',
+  achKeepExploringBody:'There is always another opening to enjoy. Explore your collection at your own pace.',
+  achEmptyTitle:'Your collection starts here',
+  achEmptyBody:'Finish your first learning line to earn First Steps. Your earned achievements will appear here.',
+  achNextGoals:'Next goals',
+  achAll:'All',
+  achFilters:'Filter achievements',
+  achShowing:'{n} cards shown',
+  achHiddenCount:'{n} discoveries waiting',
+  achHiddenBody:'Small surprises from exploring and playing. Their names and requirements appear when you earn them.',
+  achFootnote:'Your earned medals are permanent. Drill totals and perfect-run streaks count the first attempt at each line each day.',
+  medalEarned:'Achievement earned',
   secretMedal:'??? — a secret medal',
   pieceCue:'Hint: the line plays a {piece} move.',
   cueCastle:'Hint: the line castles here.',
@@ -795,8 +923,60 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   payoffDay:'今天全对——三天进度 {d}/3',
   payoffLearn:'学新线——获得 ♟',
   deepCount:'{n} 条巩固中',
-  medalsTitle:'奖章',
-  medalEarned:'获得奖章',
+  medalsTitle:'成就',
+  achIntro:'每一个里程碑，都记录着你的进步。',
+  achLearning:'开局收藏',
+  achPractice:'操练与准确',
+  achConsistency:'坚持与耐心',
+  achExploration:'探索棋路',
+  achPlay:'挑战引擎',
+  achDiscoveries:'隐藏发现',
+  achQueens:'后之收藏',
+  achGap:'久别仍记得',
+  achStreak:'连续训练',
+  achDays:'累计训练日',
+  achRoll:'连续全对',
+  achReps:'操练里程碑',
+  achMoves:'凭记忆走棋',
+  achProgress:'进度',
+  achRestDays:'距上次操练天数',
+  achCurrentStreak:'当前连续天数',
+  achBestOpening:'最接近完成的开局',
+  achOneColor:'最接近完成的一方',
+  achLines:'已完成变例',
+  achRookLines:'达到车及以上的变例',
+  achQueenLines:'加冕为后的变例',
+  achDrills:'已完成操练',
+  achRecallMoves:'凭记忆走出的步数',
+  achPerfectDrills:'当前连续全对次数',
+  achTrainingDays:'累计训练天数',
+  achOpenings:'已探索开局',
+  achColors:'已学习的执棋方',
+  achModes:'已完成模式',
+  achRestNote:'还需一次全对回忆才能获得成就。请继续按复习计划训练。',
+  achEarned:'已获得',
+  achToEarn:'待解锁',
+  achTiersEarned:'已获得 {n}/{total} 个里程碑',
+  achViewTiers:'查看全部 {n} 个里程碑',
+  achMetalb:'铜',
+  achMetals:'银',
+  achMetalg:'金',
+  achEarnedOn:'获得于 {date}',
+  achCollectionCount:'已获得 {n}/{total} 个里程碑',
+  achViewBoard:'查看成就',
+  achNextMilestone:'下一个里程碑',
+  achKeepExploring:'继续探索',
+  achKeepExploringBody:'每个开局都有值得发现的乐趣。按自己的节奏继续探索吧。',
+  achEmptyTitle:'从这里开始收藏',
+  achEmptyBody:'完成第一条学习变例，即可获得“第一步”。已获得的成就都会显示在这里。',
+  achNextGoals:'下一目标',
+  achAll:'全部',
+  achFilters:'筛选成就',
+  achShowing:'显示 {n} 张成就卡',
+  achHiddenCount:'还有 {n} 个隐藏发现',
+  achHiddenBody:'探索与对弈中的小惊喜。解锁后即可看到它们的名称和获得条件。',
+  achFootnote:'已获得的奖章永久保留。操练总数与连续全对，只计入每天对每条变例的首次操练。',
+  medalEarned:'解锁成就',
   secretMedal:'??? —— 隐藏奖章',
   pieceCue:'提示：本线这步走的是{piece}。',
   cueCastle:'提示：本线在这里易位。',
@@ -850,6 +1030,7 @@ function setLang(l){
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
   renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge();
   buildLineSel();
+  if(document.getElementById('medalsOverlay')?.style.display==='flex') renderMedals();
   const inBoard = document.getElementById('drill').style.display!=='none';
   if(!inBoard){ showMenu(); return; }
   // Re-render the open session in place instead of abandoning it.
@@ -1199,16 +1380,24 @@ const MEDALS=[
  {id:'knight_shift', t:'g', sec:1, en:'Knight Shift', zh:'偏要升马', ce:'Promote a pawn to a knight', cz:'升变时偏要选马', test:S=>S.ev==='play'&&S.d.flags.promoPiece==='n'},
  {id:'long_castle', t:'b', sec:1, en:'The Long Castle', zh:'长易位', ce:'Castle queenside in a game', cz:'对局中完成长易位', test:S=>S.ev==='play'&&!!S.d.flags.longCastle},
  {id:'en_passant', t:'b', sec:1, en:'In Passing', zh:'吃过路兵', ce:'Capture en passant in a game', cz:'对局中吃过路兵', test:S=>S.ev==='play'&&!!S.d.flags.enPassant},
- {id:'triple', t:'b', en:'Triple Threat', zh:'三管齐下', ce:'Use Learn, Drill and Play', cz:'三种模式都用过', test:S=>S.ctr.modes.length>=3},
- {id:'bilingual', t:'b', sec:1, en:'Bilingual Student', zh:'双语棋手', ce:'Train in both languages', cz:'用两种语言训练', test:S=>S.ctr.langs.length>=2},
+ {id:'triple', t:'b', en:'Triple Threat', zh:'三管齐下', ce:'Finish a session in Learn, Drill and Play', cz:'学习、操练、对弈各完成一次', test:S=>S.ctr.modes.length>=3},
+ {id:'bilingual', t:'b', sec:1, en:'Bilingual Student', zh:'双语棋手', ce:'Finish a Learn or Drill line in each language', cz:'用中英文各完成一条学习或操练', test:S=>S.ctr.langs.length>=2},
  {id:'safekeeper', t:'b', en:'Safekeeper', zh:'有备无患', ce:'Export a progress backup', cz:'导出一次进度备份', test:S=>S.ev==='export'},
 ];
 const ach={
-  load(){ let d=null; try{ d=JSON.parse(localStorage.getItem('otAch')||'null'); }catch(e){}
-    if(!d||!d.ctr) d={v:1,unlocked:{},pending:[],ctr:{drills:0,roll:0,moves:0,modes:[],langs:[],dayKey:'',runsToday:0,perfToday:0}};
-    return d; },   // fresh read every time — no stale cache across tabs or imports
+  load(){
+    let d=null; try{ d=JSON.parse(localStorage.getItem('otAch')||'null'); }catch(e){}
+    if(!d||typeof d!=='object'||Array.isArray(d)) d={};
+    const c=d.ctr&&typeof d.ctr==='object'&&!Array.isArray(d.ctr)?d.ctr:{};
+    const number=k=>Number.isFinite(c[k])?Math.max(0,Math.floor(c[k])):0;
+    const list=(k,valid)=>Array.isArray(c[k])?[...new Set(c[k].filter(x=>valid.includes(x)))]:[];
+    return {...d,v:d.v||1,unlocked:d.unlocked&&typeof d.unlocked==='object'&&!Array.isArray(d.unlocked)?d.unlocked:{},
+      pending:Array.isArray(d.pending)?d.pending.filter(id=>MEDALS.some(m=>m.id===id)):[],
+      ctr:{...c,drills:number('drills'),roll:number('roll'),moves:number('moves'),runsToday:number('runsToday'),perfToday:number('perfToday'),
+        dayKey:typeof c.dayKey==='string'?c.dayKey:'',modes:list('modes',['learn','drill','play']),langs:list('langs',['en','zh'])}};
+  }, // normalize missing legacy fields on read; viewing the board never writes progress
   save(d){ try{ localStorage.setItem('otAch', JSON.stringify(d)); }catch(e){} },
-  count(){ return Object.keys(this.load().unlocked).length; }
+  count(){ const unlocked=this.load().unlocked; return MEDALS.filter(m=>unlocked[m.id]).length; }
 };
 const MEDAL_METRICS={
   streak: ()=>activity.streak(),
@@ -1226,7 +1415,7 @@ function mName(m){ return zhOn()?m.zh:m.en; }
 function mCond(m){ return zhOn()?m.cz:m.ce; }
 function achCheck(ev, d={}){
   const A=ach.load(), c=A.ctr, today=activity.key();
-  if(!c.langs.includes(LANG)) c.langs.push(LANG);
+  if((ev==='learn'||ev==='drill') && !c.langs.includes(LANG)) c.langs.push(LANG);
   if((ev==='drill'||ev==='learn'||ev==='play') && !c.modes.includes(ev)) c.modes.push(ev);
   if(ev==='drill' && d.firstToday){
     c.drills++;
@@ -1255,64 +1444,203 @@ function medalToast(m){
   if(!el){ el=document.createElement('div'); el.id='medalToast';
     el.setAttribute('role','status'); el.setAttribute('aria-live','polite');
     document.body.appendChild(el); }
-  el.innerHTML=`<span class="m-dot ${m.t}"></span><b>${mName(m)}</b><span class="m-sub">${t('medalEarned')}</span>`;
+  el.innerHTML=`${medalEmblem(m,true)}<div><span class="m-sub">${t('medalEarned')}</span><b>${medalText(mName(m))}</b></div>`;
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   SFX.medal();
   clearTimeout(el._hid); el._hid=setTimeout(()=>el.classList.remove('show'), 3400);
 }
+/* Icons share a 24px drawing grid; numbered tiers make each milestone identifiable. */
+const MEDAL_ICONS={
+  sprout:'<path d="M12 21v-9M12 15C5 15 3 11 3 6c6 0 9 3 9 9ZM12 11c0-5 3-8 9-8 0 5-3 8-9 8Z"/>',
+  check:'<circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/>',
+  rook:'<path d="M5 21h14M6 17h12l-1-9 2-2V3h-4v3h-2V3h-2v3H9V3H5v3l2 2-1 9ZM8 17v4m8-4v4"/>',
+  crown:'<path d="m3 6 4 4 5-7 5 7 4-4-2 12H5L3 6ZM5 21h14"/><circle cx="12" cy="13" r="1"/>',
+  hourglass:'<path d="M5 3h14M5 21h14M7 3v4l5 5-5 5v4M17 3v4l-5 5 5 5v4M9 6h6m-6 12h6"/>',
+  book:'<path d="M12 6c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v15M6 9h3m-3 4h3m6-4h3m-3 4h3"/>',
+  bishop:'<path d="m12 3 5 7-3 6h-4l-3-6 5-7ZM12 3v7m-5 6h10M6 21h12l-1-3H7l-1 3Z"/>',
+  crownedBook:'<path d="m7 3 2 3 3-4 3 4 2-3-1 6H8L7 3ZM12 13c-3-2-6-2-9-1v9c3-1 6-1 9 1 3-2 6-2 9-1v-9c-3-1-6-1-9 1Zm0 0v9"/>',
+  half:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M4 8h8M3 12h9m-8 4h8"/>',
+  library:'<path d="M3 4h5v16H3zM10 4h4v16h-4zM17 4l4 15M18 4l3-1 4 15-3 1" transform="translate(-2 0)"/><path d="M2 22h20"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5 5-3Z"/>',
+  sides:'<circle cx="8" cy="10" r="5"/><circle cx="16" cy="14" r="5"/><path d="M8 5v10M16 9v10"/>',
+  flame:'<path d="M13 3c1 5 6 7 6 12a7 7 0 1 1-14 0c0-3 2-5 4-7 0 3 1 4 2 5 2-3 2-6 2-10Z"/><path d="M10 17c0 2 1 3 3 3"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 3 3 5-5"/>',
+  return:'<path d="M3 11a9 9 0 1 1 2 7M3 5v6h6m3-4v6l4 2"/>',
+  bolt:'<path d="m14 2-10 12h7l-1 8 10-12h-7l1-8Z"/>',
+  sun:'<circle cx="12" cy="12" r="6"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1m-10 7 2 2 4-4"/>',
+  layers:'<path d="m3 7 9-4 9 4-9 4-9-4Zm0 5 9 4 9-4M3 17l9 4 9-4"/>',
+  repeat:'<path d="M4 8h13l-3-3m6 11H7l3 3M4 8l3-3m-3 3v5m16 3-3 3m3-3v-5"/>',
+  route:'<circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M5 17v-5c0-2 2-3 4-3h6c2 0 4-1 4-2m-8 10 3 3 5-5"/>',
+  trophy:'<path d="M7 3h10v7a5 5 0 0 1-10 0V3Zm0 2H3v3c0 3 2 4 5 4m9-7h4v3c0 3-2 4-5 4M12 15v6m-5 0h10"/>',
+  prep:'<path d="M12 6c-3-2-6-2-9-1v15c3-1 6-1 9 1V6Zm0 0c3-2 6-2 9-1v6m-7 6 3 3 5-6"/>',
+  shield:'<path d="m12 2 8 4v6c0 5-4 8-8 10-4-2-8-5-8-10V6l8-4Zm-5 6 10 9M17 8 7 17"/>',
+  timer:'<circle cx="12" cy="14" r="8"/><path d="M9 2h6m-3 0v4m6 1 2-2m-8 5v4l3 2"/>',
+  loop:'<path d="M8 7a5 5 0 1 0 0 10l8-10a5 5 0 1 1 0 10L8 7Z"/>',
+  promotion:'<circle cx="8" cy="6" r="3"/><path d="m6 9-2 8h8l-2-8M3 21h10m5-5V4m-3 3 3-3 3 3"/>',
+  knight:'<path d="M6 20h13l-2-4c4-7-1-11-7-13l-1 4-5 6 3 2 5-3-3 5-3 3ZM12 7h.01"/>',
+  castle:'<path d="M3 5h3v3h3V5h3v6l-2 2v5H5v-5l-2-2V5ZM3 21h10m8-6h-7m3-3-3 3 3 3"/>',
+  passant:'<circle cx="7" cy="5" r="2"/><path d="m6 7-2 7h6L8 7m-5 11h8m2-2 8-8m-5 0h5v5M15 21h6"/>',
+  modes:'<circle cx="12" cy="6" r="4"/><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/>',
+  language:'<path d="M3 3h13v11H9l-4 3v-3H3V3Zm13 5h5v13l-4-3h-6v-4M6 7h7M7 10h5"/>',
+  backup:'<path d="m12 2 8 4v6c0 5-4 8-8 10-4-2-8-5-8-10V6l8-4Zm-4 10 3 3 5-6"/>',
+  mystery:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/><path d="M10.5 10a1.5 1.5 0 1 1 2 1.4l-.5.6m0 2h.01"/>'
+};
+const MEDAL_GROUPS=[
+  ['learning','achLearning'],['practice','achPractice'],['consistency','achConsistency'],
+  ['exploration','achExploration'],['play','achPlay'],['discoveries','achDiscoveries']
+];
+const MEDAL_FAMILIES={
+  first_steps:['learning','sprout'], clean_sheet:['practice','check'], first_rook:['learning','rook'], queens:['learning','crown','achQueens'], gap:['consistency','hourglass','achGap'],
+  opening_read:['learning','book'], opening_bishops:['learning','bishop'], opening_crowned:['learning','crownedBook'], half_board:['learning','half'], whole_book:['learning','library'],
+  grand_tour:['exploration','compass'], both_sides:['exploration','sides'], streak:['consistency','flame','achStreak'], days:['consistency','calendar','achDays'], comeback:['discoveries','return'],
+  roll:['practice','bolt','achRoll'], flawless_day:['practice','sun'], deep_theory:['practice','layers'], reps:['practice','repeat','achReps'], moves:['practice','route','achMoves'],
+  first_win:['play','trophy'], prep_win:['play','prep'], giant:['play','shield'], miniature:['discoveries','timer'], deja_vu:['discoveries','loop'], new_queen:['discoveries','promotion'],
+  knight_shift:['discoveries','knight'], long_castle:['discoveries','castle'], en_passant:['discoveries','passant'], triple:['exploration','modes'], bilingual:['discoveries','language'], safekeeper:['exploration','backup']
+};
+function medalText(value){ return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function medalSymbol(key){ return `<svg class="medal-symbol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${MEDAL_ICONS[key]||MEDAL_ICONS.trophy}</svg>`; }
+function medalEmblem(m, earned=false){
+  const family=MEDAL_FAMILIES[m.series||m.id], chain=MEDALS.filter(x=>x.series&&x.series===m.series);
+  const level=chain.length?`<span class="medal-level" aria-hidden="true">${['I','II','III','IV','V'][chain.findIndex(x=>x.id===m.id)]}</span>`:'';
+  return `<span class="medal-emblem ${m.t}${earned?'':' locked'}" aria-hidden="true">${medalSymbol(family[1])}${level}</span>`;
+}
+function medalDate(day){
+  const date=new Date(String(day)+'T12:00:00');
+  return /^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{day:'numeric',month:'short',year:'numeric'}).format(date) : '';
+}
+function medalSnapshot(){
+  const lines=[]; DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>lines.push({oi,li,side:op.side,r:lineRank(oi,li)})));
+  return {lines, byOp:DATA.openings.map((_,oi)=>lines.filter(x=>x.oi===oi))};
+}
+function medalProgress(m,A,snapshot){
+  const metric=(cur,goal,label='achProgress',wait=false)=>({cur:Math.max(0,Math.min(Number(cur)||0,goal)),goal,label,wait});
+  if(m.series) return metric(MEDAL_METRICS[m.series](),m.goal,{gap:'achRestDays',streak:'achCurrentStreak',days:'achTrainingDays',reps:'achDrills',moves:'achRecallMoves',roll:'achPerfectDrills',queens:'achQueenLines'}[m.series],m.series==='gap');
+  const {lines,byOp}=snapshot;
+  const best=(groups,rank)=>groups.map(group=>({cur:group.filter(x=>x.r>=rank).length,goal:group.length})).filter(p=>p.goal).sort((a,b)=>b.cur/b.goal-a.cur/a.goal)[0];
+  const ranked={opening_read:1,opening_bishops:3,opening_crowned:5};
+  if(ranked[m.id]){ const p=best(byOp,ranked[m.id]); return metric(p.cur,p.goal,'achBestOpening'); }
+  if(m.id==='half_board'){ const p=best(['w','b'].map(side=>lines.filter(x=>x.side===side)),1); return metric(p.cur,p.goal,'achOneColor'); }
+  if(m.id==='first_steps') return metric(lines.filter(x=>x.r>=1).length,1,'achLines');
+  if(m.id==='first_rook') return metric(lines.filter(x=>x.r>=4).length,1,'achRookLines');
+  if(m.id==='whole_book') return metric(lines.filter(x=>x.r>=1).length,lines.length,'achLines');
+  if(m.id==='grand_tour') return metric(byOp.filter(a=>a.some(x=>x.r>=1)).length,8,'achOpenings');
+  if(m.id==='both_sides') return metric(['w','b'].filter(side=>lines.some(x=>x.side===side&&x.r>=1)).length,2,'achColors');
+  if(m.id==='triple') return metric(A.ctr.modes.length,3,'achModes');
+  return null; // event achievements show their exact requirement, not invented percentages
+}
+function medalRows(A){
+  const rows=[], seen=new Set(), snapshot=medalSnapshot();
+  MEDALS.forEach(m=>{
+    const key=m.series||m.id; if(seen.has(key)) return; seen.add(key);
+    const chain=m.series?MEDALS.filter(x=>x.series===m.series):[m];
+    const next=chain.find(x=>!A.unlocked[x.id]);
+    const shown=next||chain[chain.length-1];
+    rows.push({key,chain,next,shown,group:MEDAL_FAMILIES[key][0],earned:chain.filter(x=>A.unlocked[x.id]).length,secret:!!m.sec,progress:next&&!m.sec?medalProgress(next,A,snapshot):null});
+  });
+  return rows;
+}
+function medalProgressHTML(p){
+  if(!p) return '';
+  const percent=Math.round(100*p.cur/p.goal);
+  return `<div class="ach-progress"><div class="ach-progress-label"><span>${t(p.label)}</span><b>${p.cur.toLocaleString()} / ${p.goal.toLocaleString()}</b></div>
+    <div class="ach-progress-track" role="progressbar" aria-label="${t(p.label)}" aria-valuemin="0" aria-valuemax="${p.goal}" aria-valuenow="${p.cur}"><span style="width:${percent}%"></span></div>
+    ${p.wait?`<p class="ach-progress-note">${t('achRestNote')}</p>`:''}</div>`;
+}
+function medalCardHTML(row,A,earnedMedal=null){
+  const m=earnedMedal||row.shown, complete=!!earnedMedal||!row.next;
+  const family=MEDAL_FAMILIES[row.key];
+  const title=!earnedMedal&&family[2]?t(family[2]):mName(m);
+  const status=complete?t('achEarned'):row.chain.length>1?t('achTiersEarned',{n:row.earned,total:row.chain.length}):t('achToEarn');
+  const condition=!earnedMedal&&row.chain.length>1&&row.next?`<strong>${medalText(mName(m))}</strong><br>${medalText(mCond(m))}`:medalText(mCond(m));
+  const tiers=!earnedMedal&&row.chain.length>1?`<details class="ach-tiers"><summary>${t('achViewTiers',{n:row.chain.length})}</summary>${row.chain.map((tier,i)=>`<div class="ach-tier"><span aria-hidden="true">${A.unlocked[tier.id]?'✓':['I','II','III','IV','V'][i]}</span><div><b>${medalText(mName(tier))} · ${t('achMetal'+tier.t)}</b><p>${medalText(mCond(tier))}</p>${A.unlocked[tier.id]?`<time datetime="${medalText(A.unlocked[tier.id])}">${t('achEarnedOn',{date:medalText(medalDate(A.unlocked[tier.id]))})}</time>`:`<p>${t('achToEarn')}</p>`}</div></div>`).join('')}</details>`:'';
+  return `<article class="ach-card${complete?' complete':''}"><div class="ach-card-head">${medalEmblem(m,complete)}<div><h4>${medalText(title)}</h4><span class="ach-state">${complete?'✓ ':''}${status} · ${t('achMetal'+m.t)}</span></div></div><p class="ach-condition">${condition}</p>
+    ${complete?`<p class="ach-earned-date">${t('achEarnedOn',{date:medalText(medalDate(A.unlocked[m.id]))})}</p>`:medalProgressHTML(row.progress)}${tiers}</article>`;
+}
+function medalNextRows(rows){
+  const starters=['first_steps','both_sides','opening_read','triple','reps','streak','grand_tour','days','moves'];
+  const priority=row=>{const i=starters.indexOf(row.key);return i<0?starters.length:i;};
+  return rows.filter(row=>row.next&&!row.secret&&row.progress&&!row.progress.wait).sort((a,b)=>(b.progress.cur/b.progress.goal)-(a.progress.cur/a.progress.goal)||priority(a)-priority(b));
+}
+function renderAchievementEntry(){
+  const el=document.getElementById('achievementEntry'); if(!el) return;
+  el.innerHTML=`<button class="achievement-entry" onclick="openMedals()">${medalSymbol('trophy')}<span class="ae-copy"><b>${t('medalsTitle')}</b><span>${t('achCollectionCount',{n:ach.count(),total:MEDALS.length})}</span></span><span class="ae-link"><span>${t('achViewBoard')}</span>→</span></button>`;
+}
+const medalUI={filter:'all',returnFocus:null,bodyOverflow:'',wasInert:false};
+function medalBoardHTML(A){
+  const rows=medalRows(A), earned=MEDALS.filter(m=>A.unlocked[m.id]), nearest=medalNextRows(rows)[0];
+  const totals=['b','s','g'].map(tier=>`<span class="ach-metal ${tier}">${t('achMetal'+tier)} <b>${earned.filter(m=>m.t===tier).length}</b></span>`).join('');
+  const next=nearest?`<div class="ach-next">${medalEmblem(nearest.next)}<div class="ach-next-copy"><span class="ach-eyebrow">${t('achNextMilestone')}</span><h3>${medalText(mName(nearest.next))}</h3><p>${medalText(mCond(nearest.next))}</p>${medalProgressHTML(nearest.progress)}</div></div>`:`<div class="ach-next">${medalSymbol('trophy')}<div class="ach-next-copy"><h3>${t('achKeepExploring')}</h3><p>${t('achKeepExploringBody')}</p></div></div>`;
+  let sections='', visible=0;
+  const section=(name,cards,sub='')=>`<section class="ach-section"><div class="ach-section-head"><h3>${name}</h3>${sub?`<span>${sub}</span>`:''}</div><div class="ach-grid">${cards.join('')}</div></section>`;
+  if(medalUI.filter==='earned'){
+    const sorted=earned.slice().sort((a,b)=>String(A.unlocked[b.id]).localeCompare(String(A.unlocked[a.id])));
+    visible=sorted.length;
+    sections=visible?section(t('achEarned'),sorted.map(m=>medalCardHTML(rows.find(r=>r.chain.includes(m)),A,m))):`<div class="ach-empty">${medalSymbol('sprout')}<h3>${t('achEmptyTitle')}</h3><p>${t('achEmptyBody')}</p></div>`;
+  }else if(medalUI.filter==='next'){
+    const candidates=medalNextRows(rows).slice(0,6); visible=candidates.length;
+    sections=visible?section(t('achNextGoals'),candidates.map(row=>medalCardHTML(row,A))):`<div class="ach-empty">${medalSymbol('trophy')}<h3>${t('achKeepExploring')}</h3><p>${t('achKeepExploringBody')}</p></div>`;
+  }else{
+    MEDAL_GROUPS.filter(([group])=>medalUI.filter==='all'||group==='discoveries').forEach(([group,key])=>{
+      const members=rows.filter(row=>row.group===group), shown=members.filter(row=>!row.secret||row.earned);
+      const cards=shown.map(row=>medalCardHTML(row,A)); visible+=cards.length;
+      const hidden=members.filter(row=>row.secret&&!row.earned).length;
+      if(hidden){ cards.push(`<article class="ach-mystery">${medalSymbol('mystery')}<h4>${t('achHiddenCount',{n:hidden})}</h4><p>${t('achHiddenBody')}</p></article>`); visible++; }
+      const total=members.reduce((n,row)=>n+row.chain.length,0), got=members.reduce((n,row)=>n+row.earned,0);
+      if(cards.length) sections+=section(t(key),cards,t('achCollectionCount',{n:got,total}));
+    });
+  }
+  const filters=[['all','achAll'],['next','achNextGoals'],['earned','achEarned'],['discoveries','achDiscoveries']].map(([key,label])=>`<button class="ach-filter" data-filter="${key}" aria-pressed="${medalUI.filter===key}" onclick="setMedalFilter('${key}')">${t(label)}</button>`).join('');
+  return `<div class="ach-overview"><div class="ach-collection"><div class="ach-ring" style="--earned:${100*earned.length/MEDALS.length}" aria-hidden="true"><div class="ach-ring-inner"><strong>${earned.length}</strong><span>/ ${MEDALS.length}</span></div></div><div><h3>${t('achCollectionCount',{n:earned.length,total:MEDALS.length})}</h3><div class="ach-totals">${totals}</div></div></div>${next}</div>
+    <div class="ach-filters" role="group" aria-label="${t('achFilters')}">${filters}</div><p class="ach-results-count" role="status">${t('achShowing',{n:visible})}</p>${sections}<p class="ach-footnote">${t('achFootnote')}</p>`;
+}
+function renderMedals(){
+  const ov=document.getElementById('medalsOverlay'); if(!ov) return;
+  ov.querySelector('#achievementBoardTitle').textContent=t('medalsTitle');
+  ov.querySelector('#achievementBoardIntro').textContent=t('achIntro');
+  ov.querySelector('.ach-close').setAttribute('aria-label',t('closeWord'));
+  ov.querySelector('.medals-list').innerHTML=medalBoardHTML(ach.load());
+}
+function setMedalFilter(filter){
+  if(!['all','next','earned','discoveries'].includes(filter)) return;
+  const list=document.querySelector('#medalsOverlay .medals-list'), scrollTop=list.scrollTop;
+  medalUI.filter=filter; renderMedals();
+  const button=list.querySelector(`[data-filter="${filter}"]`); button.focus({preventScroll:true});
+  list.scrollTop=Math.min(scrollTop,button.offsetTop-list.offsetTop);
+}
 function openMedals(){
   let ov=document.getElementById('medalsOverlay');
-  if(!ov){ ov=document.createElement('div'); ov.id='medalsOverlay';
-    ov.onclick=e=>{ if(e.target===ov) closeMedals(); };
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && ov.style.display!=='none') closeMedals(); });
-    ov.addEventListener('keydown', e=>{   // keep Tab inside the dialog
+  if(!ov){
+    ov=document.createElement('div'); ov.id='medalsOverlay';
+    ov.innerHTML='<div class="medals-panel" role="dialog" aria-modal="true" aria-labelledby="achievementBoardTitle" aria-describedby="achievementBoardIntro"><div class="medals-head"><div><h2 id="achievementBoardTitle"></h2><p id="achievementBoardIntro"></p></div><button class="mini ach-close" onclick="closeMedals()">✕</button></div><div class="medals-list" tabindex="0"></div></div>';
+    ov.onclick=e=>{if(e.target===ov) closeMedals();};
+    ov.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ e.preventDefault(); closeMedals(); return; }
       if(e.key!=='Tab') return;
-      const f=[...ov.querySelectorAll('button,[tabindex="0"]')]; if(!f.length) return;
-      const first=f[0], last=f[f.length-1];
-      if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
-      else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+      const focusable=[...ov.querySelectorAll('button,summary,[tabindex="0"]')].filter(el=>el.getClientRects().length);
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault();}
+      else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault();}
     });
-    document.body.appendChild(ov); }
-  const A=ach.load();
-  // Chained medals render as ONE progressive row: earned tiers as dots, the next
-  // tier as the row's goal, and live progress toward it — always a next rung.
-  const rows=[]; const seen=new Set();
-  MEDALS.forEach(m=>{
-    if(!m.series){ rows.push({kind:'single', m}); return; }
-    if(seen.has(m.series)) return;
-    seen.add(m.series);
-    rows.push({kind:'series', chain: MEDALS.filter(x=>x.series===m.series)});
-  });
-  ov.innerHTML=`<div class="medals-panel" role="dialog" aria-modal="true" aria-label="${t('medalsTitle')}"><div class="medals-head"><b>${t('medalsTitle')}</b>
-      <span class="medals-count">${ach.count()}/${MEDALS.length}</span>
-      <button class="mini" aria-label="${t('closeWord')}" onclick="closeMedals()">✕</button></div>
-    <div class="medals-list">`+
-    rows.map(row=>{
-      if(row.kind==='single'){
-        const m=row.m, got=!!A.unlocked[m.id];
-        const name=got||!m.sec ? mName(m) : '???';
-        const cond=got ? `${mCond(m)} · ${A.unlocked[m.id]}` : (m.sec?t('secretMedal'):mCond(m));
-        return `<div class="medal-row ${got?'got':''}"><span class="m-dot ${m.t}"></span><div class="m-txt"><b>${name}</b><span>${cond}</span></div></div>`;
-      }
-      const chain=row.chain;
-      const next=chain.find(x=>!A.unlocked[x.id]);
-      const shown=next||chain[chain.length-1];
-      const anyGot=chain.some(x=>A.unlocked[x.id]);
-      const cur=Math.min(MEDAL_METRICS[shown.series] ? MEDAL_METRICS[shown.series]() : 0, shown.goal);
-      const dots=chain.map(x=>`<span class="m-dot ${x.t}${A.unlocked[x.id]?'':' off'}"></span>`).join('');
-      const prog=next?`<div class="m-prog"><div class="m-prog-fill" style="width:${Math.round(100*cur/shown.goal)}%"></div></div><span class="m-prog-n">${cur}/${shown.goal}</span>`:'';
-      return `<div class="medal-row series ${anyGot?'got':''}"><span class="m-dots">${dots}</span>
-        <div class="m-txt"><b>${mName(shown)}</b><span>${next?mCond(shown):`${mCond(shown)} · ${A.unlocked[shown.id]}`}</span>${prog}</div></div>`;
-    }).join('')+`</div></div>`;
-  ov.querySelector('.medals-list').setAttribute('tabindex','0');
-  ov.style.display='flex';
-  document.body.style.overflow='hidden';
-  const x=ov.querySelector('.medals-head .mini'); if(x) x.focus();
+    document.body.appendChild(ov);
+  }
+  if(ov.style.display!=='flex'){
+    medalUI.returnFocus=document.activeElement;
+    medalUI.bodyOverflow=document.body.style.overflow;
+    medalUI.wasInert=document.getElementById('appShell').inert;
+    medalUI.filter='all';
+  }
+  renderMedals(); ov.style.display='flex';
+  document.body.style.overflow='hidden'; document.getElementById('appShell').inert=true;
+  ov.querySelector('.medals-list').scrollTop=0;
+  ov.querySelector('.ach-close').focus();
 }
 function closeMedals(){
-  const ov=document.getElementById('medalsOverlay'); if(ov) ov.style.display='none';
-  document.body.style.overflow='';
-  const b=document.querySelector('.medal-btn'); if(b) b.focus();
+  const ov=document.getElementById('medalsOverlay'); if(!ov||ov.style.display==='none') return;
+  ov.style.display='none'; document.body.style.overflow=medalUI.bodyOverflow;
+  document.getElementById('appShell').inert=medalUI.wasInert;
+  const target=medalUI.returnFocus;
+  if(target&&target.isConnected&&target.getClientRects().length) target.focus({preventScroll:true});
+  else document.querySelector('.achievement-entry')?.focus({preventScroll:true});
 }
 
 /* ================= SPACED REPETITION (FSRS-4.5) =================
@@ -1389,7 +1717,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G18';
+const BUILD='G19';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
@@ -2098,17 +2426,18 @@ function showMenu(){
     });
     return card;
   }
+  achCheck('menu');
   const started=tierCounts.slice(1).reduce((a,b)=>a+b,0);
   const strength=started?Math.round(100*rankSum/(started*5)):0;
   const tiers=[1,2,3,4,5].map(r=>`<span class="tier-count r${r}" title="${t('rank'+r)} — ${t('rank'+r+'Tip')}">${RANKS[r].icon}<b>${tierCounts[r]}</b></span>`).join('');
   const legend=[1,2,3,4,5].map(r=>`${RANKS[r].icon} ${t('rank'+r)}`).join(' · ');
   document.getElementById('summaryBar').innerHTML=
     `<div class="rep-strength"><b>${strength}%</b>${t('repStrength')}</div><div><b>${started}/${totalLines}</b>${t('startedWord')}</div><div class="tier-counts">${tiers}</div><div><b>${totalRuns}</b>${t('totalDrills')}</div>
-     <button class="medal-btn" onclick="openMedals()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> <b>${ach.count()}</b>/${MEDALS.length}</button>
+     <button class="medal-btn" onclick="openMedals()">${medalSymbol('trophy')} ${t('medalsTitle')} <b>${ach.count()}</b>/${MEDALS.length}</button>
      <div class="rank-legend">${legend}</div>`;
   renderTodayBar();
   renderHeatmap();
-  achCheck('menu'); flushMedals();
+  renderAchievementEntry(); flushMedals();
 }
 
 /* "Today" bar: review queue, streak, and continue-where-you-left-off. */
