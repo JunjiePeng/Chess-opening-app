@@ -40,12 +40,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline:3px so
 .page-shell.board-view > header { contain:inline-size; }
 header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:flex-start; gap:14px; }
 .header-brand { display:flex; flex:1; min-width:0; align-items:center; gap:4px 14px; flex-wrap:wrap; }
-.header-controls { display:flex; flex:0 0 auto; align-items:center; gap:12px; min-height:2.325rem; margin-left:auto; }
-header h1 { display:inline-flex; align-items:center; gap:8px; font-family:'Caprasimo',serif; font-weight:400; font-size:1.55rem; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
+.header-controls { display:flex; flex:0 0 auto; align-items:center; gap:12px; min-height:48px; margin-left:auto; }
+header h1 { display:inline-flex; align-items:center; gap:10px; font-family:'Caprasimo',serif; font-weight:400; font-size:1.75rem; line-height:1.1; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
 header h1:hover { opacity:.8; }
 header h1 span { color:var(--accent); }
-header h1 .logo-wordmark { color:var(--text); }
-.logo-mark { display:block; width:36px; height:36px; flex:0 0 auto; border-radius:10px; }
+header h1 .logo-wordmark { color:var(--text); white-space:nowrap; }
+.logo-mark { display:block; width:48px; height:48px; flex:0 0 auto; border-radius:12px; }
 header p { color:var(--dim); font-size:.9rem; }
 .header-brand .eng-badge { padding-inline:0; }
 .layout { display:flex; gap:20px; padding-block:10px 30px; flex-wrap:wrap; align-items:flex-start; justify-content:center; }
@@ -465,10 +465,10 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .page-shell { container-type:inline-size; }
   .page-shell.board-view { width:100%; }
   header { padding-block:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 6px; gap:8px; }
-  .header-brand { gap:4px 8px; min-height:32px; }
-  .header-controls { gap:8px; min-height:32px; }
-  header h1 { font-size:1.2rem; gap:6px; }
-  .logo-mark { width:28px; height:28px; border-radius:8px; }
+  .header-brand { gap:4px 8px; min-height:40px; }
+  .header-controls { gap:8px; min-height:40px; }
+  header h1 { font-size:1.4rem; gap:8px; }
+  .logo-mark { width:40px; height:40px; border-radius:10px; }
   header p { display:none; }
   .layout { padding-block:6px 16px; gap:10px; }
   #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
@@ -516,7 +516,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <div id="appShell" class="page-shell">
 <header>
   <div class="header-brand">
-    <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu"><img class="logo-mark" src="icon-192.png?v=G18" width="36" height="36" alt=""><span class="logo-wordmark">De<span>but</span></span></h1>
+    <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu"><img class="logo-mark" src="icon-192.png?v=G20" width="48" height="48" alt=""><span class="logo-wordmark">De<span>but</span></span></h1>
     <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
     <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
   </div>
@@ -543,7 +543,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G19</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G20</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1717,7 +1717,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G19';
+const BUILD='G20';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
