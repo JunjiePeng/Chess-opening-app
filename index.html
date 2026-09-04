@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Debut — Chess Opening Trainer</title>
 <!-- Install-to-home-screen / app metadata -->
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=G18">
 <meta name="theme-color" content="#241b12">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=G18">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=G18">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
@@ -38,11 +38,16 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline:3px so
   padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
 .page-shell.board-view { width:fit-content; }
 .page-shell.board-view > header { contain:inline-size; }
-header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
-header h1 { font-family:'Caprasimo',serif; font-weight:400; font-size:1.55rem; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
+header { padding-block:max(18px, env(safe-area-inset-top, 0px)) 10px; display:flex; align-items:flex-start; gap:14px; }
+.header-brand { display:flex; flex:1; min-width:0; align-items:center; gap:4px 14px; flex-wrap:wrap; }
+.header-controls { display:flex; flex:0 0 auto; align-items:center; gap:12px; min-height:2.325rem; margin-left:auto; }
+header h1 { display:inline-flex; align-items:center; gap:8px; font-family:'Caprasimo',serif; font-weight:400; font-size:1.55rem; letter-spacing:0; cursor:pointer; user-select:none; transition:opacity .15s; }
 header h1:hover { opacity:.8; }
 header h1 span { color:var(--accent); }
+header h1 .logo-wordmark { color:var(--text); }
+.logo-mark { display:block; width:36px; height:36px; flex:0 0 auto; border-radius:10px; }
 header p { color:var(--dim); font-size:.9rem; }
+.header-brand .eng-badge { padding-inline:0; }
 .layout { display:flex; gap:20px; padding-block:10px 30px; flex-wrap:wrap; align-items:flex-start; justify-content:center; }
 
 /* ---- menu ---- */
@@ -385,7 +390,10 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .page-shell { container-type:inline-size; }
   .page-shell.board-view { width:100%; }
   header { padding-block:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 6px; gap:8px; }
-  header h1 { font-size:1.2rem; }
+  .header-brand { gap:4px 8px; min-height:32px; }
+  .header-controls { gap:8px; min-height:32px; }
+  header h1 { font-size:1.2rem; gap:6px; }
+  .logo-mark { width:28px; height:28px; border-radius:8px; }
   header p { display:none; }
   .layout { padding-block:6px 16px; gap:10px; }
   #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
@@ -432,11 +440,15 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <body>
 <div id="appShell" class="page-shell">
 <header>
-  <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu">♞ De<span>but</span></h1>
-  <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
-  <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
-  <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
-  <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
+  <div class="header-brand">
+    <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu"><img class="logo-mark" src="icon-192.png?v=G18" width="36" height="36" alt=""><span class="logo-wordmark">De<span>but</span></span></h1>
+    <p data-i18n="tagline">Chess opening trainer — learn the lines, then drill them from memory.</p>
+    <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
+  </div>
+  <div class="header-controls">
+    <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
+    <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
+  </div>
 </header>
 
 <div class="layout">
@@ -455,7 +467,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G16</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G18</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1377,7 +1389,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G16';
+const BUILD='G18';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
