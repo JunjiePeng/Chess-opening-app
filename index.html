@@ -9,6 +9,7 @@
 <meta name="theme-color" content="#241b12">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=G18">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=G18">
+<link rel="icon" type="image/svg+xml" sizes="any" href="favicon.svg?v=G22">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
@@ -543,7 +544,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G21</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G22</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1717,7 +1718,7 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G21';
+const BUILD='G22';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function exportProgress(){
   achCheck('export');   // Safekeeper lands in the file being written
