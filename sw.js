@@ -6,7 +6,7 @@
    never delays rendering). Other cross-origin requests (the Stockfish CDN)
    are left untouched — the engine degrades gracefully offline.
    Bump CACHE together with the build tag in index.html when releasing. */
-const CACHE = 'debut-g24';
+const CACHE = 'debut-g25';
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 const SHELL = ['./', './index.html', './manifest.webmanifest?v=G24', './icon-192.png?v=G24', './icon-512.png?v=G24', './icon-maskable-512.png?v=G24', './apple-touch-icon.png?v=G18', './favicon-32.png?v=G23'];
 
@@ -17,7 +17,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('debut-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -29,6 +29,7 @@ self.addEventListener('fetch', e => {
   if (FONT_HOSTS.includes(url.hostname)) {
     e.respondWith(
       caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+        if(!res.ok) return res;
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
         return res;
@@ -42,6 +43,7 @@ self.addEventListener('fetch', e => {
   if (e.request.mode === 'navigate' || url.pathname.endsWith('/index.html')) {
     e.respondWith(
       fetch(e.request).then(r => {
+        if(!r.ok) return r;
         const copy = r.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
         return r;
@@ -52,6 +54,7 @@ self.addEventListener('fetch', e => {
 
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).then(res => {
+      if(!res.ok) return res;
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(e.request, copy));
       return res;

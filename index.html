@@ -32,7 +32,7 @@
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.5; min-height:100vh; }
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
-button:focus-visible, input:focus-visible, select:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
 .page-shell { width:100%; max-width:min(100%,var(--page-max-width)); min-width:0; margin-inline:auto;
   padding-left:max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
@@ -152,6 +152,8 @@ header p { color:var(--dim); font-size:.9rem; }
 .sq { position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer;
   font-size:calc(var(--bsize)/8*.80); line-height:1; min-width:0; min-height:0; }
 .sq.anim-top { z-index:3; }
+.sq:focus-visible { outline:3px solid #fff4e3; outline-offset:-4px; z-index:4; }
+button:disabled { opacity:.45; cursor:default; }
 .sq.light { background:var(--light-sq); } .sq.dark { background:var(--dark-sq); }
 .sq .pc { pointer-events:none; }
 .pc { display:inline-flex; }
@@ -502,12 +504,13 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 @media (max-height:520px) and (min-width:600px){
   header { padding-block:6px 4px; }
   header p { display:none; }
-  #drill.layout { flex-wrap:nowrap; padding:4px 10px 8px; gap:12px; align-items:flex-start; }
-  #boardCol { --bsize:calc(100dvh - 80px); }
-  #drill.play #boardCol { --bsize:calc(100dvh - 136px); }
-  .side-panel { width:min(44vw, 380px); max-width:none; }
+  .page-shell.board-view { width:100%; }
+  #drill.layout { width:100%; flex-wrap:nowrap; padding:4px 0 8px; gap:12px; align-items:flex-start; }
+  #boardCol { --bsize:min(calc(100dvh - 90px),calc((min(100vw,var(--page-max-width)) - 2*var(--page-gutter) - 12px)*.49)); }
+  #drill.play #boardCol { --bsize:min(calc(100dvh - 136px),calc((min(100vw,var(--page-max-width)) - 2*var(--page-gutter) - 32px)*.49)); }
+  .side-panel { flex:1; width:0; min-width:0; max-width:none; padding:0; }
 }
-@media (max-width:760px) and (max-height:680px){
+@media (max-width:599px) and (max-height:680px){
   #boardCol { --bsize:min(calc(100cqw - var(--board-extra, 0px)), calc(100dvh - 236px - env(safe-area-inset-top, 0px))); }  /* shorter phones */
 }
 </style>
@@ -516,7 +519,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <div id="appShell" class="page-shell">
 <header>
   <div class="header-brand">
-    <h1 id="logo" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu"><img class="logo-mark" src="icon-192.png?v=G24" width="48" height="48" alt=""><span class="logo-wordmark">De<span>but</span></span></h1>
+    <h1 id="logo" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showMenu();}" onclick="showMenu()" data-i18n-title="tipMenu" title="Back to main menu"><img class="logo-mark" src="icon-192.png?v=G24" width="48" height="48" alt=""><span class="logo-wordmark">De<span>but</span></span></h1>
     <p data-i18n="tagline">Every great game begins with a confident Debut.</p>
     <button id="engineBadge" class="eng-badge" onclick="retryEngine()" data-i18n-title="tipEngine" title="Engine status — click to retry"></button>
   </div>
@@ -532,7 +535,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div id="todayBar" class="today-bar" style="display:none"></div>
     <div id="achievementEntry"></div>
     <div id="findRow">
-      <input id="searchBox" type="search" autocomplete="off" data-i18n-ph="searchPh">
+      <input id="searchBox" data-i18n-label="searchPh" type="search" autocomplete="off" data-i18n-ph="searchPh">
       <div class="sort-seg" id="sortSeg">
         <button data-sort="group" data-i18n="sortGroup">Groups</button>
         <button data-sort="az">A–Z</button>
@@ -543,7 +546,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G24</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G25</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -558,7 +561,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
       <div id="evalBarWrap"><div id="evalFill"></div><span id="evalNum"></span></div>
       <div id="boardStack">
         <div id="capTop" class="cap-tray"></div>
-        <div class="board-wrap"><div id="board"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
+        <div class="board-wrap"><div id="board" role="group" data-i18n-label="boardHelp"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
         <div id="capBottom" class="cap-tray"></div>
       </div>
     </div>
@@ -567,7 +570,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <div id="lineTitle"></div>
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
         <div class="line-controls">
-          <select id="lineSel" onchange="onLineSel(this.value)"></select>
+          <select id="lineSel" data-i18n-label="pickOpening" onchange="onLineSel(this.value)"></select>
           <button class="mini" id="annotBtn" onclick="toggleAnnots()" data-i18n-title="tipArrows" title="Show or hide arrows and key-square markers"></button>
           <button class="mini" id="aimBtn" onclick="toggleAims()" data-i18n-title="tipDots" title="Show or hide legal-move dots when you select a piece"></button>
         </div>
@@ -575,7 +578,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
           <label style="font-size:.875rem;color:var(--dim);display:flex;justify-content:space-between">
             <span data-i18n="engineStrength">Engine strength</span><span id="eloLabel"></span>
           </label>
-          <input type="range" id="eloSlider" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
+          <input type="range" id="eloSlider" data-i18n-label="engineStrength" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
           <div id="colorRow" class="color-row" style="display:none">
             <span class="color-label" data-i18n="youPlay">You play</span>
@@ -598,7 +601,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <p class="drill-side-note" id="drillSideNote" data-i18n="drillSideNote">Switching sides starts this line again.</p>
       </section>
       <div class="panel-box" id="promptBox">
-        <div id="prompt"></div>
+        <div id="prompt" role="status" aria-live="polite" aria-atomic="true"></div>
         <div id="comment"></div>
       </div>
       <div id="drillNav" style="display:none">
@@ -729,6 +732,10 @@ const I18N_EN = {
 const I18N = { en:I18N_EN, zh:(typeof I18N_ZH!=='undefined'?I18N_ZH:I18N_EN) };
 // a few extra runtime strings not carried in the content file
 Object.assign(I18N_EN, {
+  boardHelp:'Chessboard. Use arrow keys to move between squares, Enter or Space to select and move, and Escape to cancel.',
+  emptySquare:'empty',
+  boardSquare:'{sq}, {piece}',
+  illegalMove:'That move is not legal. Try another square.',
   drillAs:'Drill as',
   drillWhite:'Drill as White',
   drillBlack:'Drill as Black',
@@ -859,10 +866,14 @@ Object.assign(I18N_EN, {
   tipArrows:'Show or hide arrows and key-square markers',
   tipDots:'Show or hide legal-move dots when you select a piece',
   tipEval:'Show or hide the engine evaluation bar',
-  tipEngMove:'Let the engine move for you',
+  tipEngMove:'Let the engine move for you; victory medals need an unassisted game',
   closeWord:'Close'
 });
 if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
+  boardHelp:'棋盘。用方向键选择格子，回车或空格键选择和移动棋子，Esc 键取消选择。',
+  emptySquare:'空格',
+  boardSquare:'{sq}，{piece}',
+  illegalMove:'这步不符合走棋规则，请换一个落点。',
   drillAs:'操练执方',
   drillWhite:'执白操练',
   drillBlack:'执黑操练',
@@ -993,9 +1004,29 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   tipArrows:'显示或隐藏箭头与关键格标记',
   tipDots:'选中棋子时显示或隐藏落点提示',
   tipEval:'显示或隐藏引擎评估条',
-  tipEngMove:'让引擎替你走这一步',
+  tipEngMove:'让引擎替你走这一步；取胜成就需在不使用代走的对局中获得',
   closeWord:'关闭'
 });
+/* Read old or damaged records without letting one field break the app. */
+const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
+const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
+function readStoredJSON(key, fallback){
+  try{ const value=localStorage.getItem(key); return value===null ? fallback : JSON.parse(value); }catch(e){ return fallback; }
+}
+function readStoredRecord(key){ const value=readStoredJSON(key,{}); return isRecord(value)?value:{}; }
+function readStoredList(key){ const value=readStoredJSON(key,[]); return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]; }
+function progressRecords(value){
+  const out={};
+  for(const [key,raw] of Object.entries(isRecord(value)?value:{})){
+    if(!isRecord(raw)) continue;
+    out[key]={...raw,runs:countValue(raw.runs),perfect:countValue(raw.perfect),streak:countValue(raw.streak),
+      rank:Number.isInteger(raw.rank)&&raw.rank>=0&&raw.rank<=5?raw.rank:0,learned:raw.learned===true};
+  }
+  return out;
+}
+function validSrsRecord(v){ return isRecord(v) && Number.isFinite(v.s) && v.s>0 && Number.isFinite(v.d) && v.d>=1 && v.d<=10
+  && Number.isFinite(v.last) && v.last>=0 && Number.isFinite(v.due) && v.due>=0; }
+
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
 function t(key, vars){
@@ -1029,6 +1060,7 @@ function setLang(l){
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
   renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge();
+  if(board) render(curLastU());
   buildLineSel();
   if(document.getElementById('medalsOverlay')?.style.display==='flex') renderMedals();
   const inBoard = document.getElementById('drill').style.display!=='none';
@@ -1046,7 +1078,8 @@ function setLang(l){
     }
     updateOpeningName();
     updatePlayList();
-    if(!playOver && userTurnInPlay() && !locked) setPrompt(t('yourMove'),'');
+    if(playOver){ renderPlayResult(); return; }
+    setPrompt(t(userTurnInPlay()&&!locked?'yourMove':'engineThinking'),'');
     if(!playOver){   // the standing intro text is static per mode — re-issue it in the new language
       setComment(freeMode ? t('playFromStart')
         : (curOp!==null ? t('playPosition',{name:lnName(DATA.openings[curOp].lines[curLine])}) : ''));
@@ -1072,6 +1105,7 @@ function resetPromptScroll(){ const pb=document.getElementById('promptBox'); if(
 function applyStaticI18n(){
   if(!document.querySelectorAll) return;   // headless/test stub has no querySelectorAll
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-i18n-label]').forEach(el=>el.setAttribute('aria-label',t(el.getAttribute('data-i18n-label'))));
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.getAttribute('data-i18n-ph')); });
   document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.getAttribute('data-i18n-title')); });
   if(document.documentElement) document.documentElement.lang = LANG==='zh'?'zh':'en';
@@ -1144,14 +1178,14 @@ function renderAimBtn(){
 
 /* Favorites: starred openings, keyed by (stable) English opening name. */
 const favs = {
-  load(){ try { return JSON.parse(localStorage.getItem('otFavs')||'[]'); } catch(e){ return []; } },
+  load(){ return readStoredList('otFavs'); },
   save(a){ localStorage.setItem('otFavs', JSON.stringify(a)); },
   has(name){ return this.load().indexOf(name)>=0; },
   toggle(name){ const a=this.load(); const i=a.indexOf(name); if(i>=0) a.splice(i,1); else a.push(name); this.save(a); }
 };
 /* Favorite lines: starred individual lines, keyed by "opening name|line name". */
 const lineFavs = {
-  load(){ try { return JSON.parse(localStorage.getItem('otFavLines')||'[]'); } catch(e){ return []; } },
+  load(){ return readStoredList('otFavLines'); },
   save(a){ localStorage.setItem('otFavLines', JSON.stringify(a)); },
   key(op,l){ return op.name+'|'+l.name; },
   has(op,l){ return this.load().indexOf(this.key(op,l))>=0; },
@@ -1216,7 +1250,7 @@ function lineKey(oi,li){ const op=DATA.openings[oi]; return op.name+'|'+op.lines
   }catch(e){}
 })();
 const store = {
-  load(){ try { return JSON.parse(localStorage.getItem('openingTrainer')||'{}'); } catch(e){ return {}; } },
+  load(){ return progressRecords(readStoredRecord('openingTrainer')); },
   save(o){ localStorage.setItem('openingTrainer', JSON.stringify(o)); },
   key(oi,li){ return lineKey(oi,li); },
   get(oi,li){ const s=this.load(); return s[this.key(oi,li)] || {runs:0,perfect:0,streak:0}; },
@@ -1371,9 +1405,9 @@ const MEDALS=[
  {id:'reps1000', t:'g', series:'reps', goal:1000, en:'Thousand-Rep Club', zh:'千锤百炼', ce:'1000 drills', cz:'累计操练 1000 次', test:S=>S.ctr.drills>=1000},
  {id:'moves1000', t:'s', series:'moves', goal:1000, en:'Thousand Moves', zh:'千步之行', ce:'Recall 1000 book moves', cz:'凭记忆走出 1000 步棋', test:S=>S.ctr.moves>=1000},
  {id:'moves10000', t:'g', series:'moves', goal:10000, en:'Ten Thousand Moves', zh:'万步成谱', ce:'Recall 10,000 book moves', cz:'凭记忆走出 10000 步棋', test:S=>S.ctr.moves>=10000},
- {id:'first_win', t:'b', en:'First Victory', zh:'首胜引擎', ce:'Beat the engine', cz:'战胜引擎', test:S=>S.ev==='play'&&S.d.result==='win'},
- {id:'prep_win', t:'s', en:'Prep Pays Off', zh:'背谱制胜', ce:'Win after 6+ of your book moves', cz:'走出 6 步以上谱着后取胜', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.free&&S.d.bookUserMoves>=6},
- {id:'giant', t:'g', en:'Giant Slayer', zh:'力克强敌', ce:'Beat the engine at 2000+ Elo', cz:'战胜 2000 分以上的引擎', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.elo>=2000},
+ {id:'first_win', t:'b', en:'First Victory', zh:'首胜引擎', ce:'Beat the engine without move assistance', cz:'不用代走功能战胜引擎', test:S=>S.ev==='play'&&S.d.result==='win'},
+ {id:'prep_win', t:'s', en:'Prep Pays Off', zh:'背谱制胜', ce:'Win unaided after 6+ of your book moves', cz:'走出 6 步以上谱着后，不用代走功能取胜', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.free&&S.d.bookUserMoves>=6},
+ {id:'giant', t:'g', en:'Giant Slayer', zh:'力克强敌', ce:'Beat the engine at 2000+ Elo without move assistance', cz:'不用代走功能战胜 2000 分以上的引擎', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.elo>=2000},
  {id:'miniature', t:'g', sec:1, en:'Miniature', zh:'袖珍杀局', ce:'Checkmate in 20 moves or fewer', cz:'20 回合内将杀', test:S=>S.ev==='play'&&S.d.result==='win'&&S.d.reason==='checkmate'&&S.d.plies<=40},
  {id:'deja_vu', t:'s', sec:1, en:'Déjà Vu', zh:'似曾相识', ce:'Draw the engine by repetition', cz:'与引擎三次重复成和', test:S=>S.ev==='play'&&S.d.reason==='repetition'},
  {id:'new_queen', t:'b', sec:1, en:'A New Queen', zh:'小兵升变', ce:'Promote a pawn in a game', cz:'对局中实现升变', test:S=>S.ev==='play'&&!!S.d.flags.promoted},
@@ -1414,6 +1448,7 @@ const MEDAL_METRICS={
 function mName(m){ return zhOn()?m.zh:m.en; }
 function mCond(m){ return zhOn()?m.cz:m.ce; }
 function achCheck(ev, d={}){
+  if(ev==='play' && d.result==='win' && (d.flags?.assisted || d.flags?.engineFallback)) d={...d,result:'practice'};
   const A=ach.load(), c=A.ctr, today=activity.key();
   if((ev==='learn'||ev==='drill') && !c.langs.includes(LANG)) c.langs.push(LANG);
   if((ev==='drill'||ev==='learn'||ev==='play') && !c.modes.includes(ev)) c.modes.push(ev);
@@ -1667,7 +1702,7 @@ const FSRS = {
 };
 const DAY_MS=864e5;
 const srs = {
-  load(){ try { return JSON.parse(localStorage.getItem('otSrs')||'{}'); } catch(e){ return {}; } },
+  load(){ return Object.fromEntries(Object.entries(readStoredRecord('otSrs')).filter(([,v])=>validSrsRecord(v)).map(([k,v])=>[k,{...v,reps:countValue(v.reps),gap:Number.isFinite(v.gap)&&v.gap>=0?v.gap:0}])); },
   save(o){ localStorage.setItem('otSrs', JSON.stringify(o)); },
   get(oi,li){ return this.load()[lineKey(oi,li)] || null; },
   grade(oi,li,g){
@@ -1701,7 +1736,7 @@ const srs = {
 
 /* ================= ACTIVITY LOG (streak + heatmap) ================= */
 const activity = {
-  load(){ try { return JSON.parse(localStorage.getItem('otActivity')||'{}'); } catch(e){ return {}; } },
+  load(){ return Object.fromEntries(Object.entries(readStoredRecord('otActivity')).filter(([k,v])=>/^\d{4}-\d{2}-\d{2}$/.test(k) && countValue(v)>0)); },
   save(o){ localStorage.setItem('otActivity', JSON.stringify(o)); },
   key(d){ const x=d||new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); },
   log(){ const a=this.load(); const k=this.key(); a[k]=(a[k]||0)+1; this.save(a); },
@@ -1717,22 +1752,66 @@ const activity = {
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G24';
+const BUILD='G25';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
-function exportProgress(){
-  achCheck('export');   // Safekeeper lands in the file being written
-  const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString()};
+function createProgressBackup(){
+  const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
     if(BACKUP_KEY_RE.test(k)) out[k]=localStorage.getItem(k);
   }
   if(out.otAch){ try{ const A=JSON.parse(out.otAch); A.pending=[]; out.otAch=JSON.stringify(A); }catch(e){} }
+  return out;
+}
+function validateProgressBackup(o){
+  if(!isRecord(o) || o.__app!=='debut-progress') throw new Error('not a progress file');
+  const pairs=Object.entries(o).filter(([k])=>BACKUP_KEY_RE.test(k));
+  if(!pairs.length) throw new Error('empty backup');
+  const objectKeys=['openingTrainer','otSrs','otActivity','otGroups','otAch'];
+  const numericFields=(v,fields)=>fields.every(k=>v[k]===undefined || (Number.isSafeInteger(v[k]) && v[k]>=0));
+  for(const [key,raw] of pairs){
+    if(typeof raw!=='string') throw new Error('invalid backup value');
+    if(objectKeys.includes(key)){
+      const value=JSON.parse(raw);
+      if(!isRecord(value)) throw new Error('invalid record: '+key);
+      if(key==='openingTrainer') for(const v of Object.values(value)){
+        if(!isRecord(v) || !numericFields(v,['runs','perfect','streak','rank']) || (v.rank!==undefined && (!Number.isInteger(v.rank)||v.rank>5))) throw new Error('invalid progress');
+      }
+      if(key==='otSrs' && !Object.values(value).every(v=>validSrsRecord(v) && (v.gap===undefined || (Number.isFinite(v.gap)&&v.gap>=0)))) throw new Error('invalid schedule');
+      if(key==='otActivity' && !Object.entries(value).every(([k,v])=>/^\d{4}-\d{2}-\d{2}$/.test(k) && Number.isSafeInteger(v) && v>=0)) throw new Error('invalid activity');
+      if(key==='otGroups' && !Object.values(value).every(v=>typeof v==='boolean')) throw new Error('invalid groups');
+      if(key==='otAch'){
+        if(value.unlocked!==undefined && (!isRecord(value.unlocked)||!Object.values(value.unlocked).every(d=>typeof d==='string'))) throw new Error('invalid medals');
+        if(value.ctr!==undefined && !isRecord(value.ctr)) throw new Error('invalid counters');
+        if(value.pending!==undefined && !Array.isArray(value.pending)) throw new Error('invalid pending medals');
+      }
+    }else if(key==='otFavs'||key==='otFavLines'){
+      const value=JSON.parse(raw);
+      if(!Array.isArray(value)||!value.every(v=>typeof v==='string')) throw new Error('invalid favorites');
+    }else if(key==='otLast'){
+      const value=JSON.parse(raw); if(value!==null && !isRecord(value)) throw new Error('invalid last line');
+    }
+  }
+  return pairs;
+}
+function restoreProgressBackup(o){
+  const pairs=validateProgressBackup(o); // Validate everything before changing saved progress.
+  const snapshot={};
+  for(let i=0;i<localStorage.length;i++){ const key=localStorage.key(i); if(BACKUP_KEY_RE.test(key)) snapshot[key]=localStorage.getItem(key); }
+  const clearAppKeys=()=>{
+    for(let i=localStorage.length-1;i>=0;i--){const key=localStorage.key(i);if(BACKUP_KEY_RE.test(key))localStorage.removeItem(key);}
+  };
+  try{ clearAppKeys(); for(const [k,v] of pairs)localStorage.setItem(k,v); }
+  catch(error){ clearAppKeys(); for(const [k,v] of Object.entries(snapshot))localStorage.setItem(k,v); throw error; }
+  return pairs.length;
+}
+function exportProgress(){
+  achCheck('export');
+  const out=createProgressBackup();
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));
-  a.download='debut-progress-'+activity.key()+'.json';
-  a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-  flushMedals();
+  a.download='debut-progress-'+activity.key()+'.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000); flushMedals();
 }
 function importProgress(){ const el=document.getElementById('importFile'); if(el) el.click(); }
 (function(){
@@ -1742,24 +1821,12 @@ function importProgress(){ const el=document.getElementById('importFile'); if(el
     const rd=new FileReader();
     rd.onload=()=>{
       try{
-        const o=JSON.parse(rd.result);
-        if(!o || o.__app!=='debut-progress') throw new Error('not a progress file');
-        const pairs=Object.entries(o).filter(([k,v])=>BACKUP_KEY_RE.test(k)&&typeof v==='string');
-        if(!pairs.length || !pairs.some(([k])=>k==='openingTrainer'||k==='otSrs')) throw new Error('no restorable data');
-        // snapshot BEFORE destroying, so a failed write can roll back to the pre-import state
-        const snap={};
-        for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i); if(BACKUP_KEY_RE.test(k)) snap[k]=localStorage.getItem(k); }
-        try{
-          for(const k in snap) localStorage.removeItem(k);
-          pairs.forEach(([k,v])=>localStorage.setItem(k,v));
-        }catch(werr){
-          for(const k in snap) localStorage.setItem(k,snap[k]);
-          throw werr;
-        }
-        alert(t('importOk',{n:pairs.length}));
+        const n=restoreProgressBackup(JSON.parse(rd.result));
+        alert(t('importOk',{n}));
         location.reload();
       }catch(err){ alert(t('importBad')); }
     };
+    rd.onerror=()=>alert(t('importBad'));
     rd.readAsText(f);
     e.target.value='';
   });
@@ -1986,8 +2053,8 @@ function allLegalMoves(white){
     if(!p || (p===p.toUpperCase())!==white) continue;
     const from=String.fromCharCode(97+f)+(r+1);
     for(const to of legalTargetNames(from)){
-      const promo = (p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')) ? 'q' : '';
-      out.push(from+to+promo);
+      const promotions = (p.toUpperCase()==='P' && (to[1]==='8'||to[1]==='1')) ? ['q','r','b','n'] : [''];
+      for(const promo of promotions) out.push(from+to+promo);
     }
   }
   return out;
@@ -2012,6 +2079,13 @@ function applyTo(b, u){ // apply uci to a board copy in place (no global state)
   if(p.toUpperCase()==='K'&&Math.abs(f2-f1)===2){
     if(f2===6){ b[r1][5]=b[r1][7]; b[r1][7]=''; } else { b[r1][3]=b[r1][0]; b[r1][0]=''; }
   }
+}
+function fenAfterMove(u, whiteToMove){
+  const savedBoard=board, savedEp=epT, savedRights=castleRights, savedAnim=pendingAnim, savedShapes=userShapes;
+  try{
+    board=board.map(row=>row.slice()); castleRights={...castleRights}; userShapes=[];
+    applyMove(u); return toFEN(whiteToMove);
+  }finally{ board=savedBoard; epT=savedEp; castleRights=savedRights; pendingAnim=savedAnim; userShapes=savedShapes; }
 }
 function uciToSan(u){
   const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
@@ -2039,7 +2113,8 @@ function uciToSan(u){
   const b2=board.map(row=>row.slice()); applyTo(b2,u);
   const ok=findKing(b2,!white);
   if(ok && attackedBy(b2,ok[0],ok[1],white)){
-    san += anyLegalMovesOn(b2,!white,null,{K:false,Q:false,k:false,q:false}) ? '+' : '#';
+    const epAfter=pt==='P' && Math.abs(r2-r1)===2 ? [(r1+r2)/2,f1] : null;
+    san += anyLegalMovesOn(b2,!white,epAfter,castleRights) ? '+' : '#';
   }
   return san;
 }
@@ -2065,7 +2140,7 @@ const Engine = {
   },
   async _doLoad(){
     if(this.worker){ try{ this.worker.terminate(); }catch(e){} this.worker=null; }   // never leak a previous worker
-    this._q=null; this._onLine=null; this._drain=false;
+    this._q=null; this._onLine=null; this._searching=false;
     this.tried=true; this.STATUS='loading'; updateEngineBadge();
     // A worker is allowed to importScripts() cross-origin (no CORS preflight needed),
     // unlike fetch(). We try several single-file (asm.js) Stockfish builds in order.
@@ -2080,8 +2155,9 @@ const Engine = {
       'var loaded=false;' +
       'for(var i=0;i<URLS.length;i++){try{importScripts(URLS[i]);loaded=true;break;}catch(e){}}' +
       'if(!loaded){postMessage("__noengine__");}';
+    let blobUrl=null;
     try{
-      const blobUrl=URL.createObjectURL(new Blob([bootstrap],{type:'application/javascript'}));
+      blobUrl=URL.createObjectURL(new Blob([bootstrap],{type:'application/javascript'}));
       const w=new Worker(blobUrl);
       let failed=false;
       w.onmessage=e=>{
@@ -2094,21 +2170,18 @@ const Engine = {
       // give importScripts a moment, then handshake
       await new Promise(r=>setTimeout(r,150));
       if(failed) throw new Error('importScripts failed');
-      this.send('uci');
-      await this._await(l=>/uciok/.test(l), 15000);
-      this.send('isready');
-      await this._await(l=>/readyok/.test(l), 8000);
+      const uciReady=this._await(l=>/uciok/.test(l), 15000); this.send('uci'); await uciReady;
+      const ready=this._await(l=>/readyok/.test(l), 8000); this.send('isready'); await ready;
       this.ready=true; this.STATUS='ready'; updateEngineBadge();
       return true;
     }catch(e){
       if(this.worker){ try{ this.worker.terminate(); }catch(_){} this.worker=null; }
-      this.STATUS='unavailable'; updateEngineBadge();
+      this.ready=false; this.STATUS='unavailable'; updateEngineBadge();
       return false;
-    }
+    }finally{ if(blobUrl) URL.revokeObjectURL(blobUrl); }
   },
   send(cmd){ if(this.worker) this.worker.postMessage(cmd); },
   _onMessage(line){
-    if(this._drain){ if(line.startsWith('bestmove')) this._drain=false; return; }   // discard a timed-out search's late answer
     if(this._onLine) this._onLine(line);
   },
   _await(pred, ms){
@@ -2126,17 +2199,21 @@ const Engine = {
   // otherwise a move-search and an eval-analysis stomp on each other's results.
   _run(fn){
     const ep=this._ep;
-    const job=async()=>{ if(ep!==this._ep) return null; return fn(); };   // aborted-epoch jobs dissolve
+    const job=async()=>{ if(ep!==this._ep || !this.ready) return null; return fn(); };   // aborted-epoch jobs dissolve
     const next = (this._q || Promise.resolve()).then(job, job);
     this._q = next.catch(()=>{});
     return next;
   },
   abort(){   // called on every mode change: queued dead work never delays the next screen
     this._ep++;
-    if(this.worker && this.ready){ try{ this.send('stop'); this._drain=true; }catch(e){} }
+    // Let the stopped search settle on its final bestmove. Its caller's run token
+    // discards the result; the serialized queue can then start the new request.
+    if(this.worker && this.ready && this._searching){ try{ this.send('stop'); }catch(e){} }
   },
   _sick(){   // a search that times out means the worker is gone — surface it instead of stalling forever
     this.ready=false; this.tried=false; this.STATUS='unavailable';
+    this._ep++; this._searching=false;
+    if(this.worker){ try{ this.worker.terminate(); }catch(e){} this.worker=null; }
     try{ updateEngineBadge(); }catch(e){}
   },
   bestMove(fen, {skill=20, movetime=400, moves=null}={}){
@@ -2148,9 +2225,11 @@ const Engine = {
       // With the move list the engine knows the real history (repetitions, 50-move
       // clock); both play modes start from the standard position, so this is exact.
       this.send(moves!==null ? 'position startpos'+(moves?' moves '+moves:'') : 'position fen '+fen);
+      this._searching=true;
       const p=this._await(l=>l.startsWith('bestmove'), movetime+6000);
       this.send('go movetime '+movetime);
-      let line; try { line=await p; } catch(e){ this.send('stop'); this._drain=true; this._sick(); return null; }
+      let line; try { line=await p; } catch(e){ this._sick(); return null; }
+      finally{ this._searching=false; }
       const m=line.match(/^bestmove\s+(\S+)/);
       return m && m[1]!=='(none)' ? m[1] : null;
     });
@@ -2163,16 +2242,19 @@ const Engine = {
       this.send('setoption name Contempt value 0');   // neutral analysis — SF10's default 24 inflates the mover's eval
       this.send('ucinewgame'); this.send('position fen '+fen);
       let lastCp=0, mate=null;
-      const to=setTimeout(()=>{ this._onLine=null; this.send('stop'); this._drain=true; this._sick(); resolve(null); }, movetime+6000);
+      this._searching=true;
+      const finish=result=>{ clearTimeout(to); this._onLine=null; this._failHook=null; this._searching=false; resolve(result); };
+      const fail=()=>{ this._sick(); finish(null); };
+      const to=setTimeout(fail, movetime+6000);
+      this._failHook=fail;
       this._onLine=line=>{
         const dm=line.match(/\bdepth (\d+)/); const depth=dm?+dm[1]:0;
         const cp=line.match(/score cp (-?\d+)/); if(cp){ lastCp=+cp[1]; mate=null; if(onInfo && depth>=8) onInfo(lastCp,null); }
         const mt=line.match(/score mate (-?\d+)/); if(mt){ mate=+mt[1]; if(onInfo && depth>=8) onInfo(null,mate); }
         if(line.startsWith('bestmove')){
-          clearTimeout(to); this._onLine=null;
           const m=line.match(/^bestmove\s+(\S+)/);
           const finalCp = mate!==null ? (mate>0?100000-mate:-100000-mate) : lastCp;
-          resolve({bestmove:m?m[1]:null, cp:finalCp});
+          finish({bestmove:m?m[1]:null, cp:finalCp});
         }
       };
       this.send('go movetime '+movetime);
@@ -2193,6 +2275,21 @@ function retryEngine(){
 
 /* ================= RENDER ================= */
 const boardEl = document.getElementById('board');
+boardEl.addEventListener('keydown',e=>{
+  const sq=e.target.closest('.sq'); if(!sq) return;
+  const squares=[...boardEl.children], index=squares.indexOf(sq), row=Math.floor(index/8), col=index%8;
+  let next=index;
+  if(e.key==='ArrowLeft') next=row*8+Math.max(0,col-1);
+  else if(e.key==='ArrowRight') next=row*8+Math.min(7,col+1);
+  else if(e.key==='ArrowUp') next=Math.max(0,row-1)*8+col;
+  else if(e.key==='ArrowDown') next=Math.min(7,row+1)*8+col;
+  else if(e.key==='Enter'||e.key===' '){e.preventDefault();keyboardSq=sq.dataset.sq;onSquare(keyboardSq);return;}
+  else if(e.key==='Escape'){e.preventDefault();selectSquare(null);return;}
+  else return;
+  e.preventDefault(); keyboardSq=squares[next].dataset.sq;
+  for(const el of squares)el.tabIndex=el.dataset.sq===keyboardSq?0:-1;
+  squares[next].focus({preventScroll:true});
+});
 /* Right-click annotations, chess.com-style: right-drag draws an arrow, right-click
    marks a square, repeating one removes it, any left-click or move clears them all. */
 (function initUserShapes(){
@@ -2244,7 +2341,9 @@ function animMove(u){
     if(f2===6) slidePiece('h'+rank,'f'+rank); else slidePiece('a'+rank,'d'+rank);
   }
 }
+let keyboardSq='e2';
 function render(lastU){
+  const restoreFocus=!!document.activeElement?.closest('#board .sq');
   boardEl.innerHTML='';
   const flip = playerSide==='b';
   for(let i=0;i<64;i++){
@@ -2256,6 +2355,10 @@ function render(lastU){
     sq.className = 'sq ' + (((r+f)%2===0)?'dark':'light');
     sq.dataset.sq = name;
     const p = board[r][f];
+    const pieceName={P:'piecePawn',N:'pieceKnight',B:'pieceBishop',R:'pieceRook',Q:'pieceQueen',K:'pieceKing'};
+    const label=p ? t(p===p.toUpperCase()?'white':'black')+' '+t(pieceName[p.toUpperCase()]) : t('emptySquare');
+    sq.setAttribute('role','button'); sq.setAttribute('aria-label',t('boardSquare',{sq:name,piece:label}));
+    sq.setAttribute('aria-pressed',String(selSq===name)); sq.tabIndex=name===keyboardSq?0:-1;
     if(p) sq.innerHTML = pieceSVG(p);
     if(vf===0) sq.innerHTML += `<span class="coord rank">${r+1}</span>`;
     if(vr===7) sq.innerHTML += `<span class="coord file">${String.fromCharCode(97+f)}</span>`;
@@ -2264,6 +2367,7 @@ function render(lastU){
     if(aimSet && aimSet.has(name)) sq.classList.add(board[r][f] ? 'cp' : 'mv');
     boardEl.appendChild(sq);
   }
+  if(restoreFocus) boardEl.querySelector('[data-sq="'+keyboardSq+'"]')?.focus({preventScroll:true});
   if(hintSq && mode==='drill') highlightSq(hintSq);   // hint glow survives re-renders
   if(lastU && lastU===pendingAnim){ pendingAnim=null; animMove(lastU); }
   drawAnnots();
@@ -2314,12 +2418,19 @@ function drawAnnots(){
 }
 
 /* ================= MENU ================= */
+let menuScrollY=0;
 function showAppView(view){
   const inBoard = view==='board';
+  const wasBoard=document.getElementById('appShell').classList.contains('board-view');
+  if(inBoard && !wasBoard) menuScrollY=window.scrollY;
   document.getElementById('appShell').classList.toggle('board-view', inBoard);
   document.getElementById('menu').style.display=inBoard?'none':'block';
   document.getElementById('drill').style.display=inBoard?'flex':'none';
   document.getElementById('drillSetup').hidden=!inBoard || mode!=='drill';
+  promoPending=null;
+  const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
+  if(inBoard) window.scrollTo(0,0);
+  else if(wasBoard) requestAnimationFrame(()=>{ if(document.getElementById('menu').style.display!=='none') window.scrollTo(0,menuScrollY); });
 }
 function showMenu(){
   runGen++; Engine.abort();
@@ -2373,10 +2484,12 @@ function showMenu(){
     const members=DATA.openings.map((op,oi)=>({op,oi})).filter(x=>g.test(x.op));
     if(members.length) order.push({id:g.id, label:g.label, members});
   });
-  let collapsed={}; try{ collapsed=JSON.parse(localStorage.getItem('otGroups')||'{}'); }catch(e){}
+  const collapsed=readStoredRecord('otGroups');
   order.forEach(group=>{
     const isC=!!collapsed[group.id];
     const h=document.createElement('div'); h.className='group-head clickable';
+    h.tabIndex=0; h.setAttribute('role','button'); h.setAttribute('aria-expanded',String(!isC));
+    h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();} };
     h.innerHTML=`<span class="caret">${isC?'▸':'▾'}</span>${group.label}<span class="g-count">${t('opCount',{n:group.members.length})}</span>`;
     h.onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
     grid.appendChild(h);
@@ -2577,7 +2690,7 @@ function curLastU(){
 }
 
 /* ================= PLAY vs ENGINE ================= */
-let playHist=[], playWhite=true, playOver=false, freeMode=false;
+let playHist=[], playWhite=true, playOver=false, freeMode=false, playResult=null;
 let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo')) || 1000;
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
 if(playElo<500) playElo=500; if(playElo>2400) playElo=2400;
@@ -2592,6 +2705,7 @@ function onEloInput(v){
   if(Engine.ready) Engine.setStrength(eloToSkill(playElo));
 }
 function playSetupUI(side){
+  playResult=null; gameMinElo=playElo;
   showAppView('board');
   document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
@@ -2750,8 +2864,9 @@ function posKey(whiteToMove){  // placement+side+castling+ep (ep only when a cap
     const f=parts[3].charCodeAt(0)-97, r=+parts[3][1]-1;
     const capR = whiteToMove ? r-1 : r+1;                 // rank the capturing pawn would stand on
     const pawn = whiteToMove ? 'P' : 'p';
-    const can = (f>0 && board[capR] && board[capR][f-1]===pawn) || (f<7 && board[capR] && board[capR][f+1]===pawn);
-    if(!can) parts[3]='-';   // (rare pinned-pawn case intentionally ignored)
+    const can = [f-1,f+1].some(file=>file>=0 && file<8 && board[capR]?.[file]===pawn
+      && legalTargetNames(String.fromCharCode(97+file)+(capR+1)).includes(parts[3]));
+    if(!can) parts[3]='-';
   }
   return parts.slice(0,4).join(' ');
 }
@@ -2873,11 +2988,13 @@ async function engineMove(){
   const t0=Date.now();
   const skill=eloToSkill(playElo), movetime=eloToMovetime(playElo);
   let u=null;
-  if(await Engine.load()) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
+  const engineReady=await Engine.load();
+  if(g!==runGen || mode!=='play' || playOver) return;
+  if(engineReady) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
   if(g!==runGen || mode!=='play' || playOver) return;   // game restarted or left
   if(u){ const legal=allLegalMoves(white);
     if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }   // stale/foreign answers never touch the board
-  if(!u) u=pickFallbackMove(white); // graceful fallback
+  if(!u){ playFlags.engineFallback=true; u=pickFallbackMove(white); } // graceful fallback
   if(!u){ finishPlay(gameStatus(white)); return; }
   // ensure a minimum visible "thinking" beat even if the engine answers instantly
   const elapsed=Date.now()-t0, minThink=450;
@@ -2897,11 +3014,15 @@ function engineMoveNow(){ // "Engine move" button: play the user's move for them
     const g=runGen;
     locked=true; setPrompt(t('engineChoosing'),'');
     const white=playWhite; const fen=toFEN(white);
-    let u = await Engine.load() ? await Engine.bestMove(fen,{skill:20,movetime:600,moves:playHist.map(h=>h.u).join(' ')}) : pickFallbackMove(white);
+    const engineReady=await Engine.load();
+    if(g!==runGen || mode!=='play' || playOver) return;
+    let u=engineReady ? await Engine.bestMove(fen,{skill:20,movetime:600,moves:playHist.map(h=>h.u).join(' ')}) : null;
     if(g!==runGen || mode!=='play' || playOver) return;
     if(u){ const legal=allLegalMoves(white);
       if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }
-    if(!u){ locked=false; return; }
+    if(!u) u=pickFallbackMove(white);
+    playFlags.assisted=true;
+    if(!u){ locked=false; setPrompt(t('yourMove'),''); return; }
     makePlayMove(u);
     const status=gameStatus(playWhite);
     if(status!=='ongoing'){ finishPlay(status); return; }
@@ -2960,20 +3081,25 @@ function countBookUserMoves(){   // user plies inside the longest matching reper
   return best;
 }
 function finishPlay(status){
-  playOver=true; locked=true;
-  let msg, userLost=false;
+  if(playOver) return;
+  playOver=true; locked=true; playResult=status;
+  let userLost=false;
   if(status==='checkmate'){
     const loserWhite=playWhite; userLost = (loserWhite===(playerSide==='w'));
     if(userLost) SFX.mateLose(); else SFX.mateWin();
-    msg = userLost ? t('checkmateLose') : t('checkmateWin');
   } else {
     SFX.success();
-    msg = t(status==='stalemate'?'stalemate' : status==='material'?'drawMaterial' : status==='repetition'?'drawRepetition' : 'drawFifty');
   }
   achCheck('play', {result: status==='checkmate' ? (userLost?'loss':'win') : 'draw', reason: status,
     elo: gameMinElo, free: freeMode, plies: playHist.length, flags: playFlags,
     bookUserMoves: freeMode ? countBookUserMoves() : 0});
   flushMedals();
+  renderPlayResult();
+}
+function renderPlayResult(){
+  const status=playResult; if(!status) return;
+  const msg=status==='checkmate' ? t(playWhite===(playerSide==='w')?'checkmateLose':'checkmateWin')
+    : t(status==='stalemate'?'stalemate':status==='material'?'drawMaterial':status==='repetition'?'drawRepetition':'drawFifty');
   setPrompt(status==='checkmate'?t('gameOverMate') : status==='stalemate'?t('gameOverStale') : t('gameOverDraw'), status==='checkmate'?'bad':'');
   setComment(msg + t('restartHint'));
 }
@@ -3118,8 +3244,13 @@ function plyLastU(){ return ply>0 ? lineMoves()[ply-1].u : null; }
 
 function attemptMove(u){
   const expected = lineMoves()[ply];
+  if(locked || !expected || !isPlayerTurn()) return;
+  if(!legalTargetNames(u.slice(0,2)).includes(u.slice(2,4))){
+    selSq=null; aimSet=null; render(plyLastU()); setPrompt(t('illegalMove'),'bad'); return;
+  }
   if(u===expected.u.slice(0,4)){
-    misses=0; selSq=null; aimSet=null; buzz(15); recalledThisRun++;
+    if(misses===0 && hintPly!==ply) recalledThisRun++;
+    misses=0; selSq=null; aimSet=null; buzz(15);
     const cap=isCapture(expected.u);
     applyMove(expected.u); ply++;
     playMoveSound(expected,cap);
@@ -3166,16 +3297,12 @@ async function engineExplain(wrongU, expected, reveal, atPly, tok){
   let promo = '';
   const [r1,f1]=sqRC(wrong.slice(0,2));
   if(board[r1][f1].toUpperCase()==='P' && (wrong[3]==='8'||wrong[3]==='1')) promo='q';
-  const b2=board.map(row=>row.slice()); applyTo(b2, wrong+promo);
-  const sB=board; board=b2;
-  const fenAfter=toFEN(!white);
-  board=sB;
+  const fenAfter=fenAfterMove(wrong+promo,!white);
   const after = await Engine.analyse(fenAfter, {movetime:500});
   if(!after || tok!==explainSeq || g!==runGen || mode!=='drill' || ply!==atPly) return;
   const playedCp = -after.cp;                 // back to our POV
   const bestCp = before.cp;
   const loss = bestCp - playedCp;             // centipawns thrown away
-  const bestSan = before.bestmove ? uciToSan(before.bestmove) : null;
   const fmt = cp => (cp>=0?'+':'') + (cp/100).toFixed(1);
   let verdict;
   const lossP=(loss/100).toFixed(1);
@@ -3429,6 +3556,8 @@ function learnNextStrip(){
 }
 function learnShowStep(){
   const line=DATA.openings[curOp].lines[curLine], moves=line.moves;
+  document.querySelector('#learnNav [onclick="prevStep()"]').disabled=learnPly===0;
+  document.querySelector('#learnNav [onclick="nextStep()"]').disabled=learnPly>=moves.length;
   learnGuide = learnPly<moves.length ? moves[learnPly].u.slice(0,4) : null;   // green guide arrow for the announced move
   if(learnPly===0){
     document.getElementById('prompt').innerHTML = '<span>'+t('overview')+'</span>';
