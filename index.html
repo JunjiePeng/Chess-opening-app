@@ -249,8 +249,10 @@ button.act.primary:hover { background:var(--accent-hover); }
 .tb-stats { font-size:.9rem; color:#c3d1a6; } .tb-stats b { color:#f6ead2; font-size:1rem; }
 .tb-btns { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 .tb-cont { max-width:340px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.group-head.clickable { cursor:pointer; user-select:none; }
-.group-head.clickable:hover { color:#e0a878; }
+.group-toggle { display:inline-flex; align-items:baseline; background:none; border:none; padding:2px 6px 2px 0; margin:0;
+  font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:pointer; user-select:none;
+  border-radius:6px; transition:color .15s; }
+.group-toggle:hover { color:#e0a878; }
 .group-head .caret { margin-right:6px; color:var(--accent); }
 .group-head .g-count { margin-left:8px; color:var(--dim); font-weight:400; font-size:.875rem; letter-spacing:0; text-transform:none; }
 .op-prog-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
@@ -2487,11 +2489,11 @@ function showMenu(){
   const collapsed=readStoredRecord('otGroups');
   order.forEach(group=>{
     const isC=!!collapsed[group.id];
-    const h=document.createElement('div'); h.className='group-head clickable';
-    h.tabIndex=0; h.setAttribute('role','button'); h.setAttribute('aria-expanded',String(!isC));
-    h.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();h.click();} };
-    h.innerHTML=`<span class="caret">${isC?'▸':'▾'}</span>${group.label}<span class="g-count">${t('opCount',{n:group.members.length})}</span>`;
-    h.onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
+    const h=document.createElement('div'); h.className='group-head';
+    // Only the heading text is the toggle (a real button: native keyboard + focus);
+    // the rest of the full-width row is inert, so hover/click land on the words.
+    h.innerHTML=`<button type="button" class="group-toggle" aria-expanded="${!isC}"><span class="caret">${isC?'▸':'▾'}</span>${group.label}<span class="g-count">${t('opCount',{n:group.members.length})}</span></button>`;
+    h.querySelector('.group-toggle').onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
     grid.appendChild(h);
     if(!isC) group.members.forEach(({op,oi,onlyFav})=>{ grid.appendChild(buildOpCard(op,oi,onlyFav?(l=>lineFavs.has(op,l)):null)); });
   });
