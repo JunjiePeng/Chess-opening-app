@@ -443,6 +443,7 @@ button.act.primary:hover { background:var(--accent-hover); }
 .ln-btns > button.mini { min-width:0; min-height:40px; padding:8px 4px; }
 .line-row > .rep-toggle { grid-column:3; grid-row:1; display:grid; place-items:center; width:40px; height:40px; margin:0; padding:0; border:1px solid #70543b; border-radius:50%; background:#37291d; color:#efb97e; font-size:1.5rem; line-height:1; }
 .line-row > .rep-toggle[aria-pressed="true"] { color:#d0e3b5; border-color:#71865a; background:#35432b; font-size:1.125rem; }
+.rep-bookmark { width:18px; height:18px; fill:currentColor; display:inline-block; vertical-align:-3px; }
 .line-row > .rep-toggle:hover { border-color:var(--accent); background:#493422; }
 .line-row > .rep-toggle[aria-pressed="true"]:hover { background:#435337; border-color:#a5be86; }
 button.mini { background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:999px;
@@ -454,6 +455,8 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 #lineSel:hover { border-color:var(--accent); }
 .line-controls { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
 .line-controls #lineSel { flex-basis:100%; }
+.board-options { display:flex; gap:8px; flex-basis:100%; }
+.board-options .mini { flex:1 1 0; min-width:0; min-height:44px; white-space:normal; border-radius:12px; padding:7px 6px; }
 #donePlan { text-align:left; color:var(--text); font-size:1rem; line-height:1.7; margin:14px 0 12px; }
 #donePlan b { color:#e0a878; }
 .eng-badge { font-size:.8125rem; color:var(--dim); padding:3px 10px; border-radius:999px;
@@ -573,6 +576,36 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .home-footer p { color:#c7b89f; margin-right:auto; }
 #todayBar:not([hidden]) + #repertoirePanel { margin-top:32px; padding-top:32px; border-top:1px solid var(--line); }
 #selectedOpeningsHeading { scroll-margin-top:24px; }
+.engine-purpose { margin:0 0 14px; color:#d3c1a8; font-size:.9rem; line-height:1.6; }
+.engine-purpose b { display:block; color:#efcfaa; margin-bottom:4px; }
+.quick-add { margin:0 0 24px; padding:20px; border:1px solid #705239; border-radius:18px; background:var(--panel); }
+.quick-add-heading { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.quick-add-heading h3 { font-size:1.05rem; }
+.quick-add-heading button { flex-shrink:0; }
+.quick-add-fields { display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px; }
+.quick-add-fields label { display:flex; flex-direction:column; gap:7px; font-size:.88rem; color:#dfc9ad; min-width:0; }
+.quick-add-fields label:first-child { flex:1 1 230px; }
+.quick-add-fields input,.quick-add-fields select { min-height:44px; max-width:100%; border:1px solid #765e46; border-radius:10px; padding:9px 12px; background:var(--bg); color:var(--text); font:inherit; }
+.quick-add-fields input { width:100%; }
+.quick-add-fields input::placeholder { color:#bca98e; opacity:1; }
+.quick-add-help,.quick-add-count { font-size:.86rem; color:#c9b69b; line-height:1.5; margin-top:12px; }
+.quick-add-count { color:#edc79c; }
+.quick-add-results { margin-top:12px; max-height:460px; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding-right:4px; }
+.quick-add-group { border-top:1px solid var(--line); padding:12px 0; }
+.quick-add-group>summary { cursor:pointer; color:#f0d4b2; font-weight:650; line-height:1.6; }
+.quick-add-group>summary span { color:#c2ad90; font-size:.82rem; font-weight:400; margin-left:8px; white-space:nowrap; }
+.quick-add-group-actions { display:flex; justify-content:flex-end; margin:8px 0; }
+.quick-add-group-actions button { font-size:.83rem; min-height:40px; }
+.quick-add-group-actions button[aria-disabled="true"] { background:#303b29; border-color:#51633d; color:#c5d7b0; cursor:default; }
+.quick-add-line { display:flex; gap:12px; align-items:center; justify-content:space-between; border-top:1px solid #483624; padding:12px 0; }
+.quick-add-line>div { min-width:0; }
+.quick-add-line b { display:block; font-size:.93rem; line-height:1.5; overflow-wrap:anywhere; font-weight:550; }
+.quick-add-line small { display:block; color:#c9b69b; margin-top:3px; font-size:.82rem; }
+.quick-add-line .rep-toggle { flex:0 0 40px; width:40px; height:40px; margin:0; padding:0; border-radius:50%; font-size:1.4rem; border-style:solid; }
+#repertoireToast { position:fixed; left:50%; bottom:max(18px,env(safe-area-inset-bottom,0px)); transform:translateX(-50%); z-index:65; width:max-content; max-width:calc(100vw - 32px); padding:14px 20px; border:1px solid #829468; border-radius:14px; background:#303b29; color:#e5efd8; box-shadow:0 8px 28px #0006; pointer-events:none; }
+#repertoireToast b,#repertoireToast span { display:block; overflow-wrap:anywhere; }
+#repertoireToast b { font-size:.94rem; line-height:1.4; }
+#repertoireToast span { color:#d0d9c5; font-size:.84rem; line-height:1.5; margin-top:3px; }
 .rep-title { display:flex; gap:16px; justify-content:space-between; align-items:center; }
 .rep-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:18px; align-items:start; }
 .rep-card { border:1px solid var(--line); background:var(--panel); border-radius:20px; padding:20px; min-width:0; }
@@ -663,6 +696,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 </style>
 </head>
 <body>
+<div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 <div id="appShell" class="page-shell">
 <header>
   <div class="header-brand">
@@ -697,7 +731,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G33</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G36</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -723,16 +757,19 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
         <div class="line-controls">
           <select id="lineSel" data-i18n-label="pickOpening" onchange="onLineSel(this.value)"></select>
+          <div class="board-options" role="group" data-i18n-label="boardOptions">
           <button class="mini" id="annotBtn" onclick="toggleAnnots()" data-i18n-title="tipArrows" title="Show or hide arrows and key-square markers"></button>
           <button class="mini" id="aimBtn" onclick="toggleAims()" data-i18n-title="tipDots" title="Show or hide legal-move dots when you select a piece"></button>
+          <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" aria-pressed="false" hidden></button>
+          </div>
         </div>
         <button id="boardRepBtn" class="rep-toggle" hidden></button>
         <div id="strengthRow" style="display:none;margin-top:10px">
+          <p class="engine-purpose"><b data-i18n="enginePurposeTitle">Put your opening into play.</b> <span data-i18n="enginePurposeBody">Practise making your own decisions against an adjustable opponent, and see how your opening leads into the rest of the game.</span></p>
           <label style="font-size:.875rem;color:var(--dim);display:flex;justify-content:space-between">
             <span data-i18n="engineStrength">Engine strength</span><span id="eloLabel"></span>
           </label>
           <input type="range" id="eloSlider" data-i18n-label="engineStrength" min="500" max="2400" step="50" value="1000" oninput="onEloInput(this.value)" style="width:100%">
-          <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" title="Show or hide the engine evaluation bar" style="margin-top:8px"></button>
           <div id="colorRow" class="color-row" style="display:none">
             <span class="color-label" data-i18n="youPlay">You play</span>
             <span class="toggle color-seg">
@@ -1164,6 +1201,33 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
 /* G26 product language: concrete practice, no waiting or perfect-day pressure. */
 Object.assign(I18N_EN, {
   homeNavigation:'Main navigation',
+  boardOptions:'Board display options',
+  enginePurposeTitle:'Put your opening into play.',
+  enginePurposeBody:'Practise making your own decisions against an adjustable opponent, and see how your opening leads into the rest of the game.',
+  playFromStart:'Play a full game from move one, or choose a line above to start where its lesson ends. The opening name updates as you play.',
+  playPosition:'The <b>{name}</b> lesson has been played out. Now try its ideas in a real game: choose your own moves and respond to the engine.',
+  tipEval:'Show the engine evaluation: positive means you are better; negative means the engine is better.',
+  quickAddTitle:'Find lines for your repertoire',
+  quickAddSearch:'Search openings or variations',
+  quickAddPlaceholder:'Try Italian, Caro-Kann or London…',
+  quickAddSide:'Training colour',
+  quickAddAllSides:'All colours',
+  quickAddHelp:'Search or browse an opening, then use + to save a line for the colour shown.',
+  quickAddResults:'{openings} · {lines}',
+  quickAddOpeningOne:'1 opening',
+  quickAddOpeningMany:'{n} openings',
+  quickAddCountOne:'1 line',
+  quickAddEmpty:'No matching lines. Try another name or choose All colours.',
+  quickAddCount:'{n} lines',
+  quickAddOne:'+ Add 1 line',
+  quickAddMany:'+ Add {n} lines',
+  quickAddGroupLabel:'Add {n} matching lines from {opening} to My repertoire',
+  quickAddAllSaved:'All added',
+  quickAddSavedLabel:'All matching lines from {opening} are in My repertoire',
+  repNoticeAdded:'Added to My repertoire',
+  repNoticeRemoved:'Removed from My repertoire',
+  repNoticeMany:'{n} lines added to My repertoire',
+  repNoticeDetail:'{line} · {side}',
   navPractice:'My repertoire',
   openingFirstMove:'First move',
   openingAgainst:'vs {move}',
@@ -1212,7 +1276,7 @@ Object.assign(I18N_EN, {
   repBlackD4:'As Black · vs 1.d4',
   repOther:'As Black · other first moves',
   removeRepLine:'Remove {line} from my repertoire',
-  repAdded:'✓ Saved for practice',
+  repAdded:'Saved for practice',
   catalogueCount:'{openings} opening groups · {lines} lines',
   groupBOther:'Play as Black — other first moves',
   moreOpeningLines:'Show {n} more lines',
@@ -1296,6 +1360,33 @@ Object.assign(I18N_EN, {
 });
 Object.assign(I18N.zh, {
   homeNavigation:'主导航',
+  boardOptions:'棋盘显示选项',
+  enginePurposeTitle:'把开局知识用到实战中。',
+  enginePurposeBody:'与可调节难度的引擎对弈，练习自主判断，看看学过的开局如何发展到中局及之后。',
+  playFromStart:'从第一步开始下完整对局，或在上方选择一条变例，从课程结束的局面继续。开局名称会随走子更新。',
+  playPosition:'<b>{name}</b> 的课程着法已走完。现在试着把其中的思路用到实战中：自主选择着法，应对引擎。',
+  tipEval:'显示引擎评估：正数表示你占优，负数表示引擎占优。',
+  quickAddTitle:'为开局库添加变例',
+  quickAddSearch:'搜索开局或变例',
+  quickAddPlaceholder:'试试意大利、卡罗康或伦敦…',
+  quickAddSide:'练习执方',
+  quickAddAllSides:'所有执方',
+  quickAddHelp:'搜索或展开一个开局，点击 + 即可按标注的执方保存变例。',
+  quickAddResults:'{openings} · {lines}',
+  quickAddOpeningOne:'1 个开局',
+  quickAddOpeningMany:'{n} 个开局',
+  quickAddCountOne:'1 条变例',
+  quickAddEmpty:'没有匹配的变例。试试其他名称，或选择所有执方。',
+  quickAddCount:'{n} 条变例',
+  quickAddOne:'+ 添加 1 条',
+  quickAddMany:'+ 添加 {n} 条',
+  quickAddGroupLabel:'将「{opening}」中匹配的 {n} 条变例加入我的开局库',
+  quickAddAllSaved:'已全部添加',
+  quickAddSavedLabel:'「{opening}」中匹配的变例均已加入我的开局库',
+  repNoticeAdded:'已加入我的开局库',
+  repNoticeRemoved:'已从我的开局库移除',
+  repNoticeMany:'已将 {n} 条变例加入我的开局库',
+  repNoticeDetail:'{line} · {side}',
   navPractice:'我的开局库',
   openingFirstMove:'首着',
   openingAgainst:'应对 {move}',
@@ -1344,7 +1435,7 @@ Object.assign(I18N.zh, {
   repBlackD4:'执黑 · 应对 1.d4',
   repOther:'执黑 · 其他首着',
   removeRepLine:'从我的开局库中移除「{line}」',
-  repAdded:'✓ 已加入练习',
+  repAdded:'已加入练习',
   catalogueCount:'{openings} 组开局 · {lines} 条变例',
   groupBOther:'执黑 — 应对其他首着',
   moreOpeningLines:'再显示 {n} 条变例',
@@ -1496,7 +1587,7 @@ function setLang(l){
   applyStaticI18n();
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
-  renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge();
+  renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); updateEngineBadge(); renderRepertoireNotice();
   if(board) render(curLastU());
   buildLineSel(); renderSessionStrip(); renderRepertoireButton();
   if(document.getElementById('medalsOverlay')?.style.display==='flex') renderMedals();
@@ -1601,7 +1692,7 @@ function pieceSVG(p){
 }
 let board, curOp=null, curLine=null, playerSide='w', ply=0, selSq=null, misses=0, mistakesThisRun=0, locked=false;
 let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
-let showAims = (typeof localStorage!=='undefined' && localStorage.getItem('otAims')==='0') ? false : true;
+let showAims = typeof localStorage!=='undefined' && localStorage.getItem('otAims')==='1';
 function toggleAims(){
   showAims=!showAims; localStorage.setItem('otAims',showAims?'1':'0');
   renderAimBtn();
@@ -1610,7 +1701,7 @@ function toggleAims(){
   if(curOp!==null || mode==='play') render(curLastU());
 }
 function renderAimBtn(){
-  const b=document.getElementById('aimBtn'); if(b) b.textContent=t(showAims?'dotsOn':'dotsOff');
+  const b=document.getElementById('aimBtn'); if(b){ b.textContent=t(showAims?'dotsOn':'dotsOff'); b.setAttribute('aria-pressed',String(showAims)); }
 }
 
 /* Favorites: starred openings, keyed by (stable) English opening name. */
@@ -2337,7 +2428,7 @@ function renderSessionStrip(){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G33';
+const BUILD='G36';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2965,13 +3056,13 @@ function render(lastU){
 }
 
 /* ---- annotation overlay (arrows + key squares) ---- */
-let showAnnots = (typeof localStorage!=='undefined' && localStorage.getItem('otArrows')==='0') ? false : true;
+let showAnnots = typeof localStorage!=='undefined' && localStorage.getItem('otArrows')==='1';
 function toggleAnnots(){
   showAnnots=!showAnnots; localStorage.setItem('otArrows',showAnnots?'1':'0');
   renderAnnotBtn(); drawAnnots();
 }
 function renderAnnotBtn(){
-  const b=document.getElementById('annotBtn'); if(b) b.textContent=t(showAnnots?'arrowsOn':'arrowsOff');
+  const b=document.getElementById('annotBtn'); if(b){ b.textContent=t(showAnnots?'arrowsOn':'arrowsOff'); b.setAttribute('aria-pressed',String(showAnnots)); }
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
 let learnCredited=false;  // one ♟/streak credit per learn run, guarded against Back/Next refires
@@ -3020,7 +3111,7 @@ function showAppView(view){
   document.getElementById('drillSetup').hidden=!inBoard || mode!=='drill';
   promoPending=null;
   const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
-  if(inBoard){ renderSessionStrip(); renderRepertoireButton(); window.scrollTo(0,0); }
+  if(inBoard){ renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
   else if(wasBoard) requestAnimationFrame(()=>{ if(document.getElementById('menu').style.display!=='none') window.scrollTo(0,menuScrollY); });
 }
 let menuView='explore';
@@ -3084,19 +3175,91 @@ function saveStarterChoices(form){
   repertoire.choose(picks); daily.selectionChanged(); showMenu('practice');
   const heading=document.querySelector('#menu h2'); if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
 }
-function toggleRepertoireLine(oi,li,side=preferredSide(oi,li)){
-  repertoire.toggle(oi,li,side); daily.selectionChanged();
+function repertoireBookmark(){
+  return '<svg class="rep-bookmark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>';
+}
+const quickAdd={open:false,query:'',side:'all',expanded:new Map()};
+let repertoireNotice=null, repertoireNoticeTimer=0;
+function renderRepertoireNotice(){
+  const el=document.getElementById('repertoireToast'); if(!el||!repertoireNotice) return;
+  const {added,oi,li,side,count}=repertoireNotice, op=DATA.openings[oi];
+  const title=t(count>1?'repNoticeMany':added?'repNoticeAdded':'repNoticeRemoved',{n:count});
+  const detail=li===null?opName(op):t('repNoticeDetail',{line:lnName(op.lines[li]),side:t(side==='w'?'white':'black')});
+  el.hidden=false; el.innerHTML=`<b>${medalText(title)}</b><span>${medalText(detail)}</span>`;
+}
+function showRepertoireNotice(added,oi,li,side,count=1){
+  repertoireNotice={added,oi,li,side,count}; renderRepertoireNotice();
+  clearTimeout(repertoireNoticeTimer);
+  repertoireNoticeTimer=setTimeout(()=>{document.getElementById('repertoireToast').hidden=true;repertoireNotice=null;},4000);
+}
+function refreshRepertoireSelection(){
   const inBoard=document.getElementById('drill').style.display!=='none';
   if(inBoard){renderRepertoireButton();renderSessionStrip();if(mode==='drill'&&document.getElementById('doneBox').style.display==='block')renderDoneBox();return;}
-  const y=window.scrollY; showMenu(); window.scrollTo(0,y);
-  document.querySelector(`[data-rep-id="${lessonId(oi,li)}:${side}"]`)?.focus({preventScroll:true});
+  const active=document.activeElement, repId=active?.dataset.repId, quickId=active?.dataset.quickId;
+  const oldTop=active?.getBoundingClientRect().top, y=window.scrollY;
+  const resultScroll=document.getElementById('quickAddResults')?.scrollTop||0;
+  showMenu();
+  const results=document.getElementById('quickAddResults'); if(results) results.scrollTop=resultScroll;
+  const target=quickId?document.querySelector(`[data-quick-id="${quickId}"]`):repId?document.querySelector(`${menuView==='practice'?'#repertoirePanel':'#opGrid'} [data-rep-id="${repId}"]`):null;
+  if(target){window.scrollTo(0,y+target.getBoundingClientRect().top-oldTop);target.focus({preventScroll:true});}
+  else {window.scrollTo(0,y);if(repId)document.getElementById('selectedOpeningsHeading')?.focus({preventScroll:true});}
+}
+function toggleRepertoireLine(oi,li,side=preferredSide(oi,li)){
+  const added=repertoire.toggle(oi,li,side); daily.selectionChanged();
+  refreshRepertoireSelection(); showRepertoireNotice(added,oi,li,side);
+}
+function quickAddMatches(query=quickAdd.query,side=quickAdd.side){
+  const normalize=name=>(name||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+  const q=normalize(query);
+  const matches=(...names)=>names.some(name=>normalize(name).includes(q));
+  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,side:preferredSide(oi,li)}))
+    .filter(x=>(side==='all'||x.side===side)&&(matches(op.name,op.nameZh)||matches(x.line.name,x.line.nameZh)))})).filter(x=>x.lines.length);
+}
+function quickAddHTML(){
+  return `<section id="quickAddPanel" class="quick-add" aria-labelledby="quickAddHeading"${quickAdd.open?'':' hidden'}><div class="quick-add-heading"><h3 id="quickAddHeading">${t('quickAddTitle')}</h3><button class="linklike" type="button" onclick="toggleQuickAdd(false)">${t('closeWord')}</button></div><div class="quick-add-fields"><label for="quickAddSearch"><span>${t('quickAddSearch')}</span><input id="quickAddSearch" type="search" maxlength="120" autocomplete="off" placeholder="${t('quickAddPlaceholder')}" value="${medalText(quickAdd.query)}" oninput="updateQuickAdd(this.value,quickAdd.side)" aria-describedby="quickAddHelp"></label><label for="quickAddSide"><span>${t('quickAddSide')}</span><select id="quickAddSide" onchange="updateQuickAdd(quickAdd.query,this.value)">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${quickAdd.side===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="quickAddHelp" class="quick-add-help">${t('quickAddHelp')}</p><p id="quickAddCount" class="quick-add-count" role="status" aria-live="polite" aria-atomic="true"></p><div id="quickAddResults" class="quick-add-results"></div></section>`;
+}
+function toggleQuickAdd(open=!quickAdd.open){
+  quickAdd.open=open;
+  const panel=document.getElementById('quickAddPanel'); panel.hidden=!open;
+  document.getElementById('quickAddToggle').setAttribute('aria-expanded',String(open));
+  if(open){renderQuickAddResults();document.getElementById('quickAddSearch').focus();}
+  else document.getElementById('quickAddToggle').focus({preventScroll:true});
+}
+function updateQuickAdd(query,side){
+  quickAdd.query=query; quickAdd.side=side; quickAdd.expanded.clear();
+  renderQuickAddResults();
+  const results=document.getElementById('quickAddResults'); if(results) results.scrollTop=0;
+}
+function renderQuickAddResults(){
+  const el=document.getElementById('quickAddResults'); if(!el||!quickAdd.open)return;
+  const groups=quickAddMatches(), items=new Set(repertoire.entries().map(itemKey));
+  const count=groups.reduce((n,g)=>n+g.lines.length,0);
+  document.getElementById('quickAddCount').textContent=t('quickAddResults',{openings:t(groups.length===1?'quickAddOpeningOne':'quickAddOpeningMany',{n:groups.length}),lines:t(count===1?'quickAddCountOne':'quickAddCount',{n:count})});
+  el.innerHTML=groups.map(({op,oi,lines})=>{
+    const missing=lines.filter(x=>!items.has(lessonId(oi,x.li)+':'+x.side)).length;
+    const groupLabel=t(missing?'quickAddGroupLabel':'quickAddSavedLabel',{n:missing,opening:opName(op)});
+    const expanded=quickAdd.expanded.get(oi)??!!quickAdd.query.trim();
+    return `<details class="quick-add-group"${expanded?' open':''} ontoggle="if(this.isConnected)quickAdd.expanded.set(${oi},this.open)"><summary>${medalText(opName(op))}<span>${t(lines.length===1?'quickAddCountOne':'quickAddCount',{n:lines.length})}</span></summary><div class="quick-add-group-actions"><button class="mini" data-quick-id="group-${oi}" aria-label="${medalText(groupLabel)}" aria-disabled="${!missing}" onclick="addQuickOpening(${oi})">${!missing?repertoireBookmark()+' ':''}${t(!missing?'quickAddAllSaved':missing===1?'quickAddOne':'quickAddMany',{n:missing})}</button></div>${lines.map(({line,li,side})=>{
+      const id=lessonId(oi,li)+':'+side, added=items.has(id), label=t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')});
+      return `<div class="quick-add-line"><div><b>${medalText(lnName(line))}</b><small>${t(side==='w'?'white':'black')}</small></div><button class="rep-toggle" data-quick-id="${id}" aria-pressed="${added}" aria-label="${medalText(label)}" title="${medalText(label)}" onclick="toggleRepertoireLine(${oi},${li},'${side}')"><span aria-hidden="true">${added?repertoireBookmark():'+'}</span></button></div>`;
+    }).join('')}</details>`;
+  }).join('')||`<p class="home-note">${t('quickAddEmpty')}</p>`;
+}
+function addQuickOpening(oi){
+  const group=quickAddMatches().find(x=>x.oi===oi); if(!group)return;
+  const rep=repertoire.load(), saved=new Set(rep.items.map(itemKey));
+  const added=group.lines.filter(x=>!saved.has(lessonId(oi,x.li)+':'+x.side)); if(!added.length)return;
+  rep.items.push(...added.map(x=>({id:lessonId(oi,x.li),side:x.side})));
+  rep.configured=true; repertoire.save(rep); daily.selectionChanged();
+  refreshRepertoireSelection();
+  showRepertoireNotice(true,oi,added.length===1?added[0].li:null,added[0].side,added.length);
 }
 function renderRepertoireButton(){
   const el=document.getElementById('boardRepBtn'); if(!el) return;
   el.hidden=curOp===null||freeMode&&mode==='play';
   if(el.hidden) return;
   const on=repertoire.has(curOp,curLine,playerSide);
-  el.textContent=t(on?'repAdded':'repAdd'); el.setAttribute('aria-pressed',String(on));
+  el.innerHTML=(on?repertoireBookmark()+' ':'')+medalText(t(on?'repAdded':'repAdd')); el.setAttribute('aria-pressed',String(on));
   el.onclick=()=>toggleRepertoireLine(curOp,curLine,playerSide);
 }
 function renderTodayBar(){
@@ -3118,8 +3281,10 @@ function renderTodayBar(){
 }
 function renderRepertoire(){
   const el=document.getElementById('repertoirePanel'), entries=repertoire.entries();
+  const heading=`<div class="home-heading rep-title"><div><h2 id="selectedOpeningsHeading" tabindex="-1">${t('yourOpenings')}</h2><p>${t('repertoireBody')}</p></div><button id="quickAddToggle" class="act" aria-expanded="${quickAdd.open}" aria-controls="quickAddPanel" onclick="toggleQuickAdd()">${t('addMoreLines')}</button></div>`;
   if(!entries.length){
-    el.innerHTML=starterForm();
+    el.innerHTML=heading+quickAddHTML()+starterForm();
+    renderQuickAddResults();
     return;
   }
   const groups=[['w','repWhite'],['e4','repBlackE4'],['d4','repBlackD4'],['other','repOther']];
@@ -3135,7 +3300,8 @@ function renderRepertoire(){
       return `<article class="rep-line"><div class="rep-line-head"><div><h4>${lnName(line)}</h4><p>${opName(DATA.openings[x.oi])}</p></div><button class="rep-remove" data-rep-id="${itemKey(x)}" aria-label="${medalText(t('removeRepLine',{line:lnName(line)}))}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button></div><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div><div class="home-actions"><button class="mini${!st.learned&&!st.runs?' preferred':''}" onclick="startLearn(${x.oi},${x.li},'${x.side}')">${t('learn')}</button><button class="mini${st.learned||st.runs?' preferred':''}" onclick="startDrill(${x.oi},${x.li},'${x.side}')">${t('drill')}</button><button class="mini" onclick="startPlay(${x.oi},${x.li},'${x.side}')">${t('play')}</button></div></article>`;
     }).join('')}</section>`;
   }
-  el.innerHTML=`<div class="home-heading rep-title"><div><h2 id="selectedOpeningsHeading" tabindex="-1">${t('yourOpenings')}</h2><p>${t('repertoireBody')}</p></div><button class="act" onclick="setMenuView('explore')">${t('addMoreLines')}</button></div><div class="rep-grid">${cards}</div><details class="starter-editor"><summary>${t('changeStarter')}</summary>${starterForm(true)}</details><p class="home-note">${t('sideProgressNote')}</p><div class="home-footer"><p>${t('tryPositionBody')}</p><button class="act" onclick="enterFreePlay()">${t('vsEngine')}</button><button class="linklike" onclick="setMenuView('explore')">${t('navExplore')} →</button></div>`;
+  el.innerHTML=`${heading}${quickAddHTML()}<div class="rep-grid">${cards}</div><details class="starter-editor"><summary>${t('changeStarter')}</summary>${starterForm(true)}</details><p class="home-note">${t('sideProgressNote')}</p><div class="home-footer"><p>${t('tryPositionBody')}</p><button class="act" onclick="enterFreePlay()">${t('vsEngine')}</button><button class="linklike" onclick="setMenuView('explore')">${t('navExplore')} →</button></div>`;
+  renderQuickAddResults();
 }
 function renderPromotionOverview(){
   const summary=promotionSummary();
@@ -3263,7 +3429,7 @@ function renderExplore(){
       add.dataset.repId=lessonId(oi,li)+':'+side; add.setAttribute('aria-pressed',String(added));
       const saveLabel=t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')});
       add.setAttribute('aria-label',saveLabel); add.title=saveLabel;
-      const saveIcon=document.createElement('span'); saveIcon.setAttribute('aria-hidden','true'); saveIcon.textContent=added?'✓':'+';
+      const saveIcon=document.createElement('span'); saveIcon.setAttribute('aria-hidden','true'); saveIcon.innerHTML=added?repertoireBookmark():'+';
       add.appendChild(saveIcon);
       add.onclick=e=>{e.stopPropagation();toggleRepertoireLine(oi,li,side);};
       row.append(add,btns);
@@ -3493,7 +3659,11 @@ function updateOpeningName(){
 /* ---- evaluation bar (optional, engine-driven) ---- */
 let showEvalBar = false;   // always starts off — the toggle lasts for the session only
 let evalSeq=0;
-function renderEvalBtn(){ const b=document.getElementById('evalBtn'); if(b) b.textContent=t(showEvalBar?'evalOn':'evalOff'); }
+function renderEvalBtn(){
+  const b=document.getElementById('evalBtn'); if(!b) return;
+  b.hidden=mode!=='play'; b.textContent=t(showEvalBar?'evalOn':'evalOff');
+  b.setAttribute('aria-pressed',String(showEvalBar));
+}
 function toggleEvalBar(){
   showEvalBar=!showEvalBar;
   renderEvalBtn(); updateEvalBar();
