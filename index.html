@@ -430,7 +430,14 @@ button.act.primary:hover { background:var(--accent-hover); }
 .ln-info { flex:1 1 130px; min-width:0; display:flex; flex-direction:column; gap:2px; }
 .line-row .nm { overflow-wrap:anywhere; line-height:1.3; }
 .line-row .stat { font-size:.875rem; color:var(--dim); line-height:1.5; }
-.ln-btns { display:flex; gap:6px; flex:0 0 auto; margin-left:auto; }
+.ln-btns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; flex:1 0 100%; min-width:0; width:100%; margin-top:4px; }
+.ln-btns > button.mini { min-width:0; min-height:40px; padding:8px 4px; }
+.ln-btns > .rep-toggle { grid-column:1/-1; margin-top:0; display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; min-height:42px; padding:10px; text-align:left; border-style:solid; }
+.rep-save-label { min-width:0; overflow-wrap:anywhere; line-height:1.35; }
+.rep-save-side { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; color:var(--dim); font-size:.75rem; }
+.rep-save-side .side-swatch { width:10px; height:10px; flex-basis:10px; }
+.ln-btns > .rep-toggle:hover { border-color:var(--accent); background:#3e3122; }
+.ln-btns > .rep-toggle[aria-pressed="true"]:hover { background:#3d4b30; border-color:#92aa73; }
 button.mini { background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:999px;
   min-height:38px; padding:7px 10px; min-width:62px; text-align:center; cursor:pointer; font-size:.875rem; font-family:inherit;
   transition:all .15s; flex:0 0 auto; white-space:nowrap; }
@@ -575,6 +582,23 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .starter-editor .rep-setup { margin-top:8px; }
 .home-empty { padding:30px; background:var(--panel); border:1px solid var(--line); border-radius:20px; }
 #summaryBar { display:block; padding:24px; border:1px solid var(--line); border-radius:20px; margin:0 0 16px; }
+.promotion-overview { margin:0 0 20px; padding:24px; border:1px solid var(--line); border-radius:20px; background:var(--panel); }
+.promotion-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.promotion-heading h2 { font-size:1.3rem; margin-bottom:8px; }
+.promotion-heading p { max-width:62ch; color:#c8b89f; line-height:1.6; }
+.promotion-total { flex-shrink:0; text-align:right; }
+.promotion-total strong { display:block; font-size:2.4rem; line-height:1.2; color:#f1c38e; }
+.promotion-total span { font-size:.86rem; color:#ddc9ae; }
+.promotion-ranks { list-style:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; padding:0; margin-top:22px; }
+.promotion-ranks li { display:grid; grid-template-columns:auto 1fr; gap:0 12px; align-items:center; border:1px solid var(--line); border-radius:14px; padding:14px; background:var(--panel2); }
+.promotion-piece { grid-row:span 2; font-size:2rem; color:#e7b47c; }
+.promotion-ranks strong { font-size:1.5rem; }
+.promotion-ranks li>span:last-child { font-size:.88rem; color:#ddc9ae; }
+.promotion-help { margin-top:12px; color:#d9c6ae; font-size:.9rem; }
+.promotion-help summary { cursor:pointer; padding:6px 0; color:#e8b27f; }
+.promotion-help p { max-width:78ch; margin-top:6px; line-height:1.65; }
+.promotion-history { margin-top:16px; padding-top:16px; border-top:1px solid var(--line); color:#c8b89f; line-height:1.65; font-size:.9rem; }
+.promotion-history b { color:#e4c5a2; }
 .progress-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; }
 .progress-stats b,.progress-stats span { display:block; }
 .progress-stats b { font-size:1.8rem; color:var(--text); }
@@ -604,6 +628,11 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .today-aside { padding:20px; }
   .rep-title { align-items:flex-start; flex-direction:column; }
   .progress-stats { grid-template-columns:1fr 1fr; }
+  .promotion-overview { padding:20px; }
+  .promotion-heading { align-items:flex-start; flex-direction:column; gap:14px; }
+  .promotion-total { text-align:left; }
+  .promotion-ranks { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .promotion-ranks li { padding:12px; gap:0 8px; }
   .home-actions>.act { flex:1 1 auto; }
   .home-footer p { width:100%; }
   .earlier-progress { padding:8px 14px 14px; }
@@ -643,9 +672,10 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     </div>
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
+    <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
     <div id="earlierProgress" hidden></div>
-    <div id="buildTag">Debut · build <b>G28</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G29</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1158,10 +1188,21 @@ Object.assign(I18N_EN, {
   repOther:'As Black · other first moves',
   removeRepLine:'Remove {line} from my practice',
   repAdded:'✓ Saved for practice',
+  savePracticeLine:'Save {line} for practice as {side}',
+  removeSavedPractice:'Remove {line} from practice as {side}',
   repAdd:'+ Save for practice',
   addMoreLines:'+ Add lines',
   changeStarter:'Change starter choices',
   sideProgressNote:'White and Black recall are tracked separately. Lesson reading is shared.',
+  promotionTitle:'Opening promotions',
+  promotionTotal:'Total promotions',
+  promotionScope:'Rank steps earned through White and Black practice. Repeating a rank never adds to the total.',
+  promotionBreakdown:'Current ranks of practised lines',
+  promotionBreakdownNote:'Lines currently at each rank. White and Black count separately, including lines removed from My practice.',
+  promotionHow:'How is this counted?',
+  promotionCounting:'Pawn is the starting rank. Knight adds 1 promotion; Bishop represents 2, Rook 3 and Queen 4. For example, two Knights and one Bishop make 4 promotions.',
+  promotionEarlier:'Earlier promotions: {n}.',
+  promotionEarlierNote:'These came from older combined-colour ranks and are kept separately. You can see those lines in Earlier progress below.',
   progressTitle:'Practice that adds up.',
   progressBody:'A record of your learning and practice. Find your next session in My practice.',
   practisedLines:'Lines practised by colour',
@@ -1256,10 +1297,21 @@ Object.assign(I18N.zh, {
   repOther:'执黑 · 其他首着',
   removeRepLine:'从我的练习中移除「{line}」',
   repAdded:'✓ 已加入练习',
+  savePracticeLine:'将「{line}」加入练习（{side}）',
+  removeSavedPractice:'从练习移除「{line}」（{side}）',
   repAdd:'+ 加入我的练习',
   addMoreLines:'+ 添加变例',
   changeStarter:'更改入门组合',
   sideProgressNote:'白方与黑方的回忆进度分别记录，课文阅读进度共享。',
+  promotionTitle:'开局晋级',
+  promotionTotal:'累计晋级',
+  promotionScope:'通过白方与黑方练习获得的等级提升。重复达到同一等级不会增加次数。',
+  promotionBreakdown:'已练变例的当前等级',
+  promotionBreakdownNote:'各等级的当前变例数。白方与黑方分别计数，从「我的练习」移除的变例也包含在内。',
+  promotionHow:'如何计算？',
+  promotionCounting:'兵是起始等级。马计 1 次晋级，象累计 2 次，车累计 3 次，后累计 4 次。例如，两条马等级变例加一条象等级变例，共计 4 次晋级。',
+  promotionEarlier:'早期晋级：{n} 次。',
+  promotionEarlierNote:'来自旧版黑白合并的等级，单独保留。下方「早期进度」可查看对应变例。',
   progressTitle:'每次练习，都有积累。',
   progressBody:'记录你的学习与练习。下一次该复习什么，可在「我的练习」中查看。',
   practisedLines:'按执方记录的已练变例',
@@ -1644,6 +1696,22 @@ function legacyProgress(){
     out.push({oi,li,rank:r,runs:st.runs,perfect:st.perfect});
   }));
   return out;
+}
+
+// Read-only totals: each rank above Pawn is one earned step per line and colour.
+// Earlier combined-colour ranks remain separate; saved selections never limit totals.
+function promotionSummary(){
+  const records=store.load(), byRank=[0,0,0,0,0,0], bySide={w:0,b:0};
+  DATA.openings.forEach((op,oi)=>op.lines.forEach((line,li)=>{
+    for(const side of ['w','b']){
+      const st=records[lineKey(oi,li,side)]; if(!st) continue;
+      const rank=computeRank(st,null,st.rank||0);
+      if(rank<2) continue;
+      byRank[rank]++; bySide[side]+=rank-1;
+    }
+  }));
+  return {total:bySide.w+bySide.b,byRank,bySide,
+    earlier:legacyProgress().reduce((sum,line)=>sum+Math.max(0,line.rank-1),0)};
 }
 
 /* ================= MY REPERTOIRE ================= */
@@ -2201,7 +2269,7 @@ function renderSessionStrip(){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G28';
+const BUILD='G29';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2904,6 +2972,7 @@ function showMenu(view){
   document.getElementById('todayBar').hidden=menuView!=='practice';
   document.getElementById('repertoirePanel').hidden=menuView!=='practice';
   document.getElementById('summaryBar').hidden=!progress;
+  document.getElementById('promotionOverview').hidden=!progress;
   document.getElementById('heatmapBox').hidden=!progress;
   document.getElementById('earlierProgress').hidden=!progress;
   document.getElementById('achievementEntry').hidden=!progress;
@@ -2988,11 +3057,16 @@ function renderRepertoire(){
   }
   el.innerHTML=`<div class="home-heading rep-title"><div><h2 id="selectedOpeningsHeading" tabindex="-1">${t('yourOpenings')}</h2><p>${t('repertoireBody')}</p></div><button class="act" onclick="setMenuView('explore')">${t('addMoreLines')}</button></div><div class="rep-grid">${cards}</div><details class="starter-editor"><summary>${t('changeStarter')}</summary>${starterForm(true)}</details><p class="home-note">${t('sideProgressNote')}</p><div class="home-footer"><p>${t('tryPositionBody')}</p><button class="act" onclick="enterFreePlay()">${t('vsEngine')}</button><button class="linklike" onclick="setMenuView('explore')">${t('navExplore')} →</button></div>`;
 }
+function renderPromotionOverview(){
+  const summary=promotionSummary();
+  const cards=[2,3,4,5].map(rank=>`<li><span class="promotion-piece" aria-hidden="true">${RANKS[rank].icon}</span><strong>${summary.byRank[rank]}</strong><span>${t('rank'+rank)}</span></li>`).join('');
+  document.getElementById('promotionOverview').innerHTML=`<div class="promotion-heading"><div><h2 id="promotionTitle">${t('promotionTitle')}</h2><p>${t('promotionScope')}</p></div><div class="promotion-total"><strong>${summary.total}</strong><span>${t('promotionTotal')}</span></div></div><ul class="promotion-ranks" aria-label="${t('promotionBreakdown')}">${cards}</ul><p class="home-note">${t('promotionBreakdownNote')}</p><details class="promotion-help"><summary>${t('promotionHow')}</summary><p>${t('promotionCounting')}</p></details>${summary.earlier?`<p class="promotion-history"><b>${t('promotionEarlier',{n:summary.earlier})}</b> ${t('promotionEarlierNote')}</p>`:''}`;
+}
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
   const totalRuns=trained.reduce((n,[,v])=>n+v.runs,0), reviews=trained.reduce((n,[,v])=>n+countValue(v.reviewAttempts),0);
   document.getElementById('summaryBar').innerHTML=`<div class="home-heading"><h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p></div><div class="progress-stats"><div><b>${trained.length}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
-  renderHeatmap();
+  renderPromotionOverview(); renderHeatmap();
   const legacy=legacyProgress();
   document.getElementById('earlierProgress').innerHTML=legacy.length?`<details class="earlier-progress"><summary>${t('earlierProgress',{n:legacy.length})}</summary><p>${t('legacyProgressNote')}</p><ul>${legacy.map(x=>`<li><div><b>${lnName(DATA.openings[x.oi].lines[x.li])}</b><span>${opName(DATA.openings[x.oi])} · ${t('legacyDrills',{n:x.runs})}</span></div><span class="rank-chip r${x.rank}">${RANKS[x.rank].icon} ${t('rank'+x.rank)}</span></li>`).join('')}</ul></details>`:'';
 }
@@ -3092,7 +3166,11 @@ function renderExplore(){
       const side=preferredSide(oi,li), added=repertoire.has(oi,li,side);
       const add=document.createElement('button'); add.className='rep-toggle';
       add.dataset.repId=lessonId(oi,li)+':'+side; add.setAttribute('aria-pressed',String(added));
-      add.textContent=t(added?'repAdded':'repAdd')+' · '+t(side==='w'?'white':'black');
+      add.setAttribute('aria-label',t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')}));
+      const saveLabel=document.createElement('span');saveLabel.className='rep-save-label';saveLabel.textContent=t(added?'repAdded':'repAdd');
+      const sideLabel=document.createElement('span');sideLabel.className='rep-save-side';
+      const swatch=document.createElement('span');swatch.className='side-swatch '+(side==='w'?'white':'black');swatch.setAttribute('aria-hidden','true');
+      sideLabel.append(swatch,document.createTextNode(t(side==='w'?'white':'black')));add.append(saveLabel,sideLabel);
       add.onclick=e=>{e.stopPropagation();toggleRepertoireLine(oi,li,side);};
       btns.appendChild(add);
       row.appendChild(btns);
@@ -3918,7 +3996,7 @@ function finishLine(){
   activity.log();
   const grade=recallGrade({mistakes:mistakesThisRun,hints:hintsThisRun,revealed:revealedThisRun});
   const sv=srs.grade(curOp,curLine,grade,playerSide);
-  const newRank=persistRank(curOp,curLine,preRank,playerSide),rankedUp=newRank>preRank;
+  const newRank=persistRank(curOp,curLine,preRank,playerSide),rankedUp=newRank>Math.max(1,preRank);
   if(rankedUp) SFX.rankUp();else if(perfect) SFX.perfect();else SFX.success();
   doneState={perfect,mistakes:mistakesThisRun,newRank,rankedUp,rusty:rankRusty(newRank,sv),
     inDays:Math.max(1,Math.round((sv.due-Date.now())/DAY_MS)),perfectN:st.perfect,runsN:st.runs,
