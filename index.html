@@ -643,7 +643,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
     <div id="earlierProgress" hidden></div>
-    <div id="buildTag">Debut · build <b>G26</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G27</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1112,7 +1112,7 @@ Object.assign(I18N_EN, {
   homeNavigation:'Main navigation',
   navToday:'Today',
   navRepertoire:'My repertoire',
-  navExplore:'Explore',
+  navExplore:'Openings',
   navProgress:'Progress',
   todayTitle:'Your daily practice',
   todayReady:'A little practice. A clearer opening.',
@@ -1210,7 +1210,7 @@ Object.assign(I18N.zh, {
   homeNavigation:'主导航',
   navToday:'今日',
   navRepertoire:'我的开局库',
-  navExplore:'探索',
+  navExplore:'全部开局',
   navProgress:'进度',
   todayTitle:'今日练习',
   todayReady:'练一点，开局更清晰。',
@@ -2199,7 +2199,7 @@ function renderSessionStrip(){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G26';
+const BUILD='G27';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2885,7 +2885,7 @@ function showAppView(view){
   if(inBoard){ renderSessionStrip(); renderRepertoireButton(); window.scrollTo(0,0); }
   else if(wasBoard) requestAnimationFrame(()=>{ if(document.getElementById('menu').style.display!=='none') window.scrollTo(0,menuScrollY); });
 }
-let menuView='today';
+let menuView='explore';
 function setMenuView(view){
   menuScrollY=0; showMenu(view); window.scrollTo(0,0);
   document.querySelector(`[data-home="${menuView}"]`)?.focus({preventScroll:true});
@@ -2894,7 +2894,7 @@ function showMenu(view){
   if(['today','repertoire','explore','progress'].includes(view)) menuView=view;
   runGen++; Engine.abort(); reviewQueue=null; sessionActive=false; sessionItem=null;
   showAppView('menu');
-  const tabs=[['today','navToday'],['repertoire','navRepertoire'],['explore','navExplore'],['progress','navProgress']];
+  const tabs=[['explore','navExplore'],['today','navToday'],['repertoire','navRepertoire'],['progress','navProgress']];
   document.getElementById('homeNav').innerHTML=tabs.map(([key,label])=>`<button data-home="${key}" aria-current="${menuView===key?'page':'false'}" onclick="setMenuView('${key}')">${t(label)}</button>`).join('');
   const explore=menuView==='explore',progress=menuView==='progress';
   document.getElementById('findRow').hidden=!explore;
