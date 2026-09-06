@@ -693,6 +693,83 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   .earlier-progress { padding:8px 14px 14px; }
 }
 
+/* G37: custom recall tests, with controls sized for touch and text-only disclosures. */
+.test-setup-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(270px,340px); gap:24px; align-items:start; }
+.test-builder,.test-ready,.test-report,.test-resume { background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:24px; min-width:0; }
+.test-builder-heading,.test-resume { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+.test-builder h3,.test-ready h3 { font-size:1.15rem; }
+.test-name-label,.test-filters label { display:flex; flex-direction:column; gap:8px; color:#ddc6a8; font-size:.88rem; min-width:0; }
+.test-name-label { margin:20px 0 12px; }
+.test-builder input:not([type=checkbox]),.test-builder select { font:inherit; color:var(--text); background:var(--bg); border:1px solid #765e46; border-radius:10px; padding:10px 12px; min-height:44px; min-width:0; max-width:100%; }
+.test-builder input::placeholder { color:#bca98e; opacity:1; }
+.test-pool-tools,.test-filters { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.test-pool-tools { margin:16px 0; }
+.test-filters { align-items:flex-end; }
+.test-filters label:first-child { flex:1 1 220px; }
+.test-filters label:not(:first-child) { flex:0 1 auto; }
+.test-pool-results { margin-top:14px; max-height:540px; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding-right:8px; }
+.test-pool-group { border-top:1px solid var(--line); padding:12px 0; }
+.test-pool-group summary { font-weight:650; color:#f0d4b2; line-height:1.6; cursor:pointer; }
+.test-pool-group summary span { color:#b9cba6; font-size:.82rem; margin-left:8px; white-space:nowrap; }
+.test-group-actions { display:flex; justify-content:flex-end; padding:8px 0; }
+.test-pool-line { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; border-top:1px solid #493726; padding:10px 0; }
+.test-pool-line>span { flex:1 1 200px; font-size:.95rem; line-height:1.5; overflow-wrap:anywhere; }
+.test-side-choices { display:flex; gap:8px; }
+.test-side-choices label { display:inline-flex; align-items:center; gap:7px; min-height:44px; cursor:pointer; border:1px solid var(--line); padding:8px 10px; border-radius:10px; font-size:.88rem; }
+.test-side-choices label:has(input:checked) { color:#d8e8c4; background:#35432b; border-color:#6c8354; }
+.test-side-choices input { width:17px; height:17px; accent-color:#b7ce98; cursor:pointer; }
+.test-ready { position:sticky; top:20px; }
+.test-ready ol { padding-left:20px; color:#d0bea5; line-height:1.65; margin:16px 0; font-size:.94rem; }
+.test-ready li+li { margin-top:10px; }
+.test-selection-count { font-size:1.1rem; font-weight:650; color:#e8c69b; border-top:1px solid var(--line); margin:18px 0; padding-top:18px; line-height:1.5; }
+.test-start-actions { display:flex; flex-direction:column; gap:10px; }
+.test-start-actions .act:disabled { opacity:.55; cursor:default; }
+.test-resume { border-color:#728958; margin-bottom:20px; }
+.test-resume p { color:#c8baa5; margin-top:6px; }
+#testNotice:empty { display:none; }
+#testNotice:not(:empty) { margin:0 0 18px; color:#d5e7c0; }
+.test-saved,.test-history { margin-top:32px; padding-top:24px; border-top:1px solid var(--line); }
+.test-saved-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:12px; margin-top:16px; }
+.test-saved article,.test-history article { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; padding:18px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
+.test-saved article>div:first-child,.test-history article>div { min-width:0; }
+.test-saved h4,.test-history h4 { overflow-wrap:anywhere; }
+.test-saved article>div:last-child { display:flex; gap:10px; align-items:center; }
+.test-saved p,.test-history p { color:#cbb99f; font-size:.87rem; line-height:1.6; margin-top:4px; }
+.test-history article { margin-top:12px; }
+.test-score-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.test-score-grid>div { border:1px solid #66513b; border-radius:14px; padding:18px; }
+.test-score-grid strong { display:block; font-size:2rem; color:#edc99d; }
+.test-score-grid span { display:block; color:#d4c1a6; font-size:.9rem; line-height:1.5; margin-top:6px; }
+.test-result-lines { margin-top:24px; }
+.test-result-line { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; padding:20px 0; border-top:1px solid var(--line); }
+.test-result-line h3 { font-size:1.06rem; }
+.test-result-line p { color:#cbb99f; font-size:.93rem; line-height:1.7; }
+.test-result-line .mini { margin-top:8px; }
+.test-outcome { display:inline-block; background:#4b3526; color:#edc39c; border-radius:8px; padding:4px 8px; margin-top:8px; font-size:.84rem; }
+.test-outcome.recalled { background:#35432b; color:#d5e6c1; }
+.test-explanation { grid-column:1/-1; }
+.test-explanation summary { cursor:pointer; color:#ebba86; padding:6px 0; font-size:.92rem; }
+.test-explanation p { margin-top:8px; max-width:85ch; }
+#testBoardStrip { order:-2; background:#38412c; border:1px solid #617446; color:#dae8c9; border-radius:12px; padding:10px 14px; }
+#testBoardStrip b,#testBoardStrip span { display:block; }
+#testBoardStrip span { margin-top:4px; font-size:.84rem; overflow-wrap:anywhere; }
+#testNav { order:2; }
+#drill.testing #titleBox { order:-1; }
+#drill.testing .line-controls,#drill.testing #boardRepBtn,#drill.testing #drillSetup,#drill.testing #streakInfo { display:none!important; }
+@media(max-width:760px){
+  .home-nav button { padding:10px 6px; font-size:.82rem; }
+  .test-setup-layout { grid-template-columns:1fr; gap:16px; }
+  .test-builder,.test-ready,.test-report,.test-resume { padding:18px; }
+  .test-ready { position:static; }
+  .test-resume { flex-direction:column; align-items:flex-start; }
+  .test-score-grid { gap:8px; }
+  .test-score-grid>div { padding:10px; }
+  .test-score-grid strong { font-size:1.5rem; }
+  .test-score-grid span { font-size:.8rem; }
+  .test-result-line { grid-template-columns:1fr; }
+  .test-explanation { grid-column:auto; }
+}
+
 </style>
 </head>
 <body>
@@ -716,6 +793,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="home-toolbar"><nav id="homeNav" class="home-nav" data-i18n-label="homeNavigation"></nav><button id="homeEngineBtn" class="home-engine" onclick="enterFreePlay()" data-i18n="vsEngine" data-i18n-title="engineMenuTip">vs Engine</button></div>
     <div id="todayBar"></div>
     <div id="repertoirePanel" hidden></div>
+    <div id="testPanel" hidden></div>
     <div id="achievementEntry"></div>
     <div id="findRow">
       <input id="searchBox" data-i18n-label="searchPh" type="search" autocomplete="off" data-i18n-ph="searchPh">
@@ -731,7 +809,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G36</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G37</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -752,6 +830,12 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     </div>
     <div class="side-panel">
       <div id="sessionStrip" class="session-strip" role="status" hidden></div>
+      <div id="testBoardStrip" role="status" hidden></div>
+      <div id="testNav" class="btn-row" hidden>
+        <button id="testNextBtn" class="act primary" onclick="nextTestLine()" data-i18n="testNextLine">Next line</button>
+        <button id="testSkipBtn" class="act" onclick="skipTestLine()" data-i18n="testSkipLine">Skip line</button>
+        <button class="act" onclick="showMenu('test')" data-i18n="testPause">Pause test</button>
+      </div>
       <div class="panel-box" id="titleBox">
         <div id="lineTitle"></div>
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
@@ -1201,6 +1285,81 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
 /* G26 product language: concrete practice, no waiting or perfect-day pressure. */
 Object.assign(I18N_EN, {
   homeNavigation:'Main navigation',
+  navTest:'Test',
+  testTitle:'How much can you recall?',
+  testIntro:'Choose the lines you want to know, then play them from memory. Build a custom test or use your repertoire.',
+  testDefaultName:'My repertoire test',
+  testChoosePool:'Choose your lines',
+  testNameLabel:'Test name (optional)',
+  testNamePlaceholder:'e.g. My Italian and Caro-Kann',
+  testNewPool:'New pool',
+  testUseRepertoire:'Use my repertoire',
+  testClear:'Clear selection',
+  testBrowse:'Browse',
+  testColourFilter:'Filter by colour',
+  testNoSelection:'No lines selected. Browse Openings to build your test.',
+  testSelectGroup:'Select matching lines',
+  testDeselectGroup:'Deselect matching lines',
+  testSelectSide:'Test {line} as {side}',
+  testSelectionCount:'{lines} · {moves} moves to recall',
+  testMatches:'Matching variations: {n}',
+  testEmptyRepertoire:'Your repertoire is empty. Browse Openings here to choose test lines.',
+  testHowItWorks:'How your test works',
+  testRuleOrder:'Each chosen line and colour appears once, in a shuffled order. There is no timer.',
+  testRuleHelp:'The variation name stays visible. Hints, arrows, dots, evaluation and lesson explanations are hidden.',
+  testRuleMismatch:'Recall the named line from move one. The first mismatch or skip ends that line. Other legal moves may still be good chess.',
+  testRuleResults:'See your score and answers after the test. Pause and resume whenever you need.',
+  testStart:'Start test',
+  testSavePool:'Save this pool',
+  testUpdatePool:'Update saved pool',
+  testRankNote:'Tests show recall in this session. Your ranks and scheduled reviews stay separate.',
+  testScoreRule:'A line counts as recalled only when every move for your colour was correct on the first try. Move accuracy covers moves you attempted; later moves after a mismatch were not tested.',
+  testPaused:'A test is in progress',
+  testFinishedCount:'{n}/{total} lines finished',
+  testResume:'Resume test',
+  testEndNow:'End test & view results',
+  testResumeFirst:'Resume or end your current test before starting another.',
+  testStorageError:'Could not save the test. Free some browser storage, then try again. Your last saved step is kept.',
+  testPoolLimit:'You have 20 saved pools. Remove one before saving another.',
+  testPoolSaved:'Test pool saved.',
+  testPoolLoaded:'Pool loaded. You can adjust the selection before starting.',
+  testPoolRemoved:'Saved pool removed. Your test results are kept.',
+  testSavedPools:'Saved test pools',
+  testPoolCount:'Test lines: {n}',
+  testLoadPool:'Load pool',
+  testDeletePool:'Remove',
+  testDeletePoolLabel:'Remove saved test pool {name}',
+  testNoPools:'Save a selection to test it again later.',
+  testHistory:'Recent tests',
+  testHistoryNote:'Your latest 20 results are saved on this device and included in Export progress.',
+  testNoHistory:'Your first result will appear here after a test.',
+  testHistoryScore:'{n}/{total} lines recalled',
+  testViewResults:'View results',
+  testResults:'Test results',
+  testLinesRecalled:'Lines recalled',
+  testMovesAccurate:'{correct}/{total} attempted moves correct',
+  testToRevisit:'Lines to revisit',
+  testUntestedCount:'{n} line(s) were not attempted.',
+  testRepeatPool:'Test this pool again',
+  testRetestMissed:'Retest lines to revisit',
+  testBackSetup:'Back to test setup',
+  testRecalled:'Recalled',
+  testMismatch:'Line mismatch',
+  testSkipped:'Skipped',
+  testUntested:'Not attempted',
+  testPlayed:'You played <b>{move}</b>',
+  testExpected:'This line uses <b>{move}</b>',
+  testPractiseLine:'Practise this line',
+  testReviewAnswer:'Review the idea',
+  testLineNumber:'Line {n} of {total}',
+  testYourMove:'Recall the next move for {side}.',
+  testBoardRule:'Follow the named variation from memory. Your first attempt counts; answers appear after the test.',
+  testLineRecalled:'Line recalled.',
+  testLineRecorded:'Line recorded for review.',
+  testAnswersLater:'Continue to the next line. You can review all answers when the test is finished.',
+  testNextLine:'Next line',
+  testSkipLine:'Skip line',
+  testPause:'Pause test',
   boardOptions:'Board display options',
   enginePurposeTitle:'Put your opening into play.',
   enginePurposeBody:'Practise making your own decisions against an adjustable opponent, and see how your opening leads into the rest of the game.',
@@ -1360,6 +1519,81 @@ Object.assign(I18N_EN, {
 });
 Object.assign(I18N.zh, {
   homeNavigation:'主导航',
+  navTest:'测试',
+  testTitle:'你能记住多少？',
+  testIntro:'选择想掌握的变例，再凭记忆走出来。你可以自选测试内容，也可以使用我的开局库。',
+  testDefaultName:'我的开局测试',
+  testChoosePool:'选择测试变例',
+  testNameLabel:'测试名称（选填）',
+  testNamePlaceholder:'例如：意大利与卡罗康',
+  testNewPool:'新建题库',
+  testUseRepertoire:'使用我的开局库',
+  testClear:'清空选择',
+  testBrowse:'浏览范围',
+  testColourFilter:'按执方筛选',
+  testNoSelection:'尚未选择变例。请切换到全部开局，创建测试题库。',
+  testSelectGroup:'选中匹配的变例',
+  testDeselectGroup:'取消选中匹配的变例',
+  testSelectSide:'测试「{line}」（{side}）',
+  testSelectionCount:'{lines} · 需回忆 {moves} 步',
+  testMatches:'匹配 {n} 条变例',
+  testEmptyRepertoire:'你的开局库还没有变例。可切换到全部开局，在这里选择测试内容。',
+  testHowItWorks:'测试方式',
+  testRuleOrder:'每个已选变例与执方组合出现一次，顺序随机，无时间限制。',
+  testRuleHelp:'保留变例名称，隐藏提示、箭头、圆点、评估条和课程讲解。',
+  testRuleMismatch:'从第一步回忆指定变例。首次走偏或跳过即结束该线。其他合法着法仍可能是好棋。',
+  testRuleResults:'测试结束后查看得分与答案，随时可以暂停或继续。',
+  testStart:'开始测试',
+  testSavePool:'保存题库',
+  testUpdatePool:'更新题库',
+  testRankNote:'测试反映本次回忆情况，等级与到期复习单独计算。',
+  testScoreRule:'只有本方每步都在首次尝试时正确，整条变例才计为已回忆。着法正确率仅统计尝试过的着法；走偏之后的后续着法未被测试。',
+  testPaused:'有一场未完成的测试',
+  testFinishedCount:'已完成 {n}/{total} 条',
+  testResume:'继续测试',
+  testEndNow:'结束测试并查看结果',
+  testResumeFirst:'请先继续或结束当前测试，再开始新的测试。',
+  testStorageError:'无法保存测试。请释放一些浏览器存储空间后再试，最后已保存的进度仍保留。',
+  testPoolLimit:'已保存 20 个题库。请先删除一个，再保存新题库。',
+  testPoolSaved:'测试题库已保存。',
+  testPoolLoaded:'题库已载入，开始前可调整选择。',
+  testPoolRemoved:'题库已删除，历史测试结果仍保留。',
+  testSavedPools:'已保存的测试题库',
+  testPoolCount:'测试变例：{n} 条',
+  testLoadPool:'载入题库',
+  testDeletePool:'删除',
+  testDeletePoolLabel:'删除测试题库「{name}」',
+  testNoPools:'保存所选变例，方便日后再次测试。',
+  testHistory:'最近的测试',
+  testHistoryNote:'最近 20 次结果保存在此设备上，并包含在导出的进度文件中。',
+  testNoHistory:'完成首次测试后，结果会显示在这里。',
+  testHistoryScore:'回忆出 {n}/{total} 条变例',
+  testViewResults:'查看结果',
+  testResults:'测试结果',
+  testLinesRecalled:'完整回忆的变例',
+  testMovesAccurate:'已尝试着法中 {correct}/{total} 步正确',
+  testToRevisit:'需再练的变例',
+  testUntestedCount:'另有 {n} 条变例未尝试。',
+  testRepeatPool:'再次测试此题库',
+  testRetestMissed:'重测需再练的变例',
+  testBackSetup:'返回测试设置',
+  testRecalled:'完整回忆',
+  testMismatch:'偏离变例',
+  testSkipped:'已跳过',
+  testUntested:'未尝试',
+  testPlayed:'你的着法：<b>{move}</b>',
+  testExpected:'本线的着法：<b>{move}</b>',
+  testPractiseLine:'练习此线',
+  testReviewAnswer:'查看思路',
+  testLineNumber:'第 {n}/{total} 条',
+  testYourMove:'请回忆{side}下一步。',
+  testBoardRule:'凭记忆走出指定变例。按首次尝试计分，测试后显示答案。',
+  testLineRecalled:'本线已完整回忆。',
+  testLineRecorded:'本线已记录，稍后回顾。',
+  testAnswersLater:'继续下一条变例，完成测试后可回顾全部答案。',
+  testNextLine:'下一条变例',
+  testSkipLine:'跳过此线',
+  testPause:'暂停测试',
   boardOptions:'棋盘显示选项',
   enginePurposeTitle:'把开局知识用到实战中。',
   enginePurposeBody:'与可调节难度的引擎对弈，练习自主判断，看看学过的开局如何发展到中局及之后。',
@@ -1593,6 +1827,7 @@ function setLang(l){
   if(document.getElementById('medalsOverlay')?.style.display==='flex') renderMedals();
   const inBoard = document.getElementById('drill').style.display!=='none';
   if(!inBoard){ showMenu(); return; }
+  if(mode==='test'){renderTestBoard();return;}
   // Re-render the open session in place instead of abandoning it.
   if(mode==='play'){
     const sel=document.getElementById('lineSel');
@@ -2424,11 +2659,86 @@ function renderSessionStrip(){
 }
 
 
+/* ================= CUSTOM RECALL TESTS =================
+   Tests measure named-line recall now. They never write ranks or SRS grades.
+   Persist after every move; the saved cursor is the source of truth on resume. */
+function testSignature(item){const x=resolveLesson(item.id);return x?DATA.openings[x.oi].lines[x.li].moves.map(m=>m.u).join(' '):'';}
+function testMoves(item){const x=resolveLesson(item.id);return x?DATA.openings[x.oi].lines[x.li].moves:[];}
+function testOwnPly(item,p){return (p%2===0?'w':'b')===item.side;}
+function testOwnCount(item,end=testMoves(item).length){return testMoves(item).slice(0,end).filter((_,i)=>testOwnPly(item,i)).length;}
+function testRunId(){return 'test-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);}
+function testShuffle(items,random=Math.random){
+  const out=items.map(x=>({...x}));
+  for(let i=out.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
+  return out;
+}
+function cleanTestRun(run,active=false){
+  if(!isRecord(run)||!/^test-[a-z0-9-]+$/.test(run.id||'')||typeof run.name!=='string'||!Number.isSafeInteger(run.startedAt)||run.startedAt<0||run.startedAt>8640000000000000||!Array.isArray(run.items)||!run.items.length||run.items.length>1000||!Array.isArray(run.results)||run.results.length>run.items.length||!['playing','between','complete'].includes(run.phase)||!Number.isInteger(run.ply)||run.ply<0)return null;
+  const items=normalizeRepItems(run.items);if(items.length!==run.items.length)return null;
+  if(active&&run.items.some((x,i)=>x.signature!==testSignature(items[i])))return null;
+  if(run.results.some((r,i)=>!isRecord(r)||itemKey(r)!==itemKey(items[i])||!['recalled','missed','skipped','untested'].includes(r.outcome)||!Number.isInteger(r.stopPly)||r.stopPly<0||!Number.isInteger(r.correct)||r.correct<0||!Number.isInteger(r.total)||r.total<1||r.correct>r.total||typeof r.expectedSan!=='string'||typeof r.playedSan!=='string'))return null;
+  const complete=run.results.length===items.length;
+  if((run.phase==='complete')!==complete||complete&&(!Number.isSafeInteger(run.finishedAt)||run.finishedAt<0||run.finishedAt>8640000000000000))return null;
+  if(!complete&&run.ply>=testMoves(items[run.results.length]).length)return null;
+  if(run.phase!=='playing'&&run.ply!==0||run.phase==='between'&&!run.results.length)return null;
+  if(active&&run.results.some((r,i)=>r.total!==testOwnCount(items[i])||r.stopPly>testMoves(items[i]).length||r.correct!==testOwnCount(items[i],r.stopPly)||r.outcome==='recalled'&&r.correct!==r.total))return null;
+  return {...run,name:run.name.slice(0,60),items:run.items.map((x,i)=>({...items[i],signature:x.signature})),results:run.results.map(r=>({...r}))};
+}
+const testStore={
+  load(){
+    const raw=readStoredRecord('otTests');
+    const pools=(Array.isArray(raw.pools)?raw.pools:[]).filter(p=>isRecord(p)&&/^test-[a-z0-9-]+$/.test(p.id||'')&&typeof p.name==='string').slice(0,20).map(p=>({id:p.id,name:p.name.slice(0,60),items:normalizeRepItems(p.items)})).filter(p=>p.items.length);
+    const history=(Array.isArray(raw.history)?raw.history:[]).map(r=>cleanTestRun(r)).filter(r=>r&&r.phase==='complete').slice(0,20);
+    const active=cleanTestRun(raw.active,true);
+    return {v:1,pools,history,active:active?.phase!=='complete'?active:null};
+  },
+  save(d){localStorage.setItem('otTests',JSON.stringify(d));},
+  start(name,items,random=Math.random){
+    const d=this.load();if(d.active)throw new Error('active-test');
+    const pool=normalizeRepItems(items);if(!pool.length)throw new Error('empty-pool');
+    d.active={id:testRunId(),name:name.slice(0,60),startedAt:Date.now(),finishedAt:null,items:testShuffle(pool,random).map(x=>({...x,signature:testSignature(x)})),results:[],ply:0,phase:'playing'};
+    this.save(d);return d.active;
+  },
+  next(){const d=this.load();if(!d.active)return null;d.active.phase='playing';this.save(d);return d.active;},
+  record(d,outcome,playedSan=''){
+    const run=d.active,item=run.items[run.results.length],moves=testMoves(item),p=run.ply;
+    run.results.push({...item,outcome,stopPly:p,correct:testOwnCount(item,p),total:testOwnCount(item),expectedSan:testOwnPly(item,p)?moves[p]?.san||'':'',playedSan});
+    run.ply=0;run.phase=run.results.length===run.items.length?'complete':'between';
+    if(run.phase==='complete'){
+      run.finishedAt=Date.now();d.history=[run,...d.history.filter(r=>r.id!==run.id)].slice(0,20);d.active=null;
+    }
+    this.save(d);return run;
+  },
+  move(u,playedSan=''){
+    const d=this.load(),run=d.active;if(!run||run.phase!=='playing')return null;
+    const item=run.items[run.results.length],moves=testMoves(item),expected=moves[run.ply];
+    if(!expected)return null;
+    const own=testOwnPly(item,run.ply);
+    if(u!==expected.u){if(!own)return null;return this.record(d,'missed',playedSan);}
+    run.ply++;
+    if(run.ply>=moves.length)return this.record(d,'recalled');
+    this.save(d);return run;
+  },
+  skip(){const d=this.load();if(!d.active||d.active.phase!=='playing')return null;return this.record(d,'skipped');},
+  end(){
+    let d=this.load(),run=d.active;if(!run)return null;
+    while(d.active){run=this.record(d,d.active.ply?'skipped':'untested');d=this.load();}
+    return run;
+  },
+  savePool(id,name,items){
+    const d=this.load(),pool={id:id||testRunId(),name:name.slice(0,60),items:normalizeRepItems(items)};
+    if(!pool.items.length)throw new Error('empty-pool');
+    if(!d.pools.some(p=>p.id===pool.id)&&d.pools.length>=20)throw new Error('pool-limit');
+    d.pools=[pool,...d.pools.filter(p=>p.id!==pool.id)];this.save(d);return pool;
+  },
+  removePool(id){const d=this.load();d.pools=d.pools.filter(p=>p.id!==id);this.save(d);}
+};
+
 /* ================= PROGRESS BACKUP (export / import file) =================
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G36';
+const BUILD='G37';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2439,11 +2749,19 @@ function createProgressBackup(){
   if(out.otAch){ try{ const A=JSON.parse(out.otAch); A.pending=[]; out.otAch=JSON.stringify(A); }catch(e){} }
   return out;
 }
+function validTestBackup(value){
+  const id=v=>typeof v==='string'&&/^test-[a-z0-9-]+$/.test(v);
+  const time=v=>Number.isSafeInteger(v)&&v>=0&&v<=8640000000000000;
+  const items=list=>Array.isArray(list)&&list.length>0&&list.length<=1000&&list.every(x=>isRecord(x)&&typeof x.id==='string'&&/^[a-z0-9-]+$/.test(x.id)&&['w','b'].includes(x.side))&&new Set(list.map(x=>x.id+':'+x.side)).size===list.length;
+  const run=r=>isRecord(r)&&id(r.id)&&typeof r.name==='string'&&r.name.length<=60&&time(r.startedAt)&&items(r.items)&&r.items.every(x=>typeof x.signature==='string'&&x.signature.length<=4096)&&['playing','between','complete'].includes(r.phase)&&Number.isSafeInteger(r.ply)&&r.ply>=0&&r.ply<=1000&&Array.isArray(r.results)&&r.results.length<=r.items.length&&r.results.every((x,i)=>isRecord(x)&&x.id===r.items[i].id&&x.side===r.items[i].side&&['recalled','missed','skipped','untested'].includes(x.outcome)&&Number.isSafeInteger(x.stopPly)&&x.stopPly>=0&&Number.isSafeInteger(x.total)&&x.total>0&&Number.isSafeInteger(x.correct)&&x.correct>=0&&x.correct<=x.total&&typeof x.expectedSan==='string'&&typeof x.playedSan==='string')&&(r.phase!=='between'||r.results.length>0)&&((r.phase==='complete'&&r.results.length===r.items.length&&time(r.finishedAt))||(r.phase!=='complete'&&r.results.length<r.items.length&&r.finishedAt===null));
+  return isRecord(value)&&value.v===1&&Array.isArray(value.pools)&&value.pools.length<=20&&value.pools.every(p=>isRecord(p)&&id(p.id)&&typeof p.name==='string'&&p.name.length<=60&&items(p.items))&&Array.isArray(value.history)&&value.history.length<=20&&value.history.every(r=>run(r)&&r.phase==='complete')&&(value.active===null||run(value.active)&&value.active.phase!=='complete');
+}
+
 function validateProgressBackup(o){
   if(!isRecord(o) || o.__app!=='debut-progress') throw new Error('not a progress file');
   const pairs=Object.entries(o).filter(([k])=>BACKUP_KEY_RE.test(k));
   if(!pairs.length) throw new Error('empty backup');
-  const objectKeys=['openingTrainer','otSrs','otActivity','otGroups','otAch','otRep','otSession'];
+  const objectKeys=['openingTrainer','otSrs','otActivity','otGroups','otAch','otRep','otSession','otTests'];
   const numericFields=(v,fields)=>fields.every(k=>v[k]===undefined || (Number.isSafeInteger(v[k]) && v[k]>=0));
   for(const [key,raw] of pairs){
     if(typeof raw!=='string') throw new Error('invalid backup value');
@@ -2462,6 +2780,7 @@ function validateProgressBackup(o){
       if(key==='otSession'){
         if(typeof value.day!=='string'||!Array.isArray(value.items)||value.items.length>6||!value.items.every(x=>isRecord(x)&&typeof x.id==='string'&&['w','b'].includes(x.side)&&['learn','drill'].includes(x.mode))||!Array.isArray(value.done)||!value.done.every(x=>typeof x==='string')||typeof value.completed!=='boolean') throw new Error('invalid session');
       }
+      if(key==='otTests'&&!validTestBackup(value)) throw new Error('invalid tests');
       if(key==='otAch'){
         if(value.unlocked!==undefined && (!isRecord(value.unlocked)||!Object.values(value.unlocked).every(d=>typeof d==='string'))) throw new Error('invalid medals');
         if(value.ctr!==undefined && !isRecord(value.ctr)) throw new Error('invalid counters');
@@ -2978,7 +3297,7 @@ boardEl.addEventListener('keydown',e=>{
   const sqAt = e => { const el=e.target.closest('.sq'); return el ? el.dataset.sq : null; };
   boardEl.addEventListener('contextmenu', e=>e.preventDefault());
   boardEl.addEventListener('mousedown', e=>{
-    if(e.button===2){ rcFrom=sqAt(e); }
+    if(e.button===2&&mode!=='test'){ rcFrom=sqAt(e); }
     else if(e.button===0 && userShapes.length){ userShapes=[]; drawAnnots(); }
   });
   boardEl.addEventListener('mouseup', e=>{
@@ -3072,6 +3391,7 @@ let userShapes=[];     // right-click marks: {from,to} arrows and {sq} highlight
 let rcFrom=null;       // square where a right-button drag started
 function drawAnnots(){
   const ov=document.getElementById('overlay'); if(!ov) return;
+  if(mode==='test'){ov.innerHTML='';return;}
   const guide = (mode==='learn' && showAnnots) ? learnGuide : null;
   if((!curAnnot || !showAnnots) && !guide && !userShapes.length){ ov.innerHTML=''; return; }
   const flip = playerSide==='b';
@@ -3099,6 +3419,165 @@ function drawAnnots(){
   ov.innerHTML=s;
 }
 
+/* The test board shares legal move input, but never the drill's hint/grading path. */
+let testBoardRun=null,testBoardMessage='';
+function renderTestBoard(){
+  const run=testBoardRun;if(!run||mode!=='test')return;
+  const between=run.phase==='between',index=between?run.results.length-1:run.results.length,item=run.items[index],x=resolveLesson(item.id);
+  document.getElementById('lineTitle').innerHTML=`${medalText(opName(DATA.openings[x.oi]))}<small>${medalText(lnName(DATA.openings[x.oi].lines[x.li]))} · ${t(item.side==='w'?'white':'black')}</small>`;
+  document.getElementById('testBoardStrip').innerHTML=`<b>${t('testLineNumber',{n:index+1,total:run.items.length})}</b><span>${medalText(run.name)}</span>`;
+  const key=between?(run.results.at(-1).outcome==='recalled'?'testLineRecalled':'testLineRecorded'):(testBoardMessage||(!isPlayerTurn()?'oppReplying':'testYourMove'));
+  setPrompt(t(key,{side:t(playerSide==='w'?'white':'black')}),between&&run.results.at(-1).outcome==='recalled'?'good':'');
+  setComment(t(between?'testAnswersLater':'testBoardRule'));
+  document.getElementById('testNextBtn').hidden=!between;
+  document.getElementById('testSkipBtn').hidden=between;
+  document.getElementById('testSkipBtn').disabled=locked;
+  document.getElementById('progFill').style.width=100*(run.results.length)/run.items.length+'%';
+  updateMoveList();
+}
+function resumeRecallTest(){
+  const run=testStore.load().active;if(!run){showMenu('test');return;}
+  sessionActive=false;sessionItem=null;runGen++;Engine.abort();testBoardRun=run;testBoardMessage='';
+  const index=run.phase==='between'?run.results.length-1:run.results.length,item=run.items[index],x=resolveLesson(item.id);
+  curOp=x.oi;curLine=x.li;playerSide=item.side;mode='test';board=initBoard();selSq=null;aimSet=null;curAnnot=null;hintSq=null;learnGuide=null;
+  ply=run.phase==='between'?run.results.at(-1).stopPly:run.ply;
+  for(const mv of lineMoves().slice(0,ply))applyMove(mv.u);
+  pendingAnim=null;locked=run.phase==='between';
+  showAppView('board');document.getElementById('drill').classList.remove('play');
+  for(const id of ['doneBox','drillNav','learnNav','playNav','strengthRow','evalBarWrap'])document.getElementById(id).style.display='none';
+  document.getElementById('promptBox').style.display='block';document.getElementById('streakInfo').textContent='';showCapTrays(false);
+  render(plyLastU());renderTestBoard();
+  if(run.phase==='playing')testTick();
+}
+function acceptTestRun(run){
+  if(!run)return;
+  testBoardRun=run;testBoardMessage='';
+  if(run.phase==='complete'){locked=true;testReportId=run.id;showMenu('test');document.getElementById('testResultHeading')?.focus();return;}
+  if(run.phase==='between'){locked=true;renderTestBoard();document.getElementById('testNextBtn').focus({preventScroll:true});return;}
+  testTick();
+}
+function testTick(){
+  if(mode!=='test'||testBoardRun?.phase!=='playing')return;
+  if(isPlayerTurn()){locked=false;renderTestBoard();return;}
+  locked=true;renderTestBoard();const g=runGen,id=testBoardRun.id,at=ply;
+  setTimeout(()=>{
+    if(g!==runGen||mode!=='test'||testBoardRun?.id!==id||ply!==at)return;
+    const mv=lineMoves()[ply];
+    try{
+      const next=testStore.move(mv.u);if(!next)return;
+      const cap=isCapture(mv.u);applyMove(mv.u);ply++;playMoveSound(mv,cap);render(mv.u);acceptTestRun(next);
+    }catch(e){testBoardMessage='testStorageError';locked=true;renderTestBoard();}
+  },450);
+}
+function attemptTestMove(u){
+  if(mode!=='test'||locked||!isPlayerTurn()||testBoardRun?.phase!=='playing')return;
+  const expected=lineMoves()[ply];if(!expected)return;
+  if(!legalTargetNames(u.slice(0,2)).includes(u.slice(2,4))){selSq=null;aimSet=null;testBoardMessage='illegalMove';render(plyLastU());renderTestBoard();return;}
+  // The current catalogue contains no promotion lessons; preserve a future promotion suffix.
+  const full=u===expected.u.slice(0,4)?expected.u:u;
+  const san=uciToSan(full);
+  try{
+    const next=testStore.move(full,san);if(!next)return;
+    selSq=null;aimSet=null;
+    if(full===expected.u){const cap=isCapture(full);applyMove(full);ply++;playMoveSound(expected,cap);render(full);}
+    else render(plyLastU());
+    acceptTestRun(next);
+  }catch(e){testBoardMessage='testStorageError';renderTestBoard();}
+}
+function skipTestLine(){
+  if(mode!=='test'||locked||testBoardRun?.phase!=='playing')return;
+  try{acceptTestRun(testStore.skip());}catch(e){testBoardMessage='testStorageError';renderTestBoard();}
+}
+function nextTestLine(){try{testStore.next();resumeRecallTest();}catch(e){testBoardMessage='testStorageError';renderTestBoard();}}
+
+/* ================= TEST SETUP & RESULTS ================= */
+let testDraft=null,testReportId=null,testQuery='',testColour='all',testSource='all',testNotice='';
+const testExpanded=new Map();
+function ensureTestDraft(){if(!testDraft)testDraft={id:null,name:'',items:repertoire.load().items.map(x=>({...x}))};}
+function testDraftName(){return testDraft.name.trim()||t('testDefaultName');}
+function testPoolGroups(){
+  const normalize=s=>(s||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,''),q=normalize(testQuery),saved=new Set(repertoire.entries().map(itemKey)),selected=new Set(testDraft.items.map(itemKey));
+  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,sides:['w','b'].filter(side=>(testColour==='all'||side===testColour)&&(testSource==='all'||(testSource==='selected'?selected:saved).has(line.id+':'+side)))}))
+    .filter(x=>x.sides.length&&[op.name,op.nameZh,x.line.name,x.line.nameZh].some(n=>normalize(n).includes(q)))})).filter(g=>g.lines.length);
+}
+function updateTestSummary(){
+  const n=testDraft.items.length;
+  document.getElementById('testSelectionCount').textContent=t('testSelectionCount',{lines:t(n===1?'quickAddCountOne':'quickAddCount',{n}),moves:testDraft.items.reduce((sum,x)=>sum+testOwnCount(x),0)});
+  const active=!!testStore.load().active;
+  document.getElementById('testStartBtn').disabled=!n||active;
+  document.getElementById('testSavePoolBtn').disabled=!n;
+}
+function renderTestPoolResults(){
+  const el=document.getElementById('testPoolResults');if(!el)return;
+  const groups=testPoolGroups(),chosen=new Set(testDraft.items.map(itemKey));
+  el.innerHTML=groups.map(({op,oi,lines})=>{
+    const selected=lines.reduce((n,x)=>n+x.sides.filter(side=>chosen.has(x.line.id+':'+side)).length,0),total=lines.reduce((n,x)=>n+x.sides.length,0);
+    const open=testExpanded.get(oi)??(!!testQuery.trim()||testSource==='selected');
+    return `<details class="test-pool-group"${open?' open':''} ontoggle="if(this.isConnected)testExpanded.set(${oi},this.open)"><summary>${medalText(opName(op))} <span>${selected}/${total}</span></summary><div class="test-group-actions"><button class="linklike" data-test-group="${oi}" onclick="toggleTestGroup(${oi})">${t(selected===total?'testDeselectGroup':'testSelectGroup')}</button></div>${lines.map(({line,li,sides})=>`<div class="test-pool-line"><span>${medalText(lnName(line))}</span><div class="test-side-choices">${sides.map(side=>`<label><input type="checkbox" data-test-key="${line.id}:${side}"${chosen.has(line.id+':'+side)?' checked':''} aria-label="${medalText(t('testSelectSide',{line:lnName(line),side:t(side==='w'?'white':'black')}))}" onchange="toggleTestChoice(${oi},${li},'${side}',this.checked)"><span>${t(side==='w'?'white':'black')}</span></label>`).join('')}</div></div>`).join('')}</details>`;
+  }).join('')||`<p class="home-note">${t(testSource==='selected'&&!testDraft.items.length?'testNoSelection':testSource==='saved'&&!repertoire.entries().length?'testEmptyRepertoire':'quickAddEmpty')}</p>`;
+  document.getElementById('testSearchCount').textContent=t('testMatches',{n:groups.reduce((n,g)=>n+g.lines.length,0)});
+}
+function updateTestFilter(){
+  testQuery=document.getElementById('testSearch').value;testColour=document.getElementById('testColour').value;testSource=document.getElementById('testSource').value;
+  testExpanded.clear();renderTestPoolResults();
+}
+function toggleTestChoice(oi,li,side,on){
+  const item={id:lessonId(oi,li),side};testDraft.items=testDraft.items.filter(x=>itemKey(x)!==itemKey(item));if(on)testDraft.items.push(item);
+  const scroll=document.getElementById('testPoolResults').scrollTop;
+  renderTestPoolResults();document.getElementById('testPoolResults').scrollTop=scroll;
+  (document.querySelector(`[data-test-key="${itemKey(item)}"]`)||document.getElementById('testSearch')).focus({preventScroll:true});updateTestSummary();
+}
+function toggleTestGroup(oi){
+  const group=testPoolGroups().find(g=>g.oi===oi);if(!group)return;
+  const items=group.lines.flatMap(x=>x.sides.map(side=>({id:x.line.id,side}))),keys=new Set(items.map(itemKey)),selected=new Set(testDraft.items.map(itemKey));
+  const remove=items.every(x=>selected.has(itemKey(x)));
+  testDraft.items=testDraft.items.filter(x=>!keys.has(itemKey(x)));if(!remove)testDraft.items.push(...items);
+  const scroll=document.getElementById('testPoolResults').scrollTop;renderTestPoolResults();document.getElementById('testPoolResults').scrollTop=scroll;
+  document.querySelector(`[data-test-group="${oi}"]`)?.focus({preventScroll:true});updateTestSummary();
+}
+function fillTestFromRepertoire(){testDraft.items=repertoire.load().items.map(x=>({...x}));renderTestPoolResults();updateTestSummary();}
+function clearTestPool(){testDraft.items=[];renderTestPoolResults();updateTestSummary();}
+function saveTestPool(){
+  try{const p=testStore.savePool(testDraft.id,testDraftName(),testDraft.items);testDraft.id=p.id;testNotice='testPoolSaved';renderTestPage();document.getElementById('testSavePoolBtn').focus({preventScroll:true});}
+  catch(e){testNotice=e.message==='pool-limit'?'testPoolLimit':'testStorageError';renderTestPage();}
+}
+function loadTestPool(id){
+  const p=testStore.load().pools.find(p=>p.id===id);if(!p)return;
+  testDraft={...p,items:p.items.map(x=>({...x}))};testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='testPoolLoaded';renderTestPage();document.getElementById('testName').focus();
+}
+function removeTestPool(id){try{testStore.removePool(id);if(testDraft?.id===id)testDraft.id=null;testNotice='testPoolRemoved';renderTestPage();}catch(e){testNotice='testStorageError';renderTestPage();}}
+function newTestPool(){testDraft={id:null,name:'',items:[]};testSource='all';testColour='all';testQuery='';testNotice='';testReportId=null;renderTestPage();document.getElementById('testName').focus();}
+function startRecallTest(){
+  try{testStore.start(testDraftName(),testDraft.items);testNotice='';testReportId=null;resumeRecallTest();}
+  catch(e){testNotice=e.message==='active-test'?'testResumeFirst':'testStorageError';renderTestPage();}
+}
+function endRecallTest(){try{const run=testStore.end();if(run)testReportId=run.id;showMenu('test');}catch(e){testNotice='testStorageError';renderTestPage();}}
+function testDate(stamp){return new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(stamp);}
+function showTestReport(id){testReportId=id;renderTestPage();document.getElementById('testResultHeading')?.focus();}
+function testReportHTML(run){
+  const recalled=run.results.filter(r=>r.outcome==='recalled').length,untested=run.results.filter(r=>r.outcome==='untested').length;
+  const correct=run.results.reduce((n,r)=>n+r.correct,0),attempted=correct+run.results.filter(r=>r.outcome==='missed').length;
+  const review=run.results.filter(r=>r.outcome!=='recalled');
+  return `<section class="test-report" aria-labelledby="testResultHeading"><div class="home-heading"><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)}</p></div><div class="test-score-grid"><div><strong>${recalled}/${run.items.length}</strong><span>${t('testLinesRecalled')}</span></div><div><strong>${attempted?Math.round(100*correct/attempted)+'%':'—'}</strong><span>${t('testMovesAccurate',{correct,total:attempted})}</span></div><div><strong>${review.length}</strong><span>${t('testToRevisit')}</span></div></div><p class="home-note">${t('testScoreRule')}${untested?' '+t('testUntestedCount',{n:untested}):''}</p><div class="home-actions"><button class="act primary" onclick="retryTestReport(false)">${t('testRepeatPool')}</button>${review.length?`<button class="act" onclick="retryTestReport(true)">${t('testRetestMissed')}</button>`:''}<button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div><div class="test-result-lines">${run.results.map(r=>{
+    const x=resolveLesson(r.id),op=DATA.openings[x.oi],line=op.lines[x.li],clean=r.outcome==='recalled';
+    const num=Math.floor(r.stopPly/2)+1+(r.side==='w'?'.':'…');
+    return `<article class="test-result-line"><div><h3>${medalText(lnName(line))}</h3><p>${medalText(opName(op))} · ${t(r.side==='w'?'white':'black')}</p><span class="test-outcome${clean?' recalled':''}">${t({recalled:'testRecalled',missed:'testMismatch',skipped:'testSkipped',untested:'testUntested'}[r.outcome])}</span></div><div>${r.outcome==='missed'?`<p>${t('testPlayed',{move:medalText(num+r.playedSan)})}</p><p>${t('testExpected',{move:medalText(num+r.expectedSan)})}</p>`:''}${!clean?`<button class="mini" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('testPractiseLine')}</button>`:''}</div>${!clean&&r.expectedSan?`<details class="test-explanation"><summary>${t('testReviewAnswer')}</summary><p>${line.moves[r.stopPly]?.san===r.expectedSan?mvC(line.moves[r.stopPly]):lnIntro(line)}</p></details>`:''}</article>`;
+  }).join('')}</div></section>`;
+}
+function retryTestReport(missedOnly){
+  const run=testStore.load().history.find(r=>r.id===testReportId);if(!run)return;
+  testDraft={id:null,name:run.name,items:run.results.filter(r=>!missedOnly||r.outcome!=='recalled').map(({id,side})=>({id,side}))};
+  testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='';renderTestPage();document.getElementById('testStartBtn').focus();
+}
+function renderTestPage(){
+  ensureTestDraft();const el=document.getElementById('testPanel'),d=testStore.load(),report=d.history.find(r=>r.id===testReportId);
+  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);return;}
+  testReportId=null;
+  const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
+  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p><div class="test-setup-layout"><section class="test-builder" aria-labelledby="testPoolHeading"><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="newTestPool()">${t('testNewPool')}</button></div><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><div class="test-pool-tools"><button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button><button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section><aside class="test-ready"><h3>${t('testHowItWorks')}</h3><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><div class="test-start-actions"><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div><p class="home-note">${t(d.active?'testResumeFirst':'testRankNote')}</p></aside></div><section class="test-saved"><h3>${t('testSavedPools')}</h3>${d.pools.length?`<div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div>`:`<p class="home-note">${t('testNoPools')}</p>`}</section><section class="test-history"><h3>${t('testHistory')}</h3><p class="home-note">${t('testHistoryNote')}</p>${d.history.length?d.history.map(r=>`<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>x.outcome==='recalled').length,total:r.items.length})}</p></div><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></article>`).join(''):`<p class="home-note">${t('testNoHistory')}</p>`}</section>`;
+  renderTestPoolResults();updateTestSummary();fitAllSelects();
+}
+
 /* ================= MENU ================= */
 let menuScrollY=0;
 function showAppView(view){
@@ -3109,6 +3588,9 @@ function showAppView(view){
   document.getElementById('menu').style.display=inBoard?'none':'block';
   document.getElementById('drill').style.display=inBoard?'flex':'none';
   document.getElementById('drillSetup').hidden=!inBoard || mode!=='drill';
+  document.getElementById('drill').classList.toggle('testing',inBoard&&mode==='test');
+  document.getElementById('testBoardStrip').hidden=!inBoard||mode!=='test';
+  document.getElementById('testNav').hidden=!inBoard||mode!=='test';
   promoPending=null;
   const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
   if(inBoard){ renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
@@ -3121,16 +3603,17 @@ function setMenuView(view){
   document.querySelector(`[data-home="${menuView}"]`)?.focus({preventScroll:true});
 }
 function showMenu(view){
-  if(['explore','practice','progress'].includes(view)) menuView=view;
+  if(['explore','practice','test','progress'].includes(view)) menuView=view;
   runGen++; Engine.abort(); reviewQueue=null; sessionActive=false; sessionItem=null;
   showAppView('menu');
-  const tabs=[['explore','navExplore'],['practice','navPractice'],['progress','navProgress']];
+  const tabs=[['explore','navExplore'],['practice','navPractice'],['test','navTest'],['progress','navProgress']];
   document.getElementById('homeNav').innerHTML=tabs.map(([key,label])=>`<button data-home="${key}" aria-current="${menuView===key?'page':'false'}" onclick="setMenuView('${key}')">${t(label)}</button>`).join('');
   const explore=menuView==='explore',progress=menuView==='progress';
   document.getElementById('findRow').hidden=!explore;
   document.getElementById('opGrid').hidden=!explore;
   document.getElementById('todayBar').hidden=menuView!=='practice';
   document.getElementById('repertoirePanel').hidden=menuView!=='practice';
+  document.getElementById('testPanel').hidden=menuView!=='test';
   document.getElementById('summaryBar').hidden=!progress;
   document.getElementById('promotionOverview').hidden=!progress;
   document.getElementById('heatmapBox').hidden=!progress;
@@ -3138,6 +3621,7 @@ function showMenu(view){
   if(explore) renderExplore();
   if(menuView==='practice') renderPractice();
   if(progress) renderProgressPage();
+  if(menuView==='test') renderTestPage();
   fitAllSelects(); achCheck('menu'); renderAchievementEntry(); flushMedals();
 }
 function renderPractice(){
@@ -3256,7 +3740,7 @@ function addQuickOpening(oi){
 }
 function renderRepertoireButton(){
   const el=document.getElementById('boardRepBtn'); if(!el) return;
-  el.hidden=curOp===null||freeMode&&mode==='play';
+  el.hidden=mode==='test'||curOp===null||freeMode&&mode==='play';
   if(el.hidden) return;
   const on=repertoire.has(curOp,curLine,playerSide);
   el.innerHTML=(on?repertoireBookmark()+' ':'')+medalText(t(on?'repAdded':'repAdd')); el.setAttribute('aria-pressed',String(on));
@@ -3521,6 +4005,7 @@ function startDrill(oi,li,side){
   tick();
 }
 function switchSide(s){
+  if(mode==='test')return;
   if(s===playerSide) return;
   if(mode==='learn') startLearn(curOp,curLine,s); else startDrill(curOp,curLine,s);
 }
@@ -3538,6 +4023,7 @@ function buildLineSel(){
   sel.innerHTML=html; fitSelectText(sel);
 }
 function onLineSel(v){
+  if(mode==='test')return;
   const [oi,li]=v.split(':').map(Number);
   const side = oi===curOp ? playerSide : preferredSide(oi,li);
   if(mode==='learn') startLearn(oi,li,side);
@@ -4020,7 +4506,7 @@ function isMine(name){
   }
   return (p===p.toUpperCase()) === (playerSide==='w');
 }
-function selectSquare(sq){ selSq=sq; aimSet = (sq&&showAims) ? new Set(legalTargetNames(sq)) : null; if(sq) buzz(8); render(curLastU()); }
+function selectSquare(sq){ selSq=sq; aimSet = (sq&&showAims&&mode!=='test') ? new Set(legalTargetNames(sq)) : null; if(sq) buzz(8); render(curLastU()); }
 function onSquare(name){
   if(locked) return;
   if(mode==='learn' && learnPly>=lineMoves().length) return;
@@ -4036,6 +4522,7 @@ function onSquare(name){
     return;
   }
   if(mode==='learn'){ learnTryMove(selSq+name); return; }
+  if(mode==='test'){ attemptTestMove(selSq+name); return; }
   attemptMove(selSq+name);
 }
 
@@ -4236,6 +4723,7 @@ function explainWrong(wrongU, expected, reveal){
 
 let hintPly=-1, hintSq=null;
 function giveHint(){
+  if(mode==='test')return;
   if(locked || ply>=lineMoves().length || !isPlayerTurn()) return;
   const exp=lineMoves()[ply];
   if(ply!==hintPly){         // repeat presses on the same move don't stack penalties
