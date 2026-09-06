@@ -552,6 +552,8 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .today-item.complete .today-index { color:#d5e5c5; background:#3d4d30; }
 .home-footer { display:flex; flex-wrap:wrap; align-items:center; gap:12px; border-top:1px solid var(--line); padding-top:20px; margin-top:24px; }
 .home-footer p { color:#c7b89f; margin-right:auto; }
+#todayBar:not([hidden]) + #repertoirePanel { margin-top:32px; padding-top:32px; border-top:1px solid var(--line); }
+#selectedOpeningsHeading { scroll-margin-top:24px; }
 .rep-title { display:flex; gap:16px; justify-content:space-between; align-items:center; }
 .rep-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:18px; align-items:start; }
 .rep-card { border:1px solid var(--line); background:var(--panel); border-radius:20px; padding:20px; min-width:0; }
@@ -643,7 +645,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
     <div class="summary-bar" id="summaryBar"></div>
     <div id="heatmapBox"></div>
     <div id="earlierProgress" hidden></div>
-    <div id="buildTag">Debut · build <b>G27</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G28</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1110,8 +1112,9 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
 /* G26 product language: concrete practice, no waiting or perfect-day pressure. */
 Object.assign(I18N_EN, {
   homeNavigation:'Main navigation',
-  navToday:'Today',
-  navRepertoire:'My repertoire',
+  navPractice:'My practice',
+  yourOpenings:'Your openings',
+  viewSelectedOpenings:'View my openings ↓',
   navExplore:'Openings',
   navProgress:'Progress',
   todayTitle:'Your daily practice',
@@ -1143,24 +1146,24 @@ Object.assign(I18N_EN, {
   editStarterTitle:'Choose your starter lines',
   editStarterBody:'This replaces your selected lines. All saved lessons, drills and achievements stay with you.',
   saveStarter:'Update selection',
-  createRepertoire:'Build my repertoire',
-  exploreFirst:'Explore first',
+  createRepertoire:'Save my openings',
+  exploreFirst:'Browse all openings',
   repEmptyTitle:'Your repertoire is ready for a first line.',
   repEmptyBody:'Choose a starter selection below, or add lines from Explore. Removing a line never deletes its progress.',
   chooseLines:'Choose my lines',
-  repertoireBody:'The lines you want to bring to your next game. Learn the ideas, then practise your side.',
+  repertoireBody:'Practise any saved line here, whenever you like. Your suggested session uses these openings.',
   repWhite:'As White',
   repBlackE4:'As Black · vs 1.e4',
   repBlackD4:'As Black · vs 1.d4',
   repOther:'As Black · other first moves',
-  removeRepLine:'Remove {line} from my repertoire',
-  repAdded:'✓ In my repertoire',
-  repAdd:'+ Add to my repertoire',
+  removeRepLine:'Remove {line} from my practice',
+  repAdded:'✓ Saved for practice',
+  repAdd:'+ Save for practice',
   addMoreLines:'+ Add lines',
   changeStarter:'Change starter choices',
   sideProgressNote:'White and Black recall are tracked separately. Lesson reading is shared.',
   progressTitle:'Practice that adds up.',
-  progressBody:'A record of your learning and practice. Your repertoire tells you what is due next.',
+  progressBody:'A record of your learning and practice. Find your next session in My practice.',
   practisedLines:'Lines practised by colour',
   earlierProgress:'Earlier progress · {n} lines',
   legacyProgressNote:'Earlier versions combined White and Black. Your old drills and ranks are kept here. New recall starts separately for each colour; completed lessons remain available to drill.',
@@ -1178,10 +1181,9 @@ Object.assign(I18N_EN, {
   readyNowTitle:'Next in your repertoire',
   payoffLearn:'Learn the idea',
   learnedBadgeRest:'Lesson complete. You can now practise either colour separately.',
-  backToday:'Back to Today',
+  backPractice:'Back to My practice',
   pauseSession:'Pause session',
   nextSessionStep:'Next step →',
-  backRepertoire:'Back to my repertoire',
   backMenu:'← Back',
   reviewEffortNote:'Practice counts even when you need help. Your next review follows today’s first result.',
   repeatPracticeNote:'Extra practice complete. Repeats today do not earn another daily review or change the first result.',
@@ -1203,13 +1205,14 @@ Object.assign(I18N_EN, {
   achNoHistory:'No earlier achievements to show.',
   achAll:'Milestones',
   achKeepExploringBody:'Your progress stays with you. Follow your repertoire at your own pace.',
-  achFootnote:'Drill totals count the first completed attempt per line, colour and day. Scheduled reviews count when due, even with mistakes. A Today session counts once per day. Earlier achievements remain in history.',
+  achFootnote:'Drill totals count the first completed attempt per line, colour and day. Scheduled reviews count when due, even with mistakes. A daily session counts once per day. Earlier achievements remain in history.',
   tipEngMove:'Let the engine play this move for you'
 });
 Object.assign(I18N.zh, {
   homeNavigation:'主导航',
-  navToday:'今日',
-  navRepertoire:'我的开局库',
+  navPractice:'我的练习',
+  yourOpenings:'已选开局',
+  viewSelectedOpenings:'查看已选开局 ↓',
   navExplore:'全部开局',
   navProgress:'进度',
   todayTitle:'今日练习',
@@ -1241,24 +1244,24 @@ Object.assign(I18N.zh, {
   editStarterTitle:'选择入门变例',
   editStarterBody:'这会替换当前选择的变例。已保存的学习、操练和成就全部保留。',
   saveStarter:'更新选择',
-  createRepertoire:'建立我的开局库',
-  exploreFirst:'先探索一下',
+  createRepertoire:'保存已选开局',
+  exploreFirst:'浏览全部开局',
   repEmptyTitle:'为你的开局库添加第一条变例。',
   repEmptyBody:'选择下方的入门组合，或从探索页添加变例。移除变例不会删除学习进度。',
   chooseLines:'选择变例',
-  repertoireBody:'把这些变例带进你的下一盘棋。先理解思路，再练习自己的执棋方。',
+  repertoireBody:'随时选择下方的变例练习。今日练习也会从这些开局中安排。',
   repWhite:'执白',
   repBlackE4:'执黑 · 应对 1.e4',
   repBlackD4:'执黑 · 应对 1.d4',
   repOther:'执黑 · 其他首着',
-  removeRepLine:'从我的开局库移除「{line}」',
-  repAdded:'✓ 已在开局库',
-  repAdd:'+ 加入我的开局库',
+  removeRepLine:'从我的练习中移除「{line}」',
+  repAdded:'✓ 已加入练习',
+  repAdd:'+ 加入我的练习',
   addMoreLines:'+ 添加变例',
   changeStarter:'更改入门组合',
   sideProgressNote:'白方与黑方的回忆进度分别记录，课文阅读进度共享。',
   progressTitle:'每次练习，都有积累。',
-  progressBody:'记录你的学习与练习。下一次该复习什么，由你的开局库来安排。',
+  progressBody:'记录你的学习与练习。下一次该复习什么，可在「我的练习」中查看。',
   practisedLines:'按执方记录的已练变例',
   earlierProgress:'早期进度 · {n} 条变例',
   legacyProgressNote:'早期版本将黑白双方合并记录。旧操练与等级保存在这里。新的回忆进度按执方分别记录，已学完的课文仍可直接操练。',
@@ -1276,10 +1279,9 @@ Object.assign(I18N.zh, {
   readyNowTitle:'开局库中的下一步',
   payoffLearn:'理解思路',
   learnedBadgeRest:'本课已完成，现在可按执方分别操练。',
-  backToday:'返回今日',
+  backPractice:'返回我的练习',
   pauseSession:'暂停本次练习',
   nextSessionStep:'下一项 →',
-  backRepertoire:'返回我的开局库',
   backMenu:'← 返回',
   reviewEffortNote:'需要帮助也算练习。下一次复习按今天的首次结果安排。',
   repeatPracticeNote:'额外练习已完成。同日重复练习不会重复计入每日复习，也不会覆盖首次结果。',
@@ -1310,7 +1312,7 @@ Object.assign(I18N_EN, {
   todayDrills:'{n} recall drills',
   todayOneLesson:'1 new lesson',
   planJoin:' + ',
-  fromRepertoire:'From your repertoire, at your own pace.',
+  fromRepertoire:'From your saved openings, at your own pace.',
   legacyWelcome:'Your earlier progress is safe. Previous ranks are kept in Progress; new recall is tracked by colour.'
 });
 Object.assign(I18N.zh, {
@@ -1318,7 +1320,7 @@ Object.assign(I18N.zh, {
   todayDrills:'{n} 条回忆操练',
   todayOneLesson:'1 条新课',
   planJoin:'，',
-  fromRepertoire:'来自你的开局库，按自己的节奏完成。',
+  fromRepertoire:'来自你的已选开局，按自己的节奏完成。',
   legacyWelcome:'早期进度已保留。旧等级可在进度页查看，新的回忆进度按黑白分别记录。'
 });
 
@@ -2167,18 +2169,18 @@ function syncSessionContext(nextMode,oi,li,side){
   }
 }
 function startDailySession(){
-  if(!repertoire.entries().length){ showMenu('repertoire'); return; }
+  if(!repertoire.entries().length){ showMenu('practice'); return; }
   let d=daily.load();
-  if(!d){ d=daily.plan(); if(!d.items.length){showMenu('today');return;} daily.save(d); }
-  if(d.completed){showMenu('today');return;}
+  if(!d){ d=daily.plan(); if(!d.items.length){showMenu('practice');return;} daily.save(d); }
+  if(d.completed){showMenu('practice');return;}
   sessionActive=true; nextSessionItem();
 }
 function nextSessionItem(){
   const d=daily.load();
-  if(!sessionActive||!d||d.completed){showMenu('today');return;}
+  if(!sessionActive||!d||d.completed){showMenu('practice');return;}
   const next=d.items.find(x=>!d.done.includes(itemKey(x)));
-  if(!next){showMenu('today');return;}
-  if(!repertoire.load().items.some(x=>itemKey(x)===itemKey(next))){daily.selectionChanged();showMenu('today');return;}
+  if(!next){showMenu('practice');return;}
+  if(!repertoire.load().items.some(x=>itemKey(x)===itemKey(next))){daily.selectionChanged();showMenu('practice');return;}
   sessionItem=next; const x=resolveLesson(next.id);
   if(next.mode==='learn') startLearn(x.oi,x.li,next.side); else startDrill(x.oi,x.li,next.side);
 }
@@ -2186,11 +2188,11 @@ function renderSessionStrip(){
   const el=document.getElementById('sessionStrip'), next=document.getElementById('learnSessionNext');
   const d=sessionActive?daily.load():null;
   el.hidden=!d;
-  if(d) el.innerHTML=`<b>${d.completed?t('sessionFinished'):t('todayTitle')}</b><span>${t('sessionProgress',{n:d.done.length,total:d.items.length})}</span><button class="linklike" onclick="showMenu('today')">${t(d.completed?'backToday':'pauseSession')}</button>`;
+  if(d) el.innerHTML=`<b>${d.completed?t('sessionFinished'):t('todayTitle')}</b><span>${t('sessionProgress',{n:d.done.length,total:d.items.length})}</span><button class="linklike" onclick="showMenu('practice')">${t(d.completed?'backPractice':'pauseSession')}</button>`;
   if(next){
     const learned=mode==='learn'&&learnCredited&&!!d;
     next.hidden=!learned;
-    next.textContent=d?.completed?t('backToday'):t('nextSessionStep');
+    next.textContent=d?.completed?t('backPractice'):t('nextSessionStep');
   }
 }
 
@@ -2199,7 +2201,7 @@ function renderSessionStrip(){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G27';
+const BUILD='G28';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2891,36 +2893,45 @@ function setMenuView(view){
   document.querySelector(`[data-home="${menuView}"]`)?.focus({preventScroll:true});
 }
 function showMenu(view){
-  if(['today','repertoire','explore','progress'].includes(view)) menuView=view;
+  if(['explore','practice','progress'].includes(view)) menuView=view;
   runGen++; Engine.abort(); reviewQueue=null; sessionActive=false; sessionItem=null;
   showAppView('menu');
-  const tabs=[['explore','navExplore'],['today','navToday'],['repertoire','navRepertoire'],['progress','navProgress']];
+  const tabs=[['explore','navExplore'],['practice','navPractice'],['progress','navProgress']];
   document.getElementById('homeNav').innerHTML=tabs.map(([key,label])=>`<button data-home="${key}" aria-current="${menuView===key?'page':'false'}" onclick="setMenuView('${key}')">${t(label)}</button>`).join('');
   const explore=menuView==='explore',progress=menuView==='progress';
   document.getElementById('findRow').hidden=!explore;
   document.getElementById('opGrid').hidden=!explore;
-  document.getElementById('todayBar').hidden=menuView!=='today';
-  document.getElementById('repertoirePanel').hidden=menuView!=='repertoire';
+  document.getElementById('todayBar').hidden=menuView!=='practice';
+  document.getElementById('repertoirePanel').hidden=menuView!=='practice';
   document.getElementById('summaryBar').hidden=!progress;
   document.getElementById('heatmapBox').hidden=!progress;
   document.getElementById('earlierProgress').hidden=!progress;
   document.getElementById('achievementEntry').hidden=!progress;
   if(explore) renderExplore();
-  if(menuView==='today') renderTodayBar();
-  if(menuView==='repertoire') renderRepertoire();
+  if(menuView==='practice') renderPractice();
   if(progress) renderProgressPage();
   achCheck('menu'); renderAchievementEntry(); flushMedals();
+}
+function renderPractice(){
+  const hasLines=repertoire.entries().length>0;
+  const today=document.getElementById('todayBar');
+  today.hidden=!hasLines;
+  if(hasLines) renderTodayBar(); else today.innerHTML='';
+  renderRepertoire();
+}
+function showSelectedOpenings(){
+  const heading=document.getElementById('selectedOpeningsHeading');
+  if(heading){heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}
 }
 function packName(pack){return zhOn()?pack.zh:pack.en;}
 function starterForm(edit=false){
   const rep=repertoire.load();
   const fields=Object.entries(STARTER_PACKS).map(([slot,packs])=>`<label class="rep-choice"><span>${t({white:'chooseWhite',e4:'chooseBlackE4',d4:'chooseBlackD4'}[slot])}</span><select name="${slot}">${packs.map(p=>`<option value="${p.key}"${rep.picks[slot]===p.key?' selected':''}>${packName(p)}</option>`).join('')}</select></label>`).join('');
-  return `<form class="rep-setup" onsubmit="event.preventDefault();saveStarterChoices(this)"><div class="home-heading"><span class="eyebrow">${t('navRepertoire')}</span><h2>${t(edit?'editStarterTitle':'starterTitle')}</h2><p>${t(edit?'editStarterBody':'starterBody')}</p></div><div class="rep-choices">${fields}</div><p class="home-note">${t('starterCoverage')}</p><div class="home-actions"><button class="act primary" type="submit">${t(edit?'saveStarter':'createRepertoire')}</button>${edit?'':`<button class="act" type="button" onclick="setMenuView('explore')">${t('exploreFirst')}</button>`}</div></form>`;
+  return `<form class="rep-setup" onsubmit="event.preventDefault();saveStarterChoices(this)"><div class="home-heading"><span class="eyebrow">${t('navPractice')}</span><h2>${t(edit?'editStarterTitle':'starterTitle')}</h2><p>${t(edit?'editStarterBody':'starterBody')}</p></div><div class="rep-choices">${fields}</div><p class="home-note">${t('starterCoverage')}</p><div class="home-actions"><button class="act primary" type="submit">${t(edit?'saveStarter':'createRepertoire')}</button>${edit?'':`<button class="act" type="button" onclick="setMenuView('explore')">${t('exploreFirst')}</button>`}</div></form>`;
 }
 function saveStarterChoices(form){
   const picks={}; Object.keys(STARTER_PACKS).forEach(k=>picks[k]=form.elements[k].value);
-  const existed=repertoire.load().configured;
-  repertoire.choose(picks); daily.selectionChanged(); showMenu(existed?'repertoire':'today');
+  repertoire.choose(picks); daily.selectionChanged(); showMenu('practice');
   const heading=document.querySelector('#menu h2'); if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
 }
 function toggleRepertoireLine(oi,li,side=preferredSide(oi,li)){
@@ -2941,8 +2952,7 @@ function renderRepertoireButton(){
 function renderTodayBar(){
   const el=document.getElementById('todayBar'), entries=repertoire.entries();
   const legacyNote=legacyProgress().length?`<p class="home-note legacy-welcome">${t('legacyWelcome')} <button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></p>`:'';
-  if(!repertoire.load().configured){el.className='';el.innerHTML=starterForm()+legacyNote;return;}
-  if(!entries.length){el.className='';el.innerHTML=`<section class="home-empty"><h2>${t('repEmptyTitle')}</h2><p>${t('repEmptyBody')}</p><button class="act primary" onclick="setMenuView('repertoire')">${t('chooseLines')}</button></section>`;return;}
+  if(!entries.length){el.innerHTML='';return;}
   const saved=daily.load(), plan=saved||daily.plan(), finished=!!saved?.completed;
   const due=srs.dueList(true), days=Object.keys(activity.load()).length;
   const reviews=plan.items.filter(x=>x.mode==='drill').length, lessons=plan.items.filter(x=>x.mode==='learn').length;
@@ -2955,11 +2965,14 @@ function renderTodayBar(){
     return `<li class="today-item${done?' complete':''}"><span class="today-index" aria-hidden="true">${done?'✓':i+1}</span><div><b>${lnName(line)}</b><span>${opName(DATA.openings[x.oi])} · ${t(it.side==='w'?'white':'black')} · ${t(it.mode==='learn'?'learn':'drill')}${done?' · '+t('completedWord'):''}</span></div></li>`;
   }).join('');
   el.className='today-content';
-  el.innerHTML=`${legacyNote}<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished&&plan.items.length?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="act" onclick="setMenuView('repertoire')">${t('navRepertoire')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>${list?`<section class="session-plan"><h3>${t('inThisSession')}</h3><ol>${list}</ol></section>`:''}<div class="home-footer"><p>${t('tryPositionBody')}</p><button class="act" onclick="enterFreePlay()">${t('vsEngine')}</button><button class="linklike" onclick="setMenuView('explore')">${t('navExplore')} →</button></div>`;
+  el.innerHTML=`${legacyNote}<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished&&plan.items.length?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="linklike" onclick="showSelectedOpenings()">${t('viewSelectedOpenings')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>${list?`<section class="session-plan"><h3>${t('inThisSession')}</h3><ol>${list}</ol></section>`:''}`;
 }
 function renderRepertoire(){
   const el=document.getElementById('repertoirePanel'), entries=repertoire.entries();
-  if(!repertoire.load().configured){el.innerHTML=starterForm();return;}
+  if(!entries.length){
+    el.innerHTML=starterForm()+(legacyProgress().length?`<p class="home-note legacy-welcome">${t('legacyWelcome')} <button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></p>`:'');
+    return;
+  }
   const groups=[['w','repWhite'],['e4','repBlackE4'],['d4','repBlackD4'],['other','repOther']];
   let cards='';
   for(const [group,label] of groups){
@@ -2973,7 +2986,7 @@ function renderRepertoire(){
       return `<article class="rep-line"><div class="rep-line-head"><div><h4>${lnName(line)}</h4><p>${opName(DATA.openings[x.oi])}</p></div><button class="rep-remove" data-rep-id="${itemKey(x)}" aria-label="${medalText(t('removeRepLine',{line:lnName(line)}))}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button></div><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div><div class="home-actions"><button class="mini${!st.learned&&!st.runs?' preferred':''}" onclick="startLearn(${x.oi},${x.li},'${x.side}')">${t('learn')}</button><button class="mini${st.learned||st.runs?' preferred':''}" onclick="startDrill(${x.oi},${x.li},'${x.side}')">${t('drill')}</button><button class="mini" onclick="startPlay(${x.oi},${x.li},'${x.side}')">${t('play')}</button></div></article>`;
     }).join('')}</section>`;
   }
-  el.innerHTML=`<div class="home-heading rep-title"><div><span class="eyebrow">${t('selectedLines')}</span><h2>${t('navRepertoire')}</h2><p>${t('repertoireBody')}</p></div><button class="act" onclick="setMenuView('explore')">${t('addMoreLines')}</button></div>${entries.length?`<div class="rep-grid">${cards}</div>`:`<section class="home-empty"><h3>${t('repEmptyTitle')}</h3><p>${t('repEmptyBody')}</p></section>`}<details class="starter-editor"><summary>${t('changeStarter')}</summary>${starterForm(true)}</details><p class="home-note">${t('sideProgressNote')}</p>`;
+  el.innerHTML=`<div class="home-heading rep-title"><div><h2 id="selectedOpeningsHeading" tabindex="-1">${t('yourOpenings')}</h2><p>${t('repertoireBody')}</p></div><button class="act" onclick="setMenuView('explore')">${t('addMoreLines')}</button></div><div class="rep-grid">${cards}</div><details class="starter-editor"><summary>${t('changeStarter')}</summary>${starterForm(true)}</details><p class="home-note">${t('sideProgressNote')}</p><div class="home-footer"><p>${t('tryPositionBody')}</p><button class="act" onclick="enterFreePlay()">${t('vsEngine')}</button><button class="linklike" onclick="setMenuView('explore')">${t('navExplore')} →</button></div>`;
 }
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
@@ -3942,12 +3955,12 @@ function renderDoneBox(){
   highlightExplanation(document.getElementById('donePlan'));
   const rail=document.getElementById('readyRail');
   if(rail) rail.innerHTML='';
-  document.getElementById('doneNext').textContent=t(sessionActive?(daily.load()?.completed?'backToday':'nextSessionStep'):'backRepertoire');
+  document.getElementById('doneNext').textContent=t(sessionActive?(daily.load()?.completed?'backPractice':'nextSessionStep'):'backPractice');
   document.getElementById('streakInfo').textContent=d.firstToday?t('reviewEffortNote'):t('repeatPracticeNote');
 }
 
 function nextLine(){
-  if(sessionActive) nextSessionItem(); else showMenu('repertoire');
+  if(sessionActive) nextSessionItem(); else showMenu('practice');
 }
 /* ================= REVIEW QUEUE ================= */
 let reviewQueue=null;
