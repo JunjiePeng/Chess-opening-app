@@ -91,10 +91,6 @@ header p { color:var(--dim); font-size:.9rem; }
   padding:11px 16px; color:var(--text); font-size:1rem; font-family:inherit; }
 #searchBox:focus { outline:none; border-color:var(--accent); }
 #searchBox::placeholder { color:var(--dim); opacity:1; }
-.sort-seg { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--panel); }
-.sort-seg button { background:transparent; color:var(--dim); border:none; min-height:42px; padding:9px 13px; cursor:pointer; font-size:.875rem; font-family:inherit; }
-.sort-seg button:hover { color:var(--text); }
-.sort-seg button.on { background:var(--accent); color:var(--on-accent); font-weight:700; }
 .no-results { grid-column:1 / -1; text-align:center; color:var(--dim); padding:26px 0; font-size:.95rem; }
 .group-head { grid-column:1 / -1; text-align:left; font-size:.875rem; font-weight:700; letter-spacing:.08em;
   color:#a9bb8a; text-transform:uppercase; margin:10px 0 -4px; padding-left:2px; }
@@ -841,6 +837,30 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   #testFeedbackHeading { scroll-margin-top:24px; scroll-margin-bottom:170px; }
 }
 
+/* G39: variation-level filters, with explicit learning stages and review ordering. */
+#findRow { gap:14px; margin-bottom:20px; }
+#searchBox { flex-basis:100%; }
+.library-filters { display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 22px; flex-basis:100%; padding:16px 18px; border:1px solid var(--line); border-radius:16px; background:var(--panel); }
+.library-filters label { display:flex; flex-direction:column; align-items:flex-start; gap:7px; min-width:0; max-width:100%; }
+.library-filters label>span { color:#ddc6a8; font-size:.8rem; font-weight:600; }
+.library-filters select { min-height:42px; max-width:100%; font:inherit; font-size:.9rem; color:#f3e5d1; border:1px solid #80674c; border-radius:9px; background:var(--bg); padding:8px 10px; cursor:pointer; }
+.library-filters select.is-filtered { border-color:#d99f64; background:#493423; color:#ffe0b9; }
+.library-filters .library-sort { margin-left:auto; }
+.library-filters #libraryClear { align-self:flex-end; min-height:42px; }
+.library-filter-help { flex-basis:100%; color:#cdbba3; font-size:.82rem; line-height:1.65; }
+.library-filter-help p { margin:0; }
+#libraryStageHelp { color:#e6caab; }
+#librarySortHelp { margin-top:4px; }
+.no-results .act { margin-top:16px; }
+@media(max-width:760px){
+  .library-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 12px; padding:14px; }
+  .library-filters .library-sort { margin-left:0; }
+  .library-filters label>span { font-size:.76rem; }
+  .library-filters select { font-size:.82rem; padding:8px; }
+  .library-filters #libraryClear { justify-self:start; grid-column:1/-1; }
+  .library-filter-help { font-size:.78rem; }
+}
+
 </style>
 </head>
 <body>
@@ -868,19 +888,21 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div id="achievementEntry"></div>
     <div id="findRow">
       <input id="searchBox" data-i18n-label="searchPh" type="search" autocomplete="off" data-i18n-ph="searchPh">
-      <div class="sort-seg" id="sortSeg">
-        <button data-sort="group" data-i18n="sortGroup">Groups</button>
-        <button data-sort="az">A–Z</button>
-        <button data-sort="prog" data-i18n="sortProg">Progress</button>
-        <button data-sort="due" data-i18n="sortDue">Due</button>
+      <div class="library-filters" role="group" data-i18n-label="libraryFilters">
+        <label><span data-i18n="libraryColourLabel">Play as</span><select id="libraryColour" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"><option value="all" data-i18n="libraryAllColours">Both colours</option><option value="w" data-i18n="white">White</option><option value="b" data-i18n="black">Black</option></select></label>
+        <label><span data-i18n="libraryFirstMoveLabel">First move</span><select id="libraryFirstMove" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"></select></label>
+        <label><span data-i18n="libraryStageLabel">Learning stage</span><select id="libraryStage" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryStageHelp"><option value="all" data-i18n="libraryAllStages">All stages</option><option value="new" data-i18n="libraryNew">Not started</option><option value="learning" data-i18n="libraryLearning">Learning · Pawn</option><option value="recalled" data-i18n="libraryRecalled">Recalled · Knight+</option><option value="due" data-i18n="libraryDue">Due for review</option></select></label>
+        <label class="library-sort"><span data-i18n="librarySortLabel">Sort by</span><select id="librarySort" onchange="updateLibraryFilters()" aria-describedby="librarySortHelp"><option value="group" data-i18n="libraryGroupSort">Opening groups</option><option value="due" data-i18n="libraryDueSort">Review due first</option></select></label>
+        <button id="libraryClear" class="linklike" onclick="clearLibraryFilters()" data-i18n="libraryClear" hidden>Clear filters</button>
       </div>
-      <div class="library-meta"><p class="library-hint" data-i18n="saveLineHint">Use + to save lines to My repertoire.</p><p id="catalogueCount"></p></div>
+      <div class="library-filter-help"><p id="libraryFilterHelp" data-i18n="libraryFilterHelp">Colour is the side taught in the lesson. First move is White’s opening move.</p><p id="libraryStageHelp"></p><p id="librarySortHelp" hidden></p></div>
+      <div class="library-meta"><p class="library-hint" data-i18n="saveLineHint">Use + to save lines to My repertoire.</p><p id="catalogueCount" role="status" aria-live="polite" aria-atomic="true"></p></div>
     </div>
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G38</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G39</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1116,9 +1138,6 @@ Object.assign(I18N_EN, {
   importOk:'Imported {n} item(s) — reloading…',
   importBad:'Not a valid Debut progress file.',
   searchPh:'Search openings…',
-  sortGroup:'Groups',
-  sortProg:'Progress',
-  sortDue:'Due',
   noResults:'No openings match — try another name.',
   playNext:'Next: {mv} — play it on the board (or tap Next ▶)',
   drawMaterial:'½–½ Draw — neither side has enough pieces left to checkmate.',
@@ -1254,9 +1273,6 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   importOk:'已导入 {n} 项——正在刷新…',
   importBad:'不是有效的 Debut 进度文件。',
   searchPh:'搜索开局…',
-  sortGroup:'分组',
-  sortProg:'进度',
-  sortDue:'待复习',
   noResults:'没有匹配的开局——换个名字试试。',
   playNext:'下一步：{mv}——请在棋盘上走出（或点 下一步 ▶）',
   drawMaterial:'½–½ 和棋——双方剩余子力都不足以将杀。',
@@ -1421,6 +1437,32 @@ Object.assign(I18N_EN, {
   testCompletedCount:'Lines completed',
   testReportEncourage:'Use the marked moves to choose what to practise next.',
   testFullyRecalledCount:'{n} fully recalled without help',
+  libraryFilters:'Opening filters and sorting',
+  libraryColourLabel:'Play as',
+  libraryAllColours:'Both colours',
+  libraryFirstMoveLabel:'First move',
+  libraryAllFirstMoves:'All first moves',
+  libraryStageLabel:'Learning stage',
+  libraryAllStages:'All stages',
+  libraryNew:'Not started',
+  libraryLearning:'Learning',
+  libraryRecalled:'Recalled',
+  libraryDue:'Due for review',
+  librarySortLabel:'Sort by',
+  libraryGroupSort:'Groups',
+  libraryDueSort:'Due first',
+  libraryClear:'Clear filters',
+  libraryFilterHelp:'Choose the side you want to learn. First move always means White’s opening move.',
+  libraryStageAllHelp:'Stages track completed lessons and drills, not a memory percentage.',
+  libraryNewHelp:'Not started: no completed lesson or drill for this line.',
+  libraryLearningHelp:'Learning (Pawn): a lesson or drill completed; full unaided recall comes next.',
+  libraryRecalledHelp:'Recalled (Knight+): at least one full drill without mistakes or hints for this colour.',
+  libraryDueHelp:'Lines whose scheduled review time has arrived. A review can be due at any rank.',
+  libraryDueSortHelp:'Earliest matching review dates first; unscheduled lines last.',
+  libraryOneOpening:'{n} opening',
+  libraryOpenings:'{n} openings',
+  libraryMatchCount:'{openings} · {lines}',
+  libraryNoResults:'No lines match these filters. Try another combination or clear the filters.',
   homeNavigation:'Main navigation',
   navTest:'Test',
   testTitle:'How much can you recall?',
@@ -1702,6 +1744,32 @@ Object.assign(I18N.zh, {
   testCompletedCount:'已完成的变例',
   testReportEncourage:'根据标记的着法，选择接下来要练习的内容。',
   testFullyRecalledCount:'其中 {n} 条完整独立回忆',
+  libraryFilters:'开局筛选与排序',
+  libraryColourLabel:'执方',
+  libraryAllColours:'黑白双方',
+  libraryFirstMoveLabel:'第一步',
+  libraryAllFirstMoves:'所有第一步',
+  libraryStageLabel:'学习阶段',
+  libraryAllStages:'所有阶段',
+  libraryNew:'尚未开始',
+  libraryLearning:'学习中',
+  libraryRecalled:'已回忆',
+  libraryDue:'到期复习',
+  librarySortLabel:'排序',
+  libraryGroupSort:'按开局分组',
+  libraryDueSort:'优先到期复习',
+  libraryClear:'清除筛选',
+  libraryFilterHelp:'执方指课程讲授的一方；第一步指白方的开局着法。',
+  libraryStageAllHelp:'学习阶段记录已完成的学习与练习，并非记忆掌握百分比。',
+  libraryNewHelp:'尚未开始：未完成该变例的课程或练习。',
+  libraryLearningHelp:'学习中（兵）：已完成课程或练习，下一步是独立回忆整条变例。',
+  libraryRecalledHelp:'已回忆（马及以上）：至少一次以该执方完整通过练习，全程无错误、无提示。',
+  libraryDueHelp:'已到复习时间的变例。任何等级都可能需要复习。',
+  libraryDueSortHelp:'按匹配变例中最早的复习时间排序；尚未安排复习的排在最后。',
+  libraryOneOpening:'{n} 个开局',
+  libraryOpenings:'{n} 个开局',
+  libraryMatchCount:'{openings} · {lines}',
+  libraryNoResults:'没有符合当前筛选条件的变例。试试其他组合，或清除筛选。',
   homeNavigation:'主导航',
   navTest:'测试',
   testTitle:'你能记住多少？',
@@ -2131,13 +2199,10 @@ const lineFavs = {
    world moved on — no stale opponent replies, engine moves, or explanations. */
 let runGen=0;
 
-/* Menu search + sort state. Query is transient; sort choice persists. */
-let menuQuery='';
+/* Search/filter choices stay in place while navigating; only the sort persists. */
+let menuQuery='',menuColour='all',menuFirstMove='all',menuStage='all',libraryCollapsed={};
 let menuSort=(typeof localStorage!=='undefined' && localStorage.getItem('otSort'))||'group';
-if(!['group','az','prog','due'].includes(menuSort)) menuSort='group';
-function renderSortSeg(){
-  document.querySelectorAll('#sortSeg button').forEach(b=>b.classList.toggle('on', b.dataset.sort===menuSort));
-}
+if(!['group','due'].includes(menuSort)) menuSort='group';
 
 /* Light haptics on supported devices (Android Chrome; iOS Safari has no vibrate API). */
 function buzz(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){} }
@@ -2947,7 +3012,7 @@ const testStore={
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G38';
+const BUILD='G39';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4082,66 +4147,93 @@ function renderProgressPage(){
 
 }
 
-function renderExplore(){
-  const grid=document.getElementById('opGrid'); grid.innerHTML='';
-  document.getElementById('catalogueCount').textContent=t('catalogueCount',{openings:DATA.openings.length,lines:DATA.openings.reduce((n,o)=>n+o.lines.length,0)});
-  // group: side + first move (e2e4 / d2d4)
-  const groups=[
-    {id:'we4', label:t('groupWE4'), test:(op,l,oi,li)=>preferredSide(oi,li)==='w'&&l.moves[0].u==='e2e4'},
-    {id:'wd4', label:t('groupWD4'), test:(op,l,oi,li)=>preferredSide(oi,li)==='w'&&l.moves[0].u==='d2d4'},
-    {id:'be4', label:t('groupBE4'), test:(op,l,oi,li)=>preferredSide(oi,li)==='b'&&l.moves[0].u==='e2e4'},
-    {id:'bd4', label:t('groupBD4'), test:(op,l,oi,li)=>preferredSide(oi,li)==='b'&&l.moves[0].u==='d2d4'},
-    {id:'wfl', label:t('groupWFlank'), test:(op,l,oi,li)=>preferredSide(oi,li)==='w'&&!['e2e4','d2d4'].includes(l.moves[0].u)},
-    {id:'bother', label:t('groupBOther'), test:(op,l,oi,li)=>preferredSide(oi,li)==='b'&&!['e2e4','d2d4'].includes(l.moves[0].u)}
-  ];
-  // search + sort: any query or non-default sort renders a flat list; otherwise the curated groups
-  const q=menuQuery;
-  const matchOp = op => !q || opName(op).toLowerCase().includes(q) || op.name.toLowerCase().includes(q) || (op.nameZh||'').toLowerCase().includes(q);
-  const matchLine = (op,l) => lnName(l).toLowerCase().includes(q) || l.name.toLowerCase().includes(q) || (l.nameZh||'').toLowerCase().includes(q);
-  if(q || menuSort!=='group'){
-    let members=DATA.openings.map((op,oi)=>({op,oi}))
-      .filter(x=>matchOp(x.op) || x.op.lines.some(l=>matchLine(x.op,l)));
-    const doneFrac = x => x.op.lines.reduce((s,_,li)=>s+lineRank(x.oi,li),0)/(x.op.lines.length*5);
-    const runsOf   = x => x.op.lines.reduce((s,_,li)=>s+store.get(x.oi,li).runs,0);
-    const earliestDue = x => Math.min(...x.op.lines.map((_,li)=>{ const v=srs.get(x.oi,li); return v?v.due:Infinity; }));
-    if(menuSort==='az') members.sort((a,b)=>opName(a.op).localeCompare(opName(b.op), LANG==='zh'?'zh':'en'));
-    else if(menuSort==='prog') members.sort((a,b)=> doneFrac(b)-doneFrac(a) || runsOf(b)-runsOf(a));
-    else if(menuSort==='due') members.sort((a,b)=> earliestDue(a)-earliestDue(b));
-    if(!members.length){
-      const d=document.createElement('div'); d.className='no-results'; d.textContent=t('noResults'); grid.appendChild(d);
-    }
-    members.forEach(x=>{
-      const lineFilter = (q && !matchOp(x.op)) ? (l=>matchLine(x.op,l)) : null;
-      grid.appendChild(buildOpCard(x.op,x.oi,lineFilter));
-    });
-  } else {
-  const order=[];
-  // starred openings (full card) and openings with starred lines (card filtered to those lines) pinned first
-  const favMembers=[];
-  DATA.openings.forEach((op,oi)=>{
-    if(favs.has(op.name)) favMembers.push({op,oi});
-    else if(op.lines.some(l=>lineFavs.has(op,l))) favMembers.push({op,oi,onlyFav:true});
-  });
-  if(favMembers.length) order.push({id:'fav', label:t('groupFav'), members:favMembers});
-  groups.forEach(g=>{
-    const members=DATA.openings.map((op,oi)=>({op,oi,filter:l=>g.test(op,l,oi,op.lines.indexOf(l))})).filter(x=>x.op.lines.some(x.filter));
-    if(members.length) order.push({id:g.id, label:g.label, members});
-  });
-  const collapsed=readStoredRecord('otGroups');
-  order.forEach(group=>{
-    const isC=!!collapsed[group.id];
-    const h=document.createElement('div'); h.className='group-head';
-    // Only the heading text is the toggle (a real button: native keyboard + focus);
-    // the rest of the full-width row is inert, so hover/click land on the words.
-    h.innerHTML=`<button type="button" class="group-toggle" aria-expanded="${!isC}"><span class="caret">${isC?'▸':'▾'}</span>${group.label}</button><span class="g-count">${t('opCount',{n:group.members.length})}</span>`;
-    h.querySelector('.group-toggle').onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
-    grid.appendChild(h);
-    if(!isC) group.members.forEach(({op,oi,onlyFav,filter})=>{ grid.appendChild(buildOpCard(op,oi,filter||(onlyFav?(l=>lineFavs.has(op,l)):null))); });
-  });
+/* Library filters work on individual variations and their taught colour. */
+function normalizeLibrarySearch(value){return (value||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');}
+function libraryFirstMoves(){
+  const moves=new Map();
+  DATA.openings.forEach(op=>op.lines.forEach(line=>{const mv=line.moves[0];if(mv)moves.set(mv.u,mv.san);}));
+  const order=['e2e4','d2d4','c2c4','g1f3'];
+  return [...moves].sort((a,b)=>{const ai=order.indexOf(a[0]),bi=order.indexOf(b[0]);return (ai<0?99:ai)-(bi<0?99:bi);}).map(([u,san])=>({u,label:'1.'+san}));
+}
+function libraryEntries({query=menuQuery,colour=menuColour,first=menuFirstMove,stage=menuStage,now=Date.now()}={}){
+  const q=normalizeLibrarySearch(query),matches=(...names)=>names.some(name=>normalizeLibrarySearch(name).includes(q));
+  return DATA.openings.flatMap((op,oi)=>op.lines.map((line,li)=>{
+    const side=preferredSide(oi,li),rank=lineRank(oi,li,side),review=srs.get(oi,li,side);
+    return {op,oi,line,li,side,rank,due:review?.due??Infinity};
+  }).filter(x=>(colour==='all'||x.side===colour)&&(first==='all'||x.line.moves[0]?.u===first)
+    &&(matches(op.name,op.nameZh)||matches(x.line.name,x.line.nameZh))
+    &&(stage==='all'||stage==='new'&&x.rank===0||stage==='learning'&&x.rank===1||stage==='recalled'&&x.rank>=2||stage==='due'&&x.due<=now)));
+}
+function libraryCards(entries,sort='group'){
+  const cards=new Map();
+  for(const entry of entries){const key=entry.oi+':'+entry.side;if(!cards.has(key))cards.set(key,{op:entry.op,oi:entry.oi,lines:[]});cards.get(key).lines.push(entry);}
+  const out=[...cards.values()];
+  if(sort==='due'){
+    out.forEach(card=>card.lines.sort((a,b)=>a.due-b.due||a.li-b.li));
+    out.sort((a,b)=>a.lines[0].due-b.lines[0].due||a.oi-b.oi);
   }
-  function buildOpCard(op,oi,lineFilter){
+  return out;
+}
+function libraryHasFilters(){return !!menuQuery||menuColour!=='all'||menuFirstMove!=='all'||menuStage!=='all';}
+function renderLibraryControls(){
+  const first=document.getElementById('libraryFirstMove');
+  first.innerHTML=`<option value="all">${t('libraryAllFirstMoves')}</option>`+libraryFirstMoves().map(x=>`<option value="${x.u}">${x.label}</option>`).join('');
+  document.getElementById('libraryColour').value=menuColour;first.value=menuFirstMove;
+  document.getElementById('libraryStage').value=menuStage;document.getElementById('librarySort').value=menuSort;
+  document.getElementById('libraryClear').hidden=!libraryHasFilters();
+  for(const id of ['libraryColour','libraryFirstMove','libraryStage']){const el=document.getElementById(id);el.classList.toggle('is-filtered',el.value!=='all');}
+  document.getElementById('libraryStageHelp').textContent=t({all:'libraryStageAllHelp',new:'libraryNewHelp',learning:'libraryLearningHelp',recalled:'libraryRecalledHelp',due:'libraryDueHelp'}[menuStage]);
+  const sortHelp=document.getElementById('librarySortHelp');sortHelp.hidden=menuSort!=='due';sortHelp.textContent=t('libraryDueSortHelp');
+}
+function updateLibraryFilters(){
+  menuColour=document.getElementById('libraryColour').value;
+  menuFirstMove=document.getElementById('libraryFirstMove').value;
+  menuStage=document.getElementById('libraryStage').value;
+  menuSort=document.getElementById('librarySort').value;
+  try{localStorage.setItem('otSort',menuSort);}catch(e){}
+  refreshMenuKeepScroll();
+}
+function clearLibraryFilters(){
+  menuQuery='';menuColour='all';menuFirstMove='all';menuStage='all';libraryCollapsed={};
+  document.getElementById('searchBox').value='';refreshMenuKeepScroll();document.getElementById('searchBox').focus({preventScroll:true});
+}
+
+function renderExplore(){
+  const grid=document.getElementById('opGrid');grid.innerHTML='';
+  const entries=libraryEntries(),q=normalizeLibrarySearch(menuQuery),filtered=libraryHasFilters();
+  renderLibraryControls();
+  const openingCount=new Set(entries.map(x=>x.oi)).size;
+  document.getElementById('catalogueCount').textContent=t('libraryMatchCount',{openings:t(openingCount===1?'libraryOneOpening':'libraryOpenings',{n:openingCount}),lines:t(entries.length===1?'quickAddCountOne':'quickAddCount',{n:entries.length})});
+  if(!entries.length){
+    const empty=document.createElement('div');empty.className='no-results';
+    empty.innerHTML=`<p>${t('libraryNoResults')}</p><button class="act" onclick="clearLibraryFilters()">${t('libraryClear')}</button>`;grid.appendChild(empty);return;
+  }
+  if(menuSort==='due'){
+    libraryCards(entries,'due').forEach(x=>grid.appendChild(buildOpCard(x.op,x.oi,x.lines)));
+  }else{
+    const groups=[
+      {id:'we4',label:t('groupWE4'),test:x=>x.side==='w'&&x.line.moves[0].u==='e2e4'},
+      {id:'wd4',label:t('groupWD4'),test:x=>x.side==='w'&&x.line.moves[0].u==='d2d4'},
+      {id:'be4',label:t('groupBE4'),test:x=>x.side==='b'&&x.line.moves[0].u==='e2e4'},
+      {id:'bd4',label:t('groupBD4'),test:x=>x.side==='b'&&x.line.moves[0].u==='d2d4'},
+      {id:'wfl',label:t('groupWFlank'),test:x=>x.side==='w'&&!['e2e4','d2d4'].includes(x.line.moves[0].u)},
+      {id:'bother',label:t('groupBOther'),test:x=>x.side==='b'&&!['e2e4','d2d4'].includes(x.line.moves[0].u)}
+    ];
+    const favourites=entries.filter(x=>favs.has(x.op.name)||lineFavs.has(x.op,x.line));
+    if(favourites.length)groups.unshift({id:'fav',label:t('groupFav'),test:x=>favs.has(x.op.name)||lineFavs.has(x.op,x.line)});
+    const savedCollapsed=readStoredRecord('otGroups');
+    // Filtering exposes matches, without overwriting how the full catalogue was folded.
+    const collapsed=filtered?libraryCollapsed:savedCollapsed;
+    groups.forEach(group=>{
+      const cards=libraryCards(entries.filter(group.test));if(!cards.length)return;
+      const isC=!!collapsed[group.id],h=document.createElement('div');h.className='group-head';
+      h.innerHTML=`<button type="button" class="group-toggle" aria-expanded="${!isC}"><span class="caret">${isC?'▸':'▾'}</span>${group.label}</button><span class="g-count">${t(cards.length===1?'libraryOneOpening':'libraryOpenings',{n:cards.length})}</span>`;
+      h.querySelector('.group-toggle').onclick=()=>{collapsed[group.id]=!isC;if(!filtered)localStorage.setItem('otGroups',JSON.stringify(collapsed));refreshMenuKeepScroll();};
+      grid.appendChild(h);if(!isC)cards.forEach(x=>grid.appendChild(buildOpCard(x.op,x.oi,x.lines)));
+    });
+  }
+  function buildOpCard(op,oi,visibleLines){
     const card=document.createElement('div'); card.className='op-card clickable';
-    const visibleLines=op.lines.map((line,li)=>({line,li})).filter(x=>!lineFilter||lineFilter(x.line));
     const sides=[...new Set(visibleLines.map(x=>preferredSide(oi,x.li)))];
     const tag=`<span class="side-tag ${sides[0]==='w'?'side-w':'side-b'}">${sides.map(side=>t(side==='w'?'white':'black')).join(' / ')}</span>`;
     const firstMoves=[...new Set(visibleLines.map(x=>x.line.moves[0]?.san).filter(Boolean))];
@@ -4159,7 +4251,7 @@ function renderExplore(){
     card.title=t('clickCard');
     // Keep a growing catalogue compact; search reveals every matching line.
     const extraCount=visibleLines.length-3, expansionKey=op.name+'|'+visibleLines.map(x=>x.line.id).join(',');
-    const more=extraCount>0&&!q?document.createElement('details'):null;
+    const more=extraCount>0&&!q&&menuSort!=='due'&&menuStage!=='due'?document.createElement('details'):null;
     if(more){
       more.className='opening-more'; more.title=''; more.open=expandedOpeningCards.has(expansionKey);
       const summary=document.createElement('summary');
@@ -4169,8 +4261,7 @@ function renderExplore(){
       more.ontoggle=()=>{if(more.open)expandedOpeningCards.add(expansionKey);else expandedOpeningCards.delete(expansionKey);updateLabel();};
     }
     let shownLines=0;
-    op.lines.forEach((line,li)=>{
-      if(lineFilter && !lineFilter(line)) return;
+    visibleLines.forEach(({line,li})=>{
       const sv=srs.get(oi,li);
       const r=lineRank(oi,li);
       const dueTag = (sv && sv.due<=Date.now()) ? ` <span class="due-tag">${t('dueTag')}</span>` : '';
@@ -5266,12 +5357,7 @@ renderMuteBtn();
 })();
 (function initFindRow(){
   const sb=document.getElementById('searchBox');
-  if(sb) sb.addEventListener('input', ()=>{ menuQuery=sb.value.trim().toLowerCase(); refreshMenuKeepScroll(); });
-  document.querySelectorAll('#sortSeg button').forEach(b=>{
-    b.onclick=()=>{ menuSort=b.dataset.sort; try{ localStorage.setItem('otSort',menuSort); }catch(e){}
-      renderSortSeg(); refreshMenuKeepScroll(); };
-  });
-  renderSortSeg();
+  if(sb)sb.addEventListener('input',()=>{menuQuery=sb.value.trim();libraryCollapsed={};refreshMenuKeepScroll();});
 })();
 buildLineSel();
 applyStaticI18n();
