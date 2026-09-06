@@ -837,28 +837,32 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   #testFeedbackHeading { scroll-margin-top:24px; scroll-margin-bottom:170px; }
 }
 
-/* G39: variation-level filters, with explicit learning stages and review ordering. */
-#findRow { gap:14px; margin-bottom:20px; }
-#searchBox { flex-basis:100%; }
-.library-filters { display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 22px; flex-basis:100%; padding:16px 18px; border:1px solid var(--line); border-radius:16px; background:var(--panel); }
-.library-filters label { display:flex; flex-direction:column; align-items:flex-start; gap:7px; min-width:0; max-width:100%; }
-.library-filters label>span { color:#ddc6a8; font-size:.8rem; font-weight:600; }
-.library-filters select { min-height:42px; max-width:100%; font:inherit; font-size:.9rem; color:#f3e5d1; border:1px solid #80674c; border-radius:9px; background:var(--bg); padding:8px 10px; cursor:pointer; }
-.library-filters select.is-filtered { border-color:#d99f64; background:#493423; color:#ffe0b9; }
-.library-filters .library-sort { margin-left:auto; }
-.library-filters #libraryClear { align-self:flex-end; min-height:42px; }
-.library-filter-help { flex-basis:100%; color:#cdbba3; font-size:.82rem; line-height:1.65; }
+/* G40: one compact filter cluster alongside search; help is available on demand. */
+#findRow { gap:10px 14px; margin-bottom:18px; align-items:center; }
+#searchBox { flex:1 1 220px; min-width:180px; min-height:46px; }
+.library-filters { position:relative; display:inline-flex; flex:0 1 auto; flex-wrap:wrap; align-items:center; gap:0; max-width:100%; margin-left:auto; padding:0; border:1px solid var(--line); border-radius:22px; background:var(--panel); }
+.library-filters label { display:flex; flex:0 1 auto; align-items:center; min-width:0; max-width:100%; }
+.library-filters label+label { border-left:1px solid var(--line); }
+.library-filters select { min-height:44px; max-width:100%; font:inherit; font-size:.85rem; color:#e8d7bf; border:0; border-radius:20px; background:transparent; padding:9px 10px; cursor:pointer; }
+.library-filters select:hover { color:#fff0d8; background:#ffffff06; }
+.library-filters select:focus-visible { outline:2px solid var(--accent); outline-offset:-3px; }
+.library-filters select.is-filtered { color:#ffd19a; font-weight:650; }
+.library-filters #libraryClear,.library-filter-help>summary { display:flex; flex:0 0 38px; width:38px; height:44px; min-height:44px; align-items:center; justify-content:center; padding:0; color:#d7b38c; border:0; background:none; cursor:pointer; border-radius:20px; }
+.library-filters #libraryClear:hover,.library-filter-help>summary:hover { color:#fff0d8; background:#ffffff08; }
+.library-filters #libraryClear svg,.library-filter-help>summary svg { width:17px; height:17px; }
+.library-filter-help { flex:0 0 auto; }
+.library-filter-help>summary { list-style:none; }
+.library-filter-help>summary::-webkit-details-marker { display:none; }
+.library-filter-help[open]>summary { color:#ffd19a; }
+.library-filter-help>div { position:absolute; right:0; top:calc(100% + 10px); z-index:10; width:min(360px,calc(100vw - 36px)); padding:16px 18px; border:1px solid #80674c; border-radius:14px; background:#30251b; box-shadow:0 8px 26px #120c0899; color:#dbc8ae; font-size:.85rem; line-height:1.65; }
 .library-filter-help p { margin:0; }
-#libraryStageHelp { color:#e6caab; }
-#librarySortHelp { margin-top:4px; }
+.library-filter-help p+p { margin-top:8px; }
+#libraryStageHelp { color:#edcea8; }
 .no-results .act { margin-top:16px; }
 @media(max-width:760px){
-  .library-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 12px; padding:14px; }
-  .library-filters .library-sort { margin-left:0; }
-  .library-filters label>span { font-size:.76rem; }
-  .library-filters select { font-size:.82rem; padding:8px; }
-  .library-filters #libraryClear { justify-self:start; grid-column:1/-1; }
-  .library-filter-help { font-size:.78rem; }
+  #searchBox { flex-basis:100%; }
+  .library-filters { border-radius:18px; justify-content:flex-start; }
+  .library-filters select { font-size:.82rem; padding:9px; }
 }
 
 </style>
@@ -889,20 +893,20 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div id="findRow">
       <input id="searchBox" data-i18n-label="searchPh" type="search" autocomplete="off" data-i18n-ph="searchPh">
       <div class="library-filters" role="group" data-i18n-label="libraryFilters">
-        <label><span data-i18n="libraryColourLabel">Play as</span><select id="libraryColour" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"><option value="all" data-i18n="libraryAllColours">Both colours</option><option value="w" data-i18n="white">White</option><option value="b" data-i18n="black">Black</option></select></label>
-        <label><span data-i18n="libraryFirstMoveLabel">First move</span><select id="libraryFirstMove" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"></select></label>
-        <label><span data-i18n="libraryStageLabel">Learning stage</span><select id="libraryStage" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryStageHelp"><option value="all" data-i18n="libraryAllStages">All stages</option><option value="new" data-i18n="libraryNew">Not started</option><option value="learning" data-i18n="libraryLearning">Learning · Pawn</option><option value="recalled" data-i18n="libraryRecalled">Recalled · Knight+</option><option value="due" data-i18n="libraryDue">Due for review</option></select></label>
-        <label class="library-sort"><span data-i18n="librarySortLabel">Sort by</span><select id="librarySort" onchange="updateLibraryFilters()" aria-describedby="librarySortHelp"><option value="group" data-i18n="libraryGroupSort">Opening groups</option><option value="due" data-i18n="libraryDueSort">Review due first</option></select></label>
-        <button id="libraryClear" class="linklike" onclick="clearLibraryFilters()" data-i18n="libraryClear" hidden>Clear filters</button>
+        <label><span class="sr-only" data-i18n="libraryColourLabel">Play as</span><select id="libraryColour" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"><option value="all" data-i18n="libraryAllColours">Both colours</option><option value="w" data-i18n="white">White</option><option value="b" data-i18n="black">Black</option></select></label>
+        <label><span class="sr-only" data-i18n="libraryFirstMoveLabel">First move</span><select id="libraryFirstMove" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryFilterHelp"></select></label>
+        <label><span class="sr-only" data-i18n="libraryStageLabel">Learning stage</span><select id="libraryStage" onchange="libraryCollapsed={};updateLibraryFilters()" aria-describedby="libraryStageHelp"><option value="all" data-i18n="libraryAllStages">All stages</option><option value="new" data-i18n="libraryNew">Not started</option><option value="learning" data-i18n="libraryLearning">Learning · Pawn</option><option value="recalled" data-i18n="libraryRecalled">Recalled · Knight+</option><option value="due" data-i18n="libraryDue">Due for review</option></select></label>
+        <label class="library-sort"><span class="sr-only" data-i18n="librarySortLabel">Sort by</span><select id="librarySort" onchange="updateLibraryFilters()" aria-describedby="librarySortHelp"><option value="group" data-i18n="libraryGroupSort">Opening groups</option><option value="due" data-i18n="libraryDueSort">Review due first</option></select></label>
+        <button id="libraryClear" type="button" onclick="clearLibraryFilters()" data-i18n-label="libraryClear" data-i18n-title="libraryClear" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        <details class="library-filter-help"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span class="sr-only" data-i18n="libraryHelpTitle">About these filters</span></summary><div><p id="libraryFilterHelp" data-i18n="libraryFilterHelp">Colour is the side taught in the lesson. First move is White’s opening move.</p><p id="libraryStageHelp"></p><p id="librarySortHelp" hidden></p></div></details>
       </div>
-      <div class="library-filter-help"><p id="libraryFilterHelp" data-i18n="libraryFilterHelp">Colour is the side taught in the lesson. First move is White’s opening move.</p><p id="libraryStageHelp"></p><p id="librarySortHelp" hidden></p></div>
       <div class="library-meta"><p class="library-hint" data-i18n="saveLineHint">Use + to save lines to My repertoire.</p><p id="catalogueCount" role="status" aria-live="polite" aria-atomic="true"></p></div>
     </div>
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G39</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G40</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1437,6 +1441,7 @@ Object.assign(I18N_EN, {
   testCompletedCount:'Lines completed',
   testReportEncourage:'Use the marked moves to choose what to practise next.',
   testFullyRecalledCount:'{n} fully recalled without help',
+  libraryHelpTitle:'About these filters',
   libraryFilters:'Opening filters and sorting',
   libraryColourLabel:'Play as',
   libraryAllColours:'Both colours',
@@ -1744,6 +1749,7 @@ Object.assign(I18N.zh, {
   testCompletedCount:'已完成的变例',
   testReportEncourage:'根据标记的着法，选择接下来要练习的内容。',
   testFullyRecalledCount:'其中 {n} 条完整独立回忆',
+  libraryHelpTitle:'筛选说明',
   libraryFilters:'开局筛选与排序',
   libraryColourLabel:'执方',
   libraryAllColours:'黑白双方',
@@ -3012,7 +3018,7 @@ const testStore={
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G39';
+const BUILD='G40';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
