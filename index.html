@@ -32,7 +32,7 @@
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.5; min-height:100vh; }
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
-button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
 .page-shell { width:100%; max-width:min(100%,var(--page-max-width)); min-width:0; margin-inline:auto;
   padding-left:max(var(--page-gutter), env(safe-area-inset-left, 0px));
   padding-right:max(var(--page-gutter), env(safe-area-inset-right, 0px)); }
@@ -81,6 +81,7 @@ header p { color:var(--dim); font-size:.9rem; }
   transition:background .15s, border-color .15s; }
 .th-engine:hover { background:rgba(208,131,72,.3); border-color:var(--accent); color:#fbf3e4; }
 #findRow { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+.library-hint { flex:0 0 100%; color:var(--dim); font-size:.8125rem; line-height:1.5; margin:2px 0 0; }
 #searchBox { flex:1; min-width:170px; background:var(--panel); border:1px solid var(--line); border-radius:999px;
   padding:11px 16px; color:var(--text); font-size:1rem; font-family:inherit; }
 #searchBox:focus { outline:none; border-color:var(--accent); }
@@ -108,7 +109,10 @@ header p { color:var(--dim); font-size:.9rem; }
   padding:9px 14px; margin-top:6px; cursor:pointer; font-size:.88rem; font-family:inherit; transition:border-color .15s; }
 .line-btn:hover { border-color:var(--accent); }
 .line-btn .stat { font-size:.875rem; color:var(--dim); white-space:nowrap; margin-left:8px; }
-.side-tag { font-size:.8125rem; padding:2px 9px; border-radius:999px; margin-left:6px; vertical-align:middle; }
+.op-card .op-name { flex:1; min-width:0; overflow-wrap:anywhere; }
+.op-tags { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:10px; }
+.side-tag,.first-move-tag { display:inline-flex; align-items:center; font-size:.8125rem; font-weight:650; padding:2px 9px; border:1px solid transparent; border-radius:999px; white-space:nowrap; }
+.first-move-tag { color:#e1c49f; background:#34281c; border-color:#65503a; }
 .side-w { background:#f0e5d3; color:#33281a; } .side-b { background:#1c1610; color:#d8c9b0; border:1px solid var(--line); }
 .summary-bar { display:flex; gap:18px; flex-wrap:wrap; background:var(--panel); border:none; box-shadow:0 2px 6px rgba(10,6,2,.4);
   border-radius:24px; padding:12px 18px; margin:16px 0 16px; font-size:.85rem; color:var(--dim); }
@@ -238,7 +242,7 @@ button.act.primary:hover { background:var(--accent-hover); }
 #overlay line.user { stroke:rgba(106,164,73,.85); }
 #overlay circle { fill:none; stroke:rgba(163,182,128,.9); stroke-width:.07; }
 #overlay circle.user { stroke:rgba(106,164,73,.9); stroke-width:.08; }
-.line-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; width:100%; background:var(--panel2);
+.line-row { display:grid; grid-template-columns:auto minmax(0,1fr) 40px; align-items:start; gap:8px; width:100%; background:var(--panel2);
   border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-top:8px; font-size:1rem;
   box-sizing:border-box; overflow:hidden; }
 .line-row.faved { border-left:3px solid var(--accent); border-radius:4px 14px 14px 4px; background:rgba(208,131,72,.12); }
@@ -424,25 +428,23 @@ button.act.primary:hover { background:var(--accent-hover); }
   font-weight:700; font-size:.9375rem; font-family:inherit; cursor:pointer; transition:transform .15s, background .15s; }
 .review-btn:hover { background:var(--accent-hover); transform:translateY(-1px); }
 .ln-fav { background:none; border:none; cursor:pointer; font-size:1rem; line-height:1; color:var(--dim);
-  padding:0 2px; flex:0 0 auto; transition:transform .15s, color .15s; }
+  padding:4px 2px; flex:0 0 auto; transition:transform .15s, color .15s; }
 .ln-fav:hover { transform:scale(1.25); color:var(--accent); }
 .ln-fav.on { color:var(--accent); }
 .ln-info { flex:1 1 130px; min-width:0; display:flex; flex-direction:column; gap:2px; }
 .line-row .nm { overflow-wrap:anywhere; line-height:1.3; }
 .line-row .stat { font-size:.875rem; color:var(--dim); line-height:1.5; }
-.ln-btns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; flex:1 0 100%; min-width:0; width:100%; margin-top:4px; }
+.ln-btns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-column:1/-1; gap:8px; min-width:0; width:100%; margin-top:4px; }
 .ln-btns > button.mini { min-width:0; min-height:40px; padding:8px 4px; }
-.ln-btns > .rep-toggle { grid-column:1/-1; margin-top:0; display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0; min-height:42px; padding:10px; text-align:left; border-style:solid; }
-.rep-save-label { min-width:0; overflow-wrap:anywhere; line-height:1.35; }
-.rep-save-side { display:inline-flex; align-items:center; gap:5px; flex-shrink:0; color:var(--dim); font-size:.75rem; }
-.rep-save-side .side-swatch { width:10px; height:10px; flex-basis:10px; }
-.ln-btns > .rep-toggle:hover { border-color:var(--accent); background:#3e3122; }
-.ln-btns > .rep-toggle[aria-pressed="true"]:hover { background:#3d4b30; border-color:#92aa73; }
+.line-row > .rep-toggle { grid-column:3; grid-row:1; display:grid; place-items:center; width:40px; height:40px; margin:0; padding:0; border:1px solid #70543b; border-radius:50%; background:#37291d; color:#efb97e; font-size:1.5rem; line-height:1; }
+.line-row > .rep-toggle[aria-pressed="true"] { color:#d0e3b5; border-color:#71865a; background:#35432b; font-size:1.125rem; }
+.line-row > .rep-toggle:hover { border-color:var(--accent); background:#493422; }
+.line-row > .rep-toggle[aria-pressed="true"]:hover { background:#435337; border-color:#a5be86; }
 button.mini { background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:999px;
   min-height:38px; padding:7px 10px; min-width:62px; text-align:center; cursor:pointer; font-size:.875rem; font-family:inherit;
   transition:all .15s; flex:0 0 auto; white-space:nowrap; }
 button.mini:hover { border-color:var(--accent); color:var(--text); }
-#lineSel { flex:1; min-width:0; background:var(--panel); color:var(--text); border:1px solid var(--line);
+#lineSel { flex:0 1 auto; max-width:100%; min-width:0; background:var(--panel); color:var(--text); border:1px solid var(--line);
   border-radius:12px; min-height:40px; padding:8px 12px; font-size:.9375rem; font-family:inherit; cursor:pointer; }
 #lineSel:hover { border-color:var(--accent); }
 .line-controls { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center; }
@@ -524,7 +526,12 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 }
 /* G26: a personal repertoire and a bounded daily session. */
 [hidden] { display:none !important; }
-.home-nav { display:flex; gap:5px; border-bottom:1px solid var(--line); padding:0 0 12px; margin-bottom:24px; }
+details > summary { display:list-item; width:fit-content; max-width:100%; list-style-position:inside; }
+.home-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 20px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:24px; }
+.home-nav { display:flex; flex:1 1 auto; gap:5px; }
+.home-engine { flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; font:inherit; font-size:.88rem; color:#dac5a8; border:1px solid #695239; background:transparent; padding:9px 14px; border-radius:12px; min-height:40px; cursor:pointer; }
+.home-engine::before { content:'♟'; font-size:1.05rem; color:var(--accent); }
+.home-engine:hover { color:var(--text); border-color:var(--accent); background:var(--panel); }
 .home-nav button { font:inherit; font-size:.98rem; font-weight:650; color:var(--dim); background:transparent; border:0; border-radius:12px; padding:11px 18px; cursor:pointer; min-height:44px; }
 .home-nav button:hover { background:var(--panel); color:var(--text); }
 .home-nav button[aria-current="page"] { background:#493725; color:#f6d6ad; }
@@ -534,8 +541,8 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .home-heading p,.daily-hero>p,.home-empty p { color:#cfc0ac; font-size:1rem; max-width:65ch; line-height:1.65; }
 .rep-setup { border:1px solid var(--line); border-radius:24px; padding:clamp(20px,3vw,36px); background:var(--panel); }
 .rep-choices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin:24px 0 16px; }
-.rep-choice { display:flex; flex-direction:column; gap:10px; min-width:0; font-weight:650; }
-.rep-choice select { font:inherit; font-size:.94rem; color:var(--text); padding:12px 34px 12px 12px; width:100%; min-width:0; border:1px solid #66513c; border-radius:10px; background:#2a2017; min-height:48px; }
+.rep-choice { display:flex; flex-direction:column; align-items:flex-start; width:fit-content; max-width:100%; gap:10px; min-width:0; font-weight:650; }
+.rep-choice select { font:inherit; font-size:.94rem; color:var(--text); padding:12px 34px 12px 12px; width:auto; max-width:100%; min-width:0; border:1px solid #66513c; border-radius:10px; background:#2a2017; min-height:48px; }
 .home-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:16px; }
 .home-note { font-size:.88rem; color:#baa98f; margin-top:15px; line-height:1.6; }
 .linklike { border:none; background:none; color:#e8b27f; padding:9px 4px; font:inherit; font-size:.92rem; cursor:pointer; text-decoration:underline; text-underline-offset:4px; }
@@ -589,11 +596,19 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .promotion-total { flex-shrink:0; text-align:right; }
 .promotion-total strong { display:block; font-size:2.4rem; line-height:1.2; color:#f1c38e; }
 .promotion-total span { font-size:.86rem; color:#ddc9ae; }
-.promotion-ranks { list-style:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; padding:0; margin-top:22px; }
-.promotion-ranks li { display:grid; grid-template-columns:auto 1fr; gap:0 12px; align-items:center; border:1px solid var(--line); border-radius:14px; padding:14px; background:var(--panel2); }
-.promotion-piece { grid-row:span 2; font-size:2rem; color:#e7b47c; }
+.promotion-ranks { list-style:none; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; padding:0; margin-top:22px; }
+.promotion-ranks li { min-width:0; border:1px solid var(--line); border-radius:14px; padding:14px; background:var(--panel2); }
+.rank-stage-head { display:flex; align-items:center; gap:8px; }
+.rank-stage-head h3 { font-size:.95rem; }
+.rank-stage-head strong { margin-left:auto; }
+.promotion-ranks li p { color:#dbc9b1; font-size:.9rem; line-height:1.5; margin-top:10px; }
+.promotion-piece { flex-shrink:0; font-size:1.7rem; color:#e7b47c; }
 .promotion-ranks strong { font-size:1.5rem; }
-.promotion-ranks li>span:last-child { font-size:.88rem; color:#ddc9ae; }
+.rank-explainer { display:grid; gap:12px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.rank-explainer p { max-width:90ch; color:#d3c1a8; line-height:1.6; font-size:.92rem; }
+.rank-explainer b { color:#f1d6b3; }
+.rank-total-note { margin-top:18px; color:#c8b89f; font-size:.88rem; line-height:1.6; }
+@media(min-width:761px) and (max-width:1100px){.promotion-ranks{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .promotion-help { margin-top:12px; color:#d9c6ae; font-size:.9rem; }
 .promotion-help summary { cursor:pointer; padding:6px 0; color:#e8b27f; }
 .promotion-help p { max-width:78ch; margin-top:6px; line-height:1.65; }
@@ -620,7 +635,9 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 #learnSessionNext { flex-basis:100%; }
 @media(min-width:1800px){.home-heading h2,.daily-hero h2{font-size:2.4rem}.daily-hero{padding:44px}}
 @media(max-width:760px){
-  .home-nav { gap:0; margin-bottom:18px; justify-content:space-between; }
+  .home-toolbar { margin-bottom:18px; gap:8px; }
+  .home-nav { flex-basis:100%; gap:0; justify-content:space-between; }
+  .home-engine { margin-left:auto; padding:7px 12px; min-height:36px; }
   .home-nav button { padding:10px 8px; font-size:.87rem; }
   .rep-choices,.today-layout,.session-plan ol { grid-template-columns:1fr; }
   .rep-choice { gap:7px; }
@@ -631,7 +648,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   .promotion-overview { padding:20px; }
   .promotion-heading { align-items:flex-start; flex-direction:column; gap:14px; }
   .promotion-total { text-align:left; }
-  .promotion-ranks { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+  .promotion-ranks { grid-template-columns:1fr; gap:10px; }
   .promotion-ranks li { padding:12px; gap:0 8px; }
   .home-actions>.act { flex:1 1 auto; }
   .home-footer p { width:100%; }
@@ -657,7 +674,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 <div class="layout">
   <!-- ============ MENU ============ -->
   <div id="menu">
-    <nav id="homeNav" class="home-nav" data-i18n-label="homeNavigation"></nav>
+    <div class="home-toolbar"><nav id="homeNav" class="home-nav" data-i18n-label="homeNavigation"></nav><button id="homeEngineBtn" class="home-engine" onclick="enterFreePlay()" data-i18n="vsEngine" data-i18n-title="engineMenuTip">vs Engine</button></div>
     <div id="todayBar"></div>
     <div id="repertoirePanel" hidden></div>
     <div id="achievementEntry"></div>
@@ -669,13 +686,13 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
         <button data-sort="prog" data-i18n="sortProg">Progress</button>
         <button data-sort="due" data-i18n="sortDue">Due</button>
       </div>
+      <p class="library-hint" data-i18n="saveLineHint">Use + to save lines to My repertoire.</p>
     </div>
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="earlierProgress" hidden></div>
-    <div id="buildTag">Debut · build <b>G29</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G32</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1142,7 +1159,10 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
 /* G26 product language: concrete practice, no waiting or perfect-day pressure. */
 Object.assign(I18N_EN, {
   homeNavigation:'Main navigation',
-  navPractice:'My practice',
+  navPractice:'My repertoire',
+  openingFirstMove:'First move',
+  openingAgainst:'vs {move}',
+  engineMenuTip:'Play a full game against the engine',
   yourOpenings:'Your openings',
   viewSelectedOpenings:'View my openings ↓',
   navExplore:'Openings',
@@ -1186,35 +1206,36 @@ Object.assign(I18N_EN, {
   repBlackE4:'As Black · vs 1.e4',
   repBlackD4:'As Black · vs 1.d4',
   repOther:'As Black · other first moves',
-  removeRepLine:'Remove {line} from my practice',
+  removeRepLine:'Remove {line} from my repertoire',
   repAdded:'✓ Saved for practice',
-  savePracticeLine:'Save {line} for practice as {side}',
-  removeSavedPractice:'Remove {line} from practice as {side}',
+  saveLineHint:'Use + to save lines to My repertoire.',
+  savePracticeLine:'Add {line} to My repertoire as {side}',
+  removeSavedPractice:'Remove {line} from My repertoire as {side}',
   repAdd:'+ Save for practice',
   addMoreLines:'+ Add lines',
   changeStarter:'Change starter choices',
   sideProgressNote:'White and Black recall are tracked separately. Lesson reading is shared.',
-  promotionTitle:'Opening promotions',
+  promotionTitle:'Your opening ranks',
   promotionTotal:'Total promotions',
-  promotionScope:'Rank steps earned through White and Black practice. Repeating a rank never adds to the total.',
-  promotionBreakdown:'Current ranks of practised lines',
-  promotionBreakdownNote:'Lines currently at each rank. White and Black count separately, including lines removed from My practice.',
+  promotionScope:'Learn a line, recall it from memory, then revisit it when it’s due.',
+  promotionBreakdown:'Pawn to Queen: current counts and requirements',
+  promotionBreakdownNote:'The numbers show how many lines are at each rank. White and Black can have different ranks; a shared lesson is counted once until you practise a side.',
   promotionHow:'How is this counted?',
-  promotionCounting:'Pawn is the starting rank. Knight adds 1 promotion; Bishop represents 2, Rook 3 and Queen 4. For example, two Knights and one Bishop make 4 promotions.',
+  promotionCounting:'Pawn is your first rank. Each step after Pawn adds one promotion: Pawn → Knight = 1, Pawn → Bishop = 2. Repeating a rank adds no extra promotions.',
   promotionEarlier:'Earlier promotions: {n}.',
   promotionEarlierNote:'These came from older combined-colour ranks and are kept separately. You can see those lines in Earlier progress below.',
   progressTitle:'Practice that adds up.',
-  progressBody:'A record of your learning and practice. Find your next session in My practice.',
+  progressBody:'A record of your learning and practice. Find your next session in My repertoire.',
   practisedLines:'Lines practised by colour',
   earlierProgress:'Earlier progress · {n} lines',
   legacyProgressNote:'Earlier versions combined White and Black. Your old drills and ranks are kept here. New recall starts separately for each colour; completed lessons remain available to drill.',
   legacyDrills:'{n} earlier drills',
   firstRecallAction:'Try your first recall',
-  rank1Tip:'You have been through this lesson.',
-  rank2Tip:'One complete drill without hints or retries, for this colour.',
-  rank3Tip:'3 successful scheduled reviews for this colour.',
-  rank4Tip:'5 successful scheduled reviews for this colour.',
-  rank5Tip:'10 successful scheduled reviews for this colour.',
+  rank1Tip:'Finish the lesson or complete a drill, even with help.',
+  rank2Tip:'Complete one drill with every move correct, without hints or revealed answers.',
+  rank3Tip:'Pass 3 reviews when they are due, with every move correct and no help.',
+  rank4Tip:'Pass 5 due reviews in total, with every move correct and no help.',
+  rank5Tip:'Pass 10 due reviews in total, with every move correct and no help.',
   rustyTip:'This badge is yours. A review is due or the last recall needed help.',
   rankComplete:'Keep following your review schedule. Your earned rank stays.',
   reviewRankHint:'{n} more successful scheduled review(s) to {rank}. No need to wait beyond your due date.',
@@ -1222,7 +1243,7 @@ Object.assign(I18N_EN, {
   readyNowTitle:'Next in your repertoire',
   payoffLearn:'Learn the idea',
   learnedBadgeRest:'Lesson complete. You can now practise either colour separately.',
-  backPractice:'Back to My practice',
+  backPractice:'Back to My repertoire',
   pauseSession:'Pause session',
   nextSessionStep:'Next step →',
   backMenu:'← Back',
@@ -1246,12 +1267,28 @@ Object.assign(I18N_EN, {
   achNoHistory:'No earlier achievements to show.',
   achAll:'Milestones',
   achKeepExploringBody:'Your progress stays with you. Follow your repertoire at your own pace.',
-  achFootnote:'Drill totals count the first completed attempt per line, colour and day. Scheduled reviews count when due, even with mistakes. A daily session counts once per day. Earlier achievements remain in history.',
-  tipEngMove:'Let the engine play this move for you'
+  achFootnote:'Drill totals count the first completed attempt per line, colour and day. Scheduled reviews count when due, even with mistakes. A daily session counts once per day.',
+  tipEngMove:'Let the engine play this move for you',
+  rankCount:'Lines at this rank: {n}',
+  rankRule1:'Finish a lesson or drill.',
+  rankRule2:'Complete 1 drill from memory.',
+  rankRule3:'Pass 3 due reviews.',
+  rankRule4:'Pass 5 due reviews in total.',
+  rankRule5:'Pass 10 due reviews in total.',
+  rankRecallTitle:'From memory',
+  rankRecallBody:'Play every move correctly, without hints or revealed answers. A mistake or hint means another chance next time.',
+  rankReviewTitle:'Due reviews',
+  rankReviewBody:'My repertoire brings a line back when it’s time to review. Only your first attempt for that line and colour each day counts. The 3, 5 and 10 targets are cumulative.',
+  rankKeepTitle:'Your ranks stay',
+  rankKeepBody:'Breaks do not lower your rank. A review-due marker tells you what to revisit.'
+
 });
 Object.assign(I18N.zh, {
   homeNavigation:'主导航',
-  navPractice:'我的练习',
+  navPractice:'我的开局库',
+  openingFirstMove:'首着',
+  openingAgainst:'应对 {move}',
+  engineMenuTip:'与引擎对弈一盘完整的棋',
   yourOpenings:'已选开局',
   viewSelectedOpenings:'查看已选开局 ↓',
   navExplore:'全部开局',
@@ -1295,35 +1332,36 @@ Object.assign(I18N.zh, {
   repBlackE4:'执黑 · 应对 1.e4',
   repBlackD4:'执黑 · 应对 1.d4',
   repOther:'执黑 · 其他首着',
-  removeRepLine:'从我的练习中移除「{line}」',
+  removeRepLine:'从我的开局库中移除「{line}」',
   repAdded:'✓ 已加入练习',
-  savePracticeLine:'将「{line}」加入练习（{side}）',
-  removeSavedPractice:'从练习移除「{line}」（{side}）',
-  repAdd:'+ 加入我的练习',
+  saveLineHint:'点击 +，将变例加入我的开局库。',
+  savePracticeLine:'将「{line}」加入我的开局库（{side}）',
+  removeSavedPractice:'从我的开局库移除「{line}」（{side}）',
+  repAdd:'+ 加入我的开局库',
   addMoreLines:'+ 添加变例',
   changeStarter:'更改入门组合',
   sideProgressNote:'白方与黑方的回忆进度分别记录，课文阅读进度共享。',
-  promotionTitle:'开局晋级',
+  promotionTitle:'你的开局等级',
   promotionTotal:'累计晋级',
-  promotionScope:'通过白方与黑方练习获得的等级提升。重复达到同一等级不会增加次数。',
-  promotionBreakdown:'已练变例的当前等级',
-  promotionBreakdownNote:'各等级的当前变例数。白方与黑方分别计数，从「我的练习」移除的变例也包含在内。',
+  promotionScope:'先学会一条变例，再凭记忆走出，并在到期时复习。',
+  promotionBreakdown:'从兵到后：当前数量与晋级条件',
+  promotionBreakdownNote:'数字表示当前处于该等级的变例数。白方和黑方可有不同等级；开始按执方练习前，共享课文只计一次。',
   promotionHow:'如何计算？',
-  promotionCounting:'兵是起始等级。马计 1 次晋级，象累计 2 次，车累计 3 次，后累计 4 次。例如，两条马等级变例加一条象等级变例，共计 4 次晋级。',
+  promotionCounting:'兵是你的第一个等级。之后每升一级计一次晋级：兵 → 马 = 1 次，兵 → 象 = 2 次。重复达到同一等级不会额外计数。',
   promotionEarlier:'早期晋级：{n} 次。',
   promotionEarlierNote:'来自旧版黑白合并的等级，单独保留。下方「早期进度」可查看对应变例。',
   progressTitle:'每次练习，都有积累。',
-  progressBody:'记录你的学习与练习。下一次该复习什么，可在「我的练习」中查看。',
+  progressBody:'记录你的学习与练习。下一次该复习什么，可在「我的开局库」中查看。',
   practisedLines:'按执方记录的已练变例',
   earlierProgress:'早期进度 · {n} 条变例',
   legacyProgressNote:'早期版本将黑白双方合并记录。旧操练与等级保存在这里。新的回忆进度按执方分别记录，已学完的课文仍可直接操练。',
   legacyDrills:'早期操练 {n} 次',
   firstRecallAction:'尝试首次回忆',
-  rank1Tip:'你已走完本课。',
-  rank2Tip:'本执方有一次完整操练，无提示、无重试。',
-  rank3Tip:'本执方完成 3 次全对的到期复习。',
-  rank4Tip:'本执方完成 5 次全对的到期复习。',
-  rank5Tip:'本执方完成 10 次全对的到期复习。',
+  rank1Tip:'完成课文或走完一次操练，使用提示也可以。',
+  rank2Tip:'完成一次操练，每步都正确，不用提示、不看答案。',
+  rank3Tip:'通过 3 次到期复习，每步都正确且不借助提示。',
+  rank4Tip:'累计通过 5 次到期复习，每步都正确且不借助提示。',
+  rank5Tip:'累计通过 10 次到期复习，每步都正确且不借助提示。',
   rustyTip:'等级永久保留。当前有复习到期，或上次回忆需要帮助。',
   rankComplete:'继续按计划复习，已获得的等级会一直保留。',
   reviewRankHint:'再完成 {n} 次全对的到期复习，即可达到「{rank}」。无需等到到期日之后。',
@@ -1331,7 +1369,7 @@ Object.assign(I18N.zh, {
   readyNowTitle:'开局库中的下一步',
   payoffLearn:'理解思路',
   learnedBadgeRest:'本课已完成，现在可按执方分别操练。',
-  backPractice:'返回我的练习',
+  backPractice:'返回我的开局库',
   pauseSession:'暂停本次练习',
   nextSessionStep:'下一项 →',
   backMenu:'← 返回',
@@ -1355,8 +1393,21 @@ Object.assign(I18N.zh, {
   achNoHistory:'暂无早期成就。',
   achAll:'里程碑',
   achKeepExploringBody:'进步会一直保留。按自己的节奏练习开局库中的变例。',
-  achFootnote:'操练总数按每天每条变例、每个执方的首次完成计数。到期复习即使有失误也计入练习。今日练习每天最多计一次。早期成就永久保存在历史中。',
-  tipEngMove:'让引擎替你走这一步'
+  achFootnote:'操练总数按每天每条变例、每个执方的首次完成计数。到期复习即使有失误也计入练习。今日练习每天最多计一次。',
+  tipEngMove:'让引擎替你走这一步',
+  rankCount:'该等级变例数：{n}',
+  rankRule1:'完成课文或走完一次操练。',
+  rankRule2:'凭记忆完成 1 次操练。',
+  rankRule3:'通过 3 次到期复习。',
+  rankRule4:'累计通过 5 次到期复习。',
+  rankRule5:'累计通过 10 次到期复习。',
+  rankRecallTitle:'凭记忆',
+  rankRecallBody:'每一步都走对，不用提示、不看答案。走错或用了提示，下次再尝试即可。',
+  rankReviewTitle:'到期复习',
+  rankReviewBody:'「我的开局库」会在合适的时间安排复习。每天每条变例、每个执方只计首次尝试。3、5、10 次是累计目标。',
+  rankKeepTitle:'等级永久保留',
+  rankKeepBody:'休息不会降低等级。「待复习」标记会提醒你该重温什么。'
+
 });
 
 Object.assign(I18N_EN, {
@@ -1698,20 +1749,21 @@ function legacyProgress(){
   return out;
 }
 
-// Read-only totals: each rank above Pawn is one earned step per line and colour.
-// Earlier combined-colour ranks remain separate; saved selections never limit totals.
+// Current earned ranks, independent of selections. One shared lesson earns one
+// Pawn; never infer an extra Pawn for an unpractised colour. No storage writes.
 function promotionSummary(){
   const records=store.load(), byRank=[0,0,0,0,0,0], bySide={w:0,b:0};
   DATA.openings.forEach((op,oi)=>op.lines.forEach((line,li)=>{
+    let hasRank=false, learned=false;
     for(const side of ['w','b']){
       const st=records[lineKey(oi,li,side)]; if(!st) continue;
-      const rank=computeRank(st,null,st.rank||0);
-      if(rank<2) continue;
-      byRank[rank]++; bySide[side]+=rank-1;
+      const rank=computeRank(st,null,st.rank||0); if(!rank) continue;
+      if(rank===1&&!st.runs){learned=true;continue;}
+      hasRank=true; byRank[rank]++; bySide[side]+=Math.max(0,rank-1);
     }
+    if(!hasRank && (learned||records['lesson:'+line.id]?.learned)) byRank[1]++;
   }));
-  return {total:bySide.w+bySide.b,byRank,bySide,
-    earlier:legacyProgress().reduce((sum,line)=>sum+Math.max(0,line.rank-1),0)};
+  return {total:bySide.w+bySide.b,byRank,bySide};
 }
 
 /* ================= MY REPERTOIRE ================= */
@@ -2045,15 +2097,11 @@ function renderAchievementEntry(){
 }
 const medalUI={filter:'all',returnFocus:null,bodyOverflow:'',wasInert:false};
 function medalBoardHTML(A){
-  const rows=medalRows(A), earned=MEDALS.filter(m=>A.unlocked[m.id]), history=historicalMedals(A);
+  const rows=medalRows(A), earned=MEDALS.filter(m=>A.unlocked[m.id]);
   const section=(name,cards)=>`<section class="ach-section"><div class="ach-section-head"><h3>${name}</h3></div><div class="ach-grid">${cards.join('')}</div></section>`;
   const empty=`<div class="ach-empty">${medalSymbol('sprout')}<h3>${t('achEmptyTitle')}</h3><p>${t('achEmptyBody')}</p></div>`;
   let sections='',visible=0;
-  if(medalUI.filter==='history'){
-    const sorted=history.slice().sort((a,b)=>String(A.unlocked[b.id]).localeCompare(String(A.unlocked[a.id])));
-    visible=sorted.length;
-    sections=`<p class="ach-history-note">${t('achHistoryNote')}</p>`+(visible?section(t('achHistory'),sorted.map(m=>medalCardHTML({key:m.series||m.id,chain:[m],shown:m,earned:1,next:null},A,m))):`<p class="ach-empty">${t('achNoHistory')}</p>`);
-  }else if(medalUI.filter==='earned'){
+  if(medalUI.filter==='earned'){
     visible=earned.length;
     sections=visible?section(t('achEarned'),earned.slice().sort((a,b)=>String(A.unlocked[b.id]).localeCompare(String(A.unlocked[a.id]))).map(m=>medalCardHTML(rows.find(r=>r.chain.includes(m)),A,m))):empty;
   }else if(medalUI.filter==='next'){
@@ -2065,8 +2113,8 @@ function medalBoardHTML(A){
       if(members.length) sections+=section(t(key),members.map(r=>medalCardHTML(r,A)));
     }
   }
-  const filters=[['all','achAll'],['next','achNextGoals'],['earned','achEarned'],['history','achHistory']]
-    .map(([key,label])=>`<button class="ach-filter" data-filter="${key}" aria-pressed="${medalUI.filter===key}" onclick="setMedalFilter('${key}')">${t(label)}${key==='history'&&history.length?` (${history.length})`:''}</button>`).join('');
+  const filters=[['all','achAll'],['next','achNextGoals'],['earned','achEarned']]
+    .map(([key,label])=>`<button class="ach-filter" data-filter="${key}" aria-pressed="${medalUI.filter===key}" onclick="setMedalFilter('${key}')">${t(label)}</button>`).join('');
   return `<div class="ach-overview ach-overview-simple">${medalSymbol('trophy')}<div><h3>${t('achEarnedCount',{n:earned.length})}</h3><p>${t('achFocusNote')}</p></div></div><div class="ach-filters" role="group" aria-label="${t('achFilters')}">${filters}</div><p class="ach-results-count" role="status">${t('achShowing',{n:visible})}</p>${sections}<p class="ach-footnote">${t('achFootnote')}</p>`;
 }
 
@@ -2079,7 +2127,7 @@ function renderMedals(){
   ov.querySelector('.medals-list').innerHTML=medalBoardHTML(ach.load());
 }
 function setMedalFilter(filter){
-  if(!['all','next','earned','history'].includes(filter)) return;
+  if(!['all','next','earned'].includes(filter)) return;
   const list=document.querySelector('#medalsOverlay .medals-list'), scrollTop=list.scrollTop;
   medalUI.filter=filter; renderMedals();
   const button=list.querySelector(`[data-filter="${filter}"]`); button.focus({preventScroll:true});
@@ -2269,7 +2317,7 @@ function renderSessionStrip(){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G29';
+const BUILD='G32';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2974,12 +3022,11 @@ function showMenu(view){
   document.getElementById('summaryBar').hidden=!progress;
   document.getElementById('promotionOverview').hidden=!progress;
   document.getElementById('heatmapBox').hidden=!progress;
-  document.getElementById('earlierProgress').hidden=!progress;
   document.getElementById('achievementEntry').hidden=!progress;
   if(explore) renderExplore();
   if(menuView==='practice') renderPractice();
   if(progress) renderProgressPage();
-  achCheck('menu'); renderAchievementEntry(); flushMedals();
+  fitAllSelects(); achCheck('menu'); renderAchievementEntry(); flushMedals();
 }
 function renderPractice(){
   const hasLines=repertoire.entries().length>0;
@@ -2992,10 +3039,23 @@ function showSelectedOpenings(){
   const heading=document.getElementById('selectedOpeningsHeading');
   if(heading){heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}
 }
+function fitSelectText(select){
+  const option=select.options[select.selectedIndex]; if(!option) return;
+  const style=getComputedStyle(select), measure=document.createElement('span');
+  measure.style.cssText='position:fixed;visibility:hidden;white-space:pre;pointer-events:none';
+  measure.style.font=style.font; measure.style.letterSpacing=style.letterSpacing;
+  measure.textContent=option.textContent; document.body.appendChild(measure);
+  const padding=parseFloat(style.paddingLeft)+parseFloat(style.paddingRight)+24;
+  select.style.width=Math.ceil(measure.getBoundingClientRect().width+padding)+'px';
+  measure.remove();
+}
+function fitAllSelects(){document.querySelectorAll('select').forEach(fitSelectText);}
+window.addEventListener('resize',fitAllSelects);
+if(document.fonts) document.fonts.ready.then(fitAllSelects);
 function packName(pack){return zhOn()?pack.zh:pack.en;}
 function starterForm(edit=false){
   const rep=repertoire.load();
-  const fields=Object.entries(STARTER_PACKS).map(([slot,packs])=>`<label class="rep-choice"><span>${t({white:'chooseWhite',e4:'chooseBlackE4',d4:'chooseBlackD4'}[slot])}</span><select name="${slot}">${packs.map(p=>`<option value="${p.key}"${rep.picks[slot]===p.key?' selected':''}>${packName(p)}</option>`).join('')}</select></label>`).join('');
+  const fields=Object.entries(STARTER_PACKS).map(([slot,packs])=>`<label class="rep-choice"><span>${t({white:'chooseWhite',e4:'chooseBlackE4',d4:'chooseBlackD4'}[slot])}</span><select name="${slot}" onchange="fitSelectText(this)">${packs.map(p=>`<option value="${p.key}"${rep.picks[slot]===p.key?' selected':''}>${packName(p)}</option>`).join('')}</select></label>`).join('');
   return `<form class="rep-setup" onsubmit="event.preventDefault();saveStarterChoices(this)"><div class="home-heading"><span class="eyebrow">${t('navPractice')}</span><h2>${t(edit?'editStarterTitle':'starterTitle')}</h2><p>${t(edit?'editStarterBody':'starterBody')}</p></div><div class="rep-choices">${fields}</div><p class="home-note">${t('starterCoverage')}</p><div class="home-actions"><button class="act primary" type="submit">${t(edit?'saveStarter':'createRepertoire')}</button>${edit?'':`<button class="act" type="button" onclick="setMenuView('explore')">${t('exploreFirst')}</button>`}</div></form>`;
 }
 function saveStarterChoices(form){
@@ -3020,7 +3080,6 @@ function renderRepertoireButton(){
 }
 function renderTodayBar(){
   const el=document.getElementById('todayBar'), entries=repertoire.entries();
-  const legacyNote=legacyProgress().length?`<p class="home-note legacy-welcome">${t('legacyWelcome')} <button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></p>`:'';
   if(!entries.length){el.innerHTML='';return;}
   const saved=daily.load(), plan=saved||daily.plan(), finished=!!saved?.completed;
   const due=srs.dueList(true), days=Object.keys(activity.load()).length;
@@ -3034,12 +3093,12 @@ function renderTodayBar(){
     return `<li class="today-item${done?' complete':''}"><span class="today-index" aria-hidden="true">${done?'✓':i+1}</span><div><b>${lnName(line)}</b><span>${opName(DATA.openings[x.oi])} · ${t(it.side==='w'?'white':'black')} · ${t(it.mode==='learn'?'learn':'drill')}${done?' · '+t('completedWord'):''}</span></div></li>`;
   }).join('');
   el.className='today-content';
-  el.innerHTML=`${legacyNote}<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished&&plan.items.length?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="linklike" onclick="showSelectedOpenings()">${t('viewSelectedOpenings')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>${list?`<section class="session-plan"><h3>${t('inThisSession')}</h3><ol>${list}</ol></section>`:''}`;
+  el.innerHTML=`<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished&&plan.items.length?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="linklike" onclick="showSelectedOpenings()">${t('viewSelectedOpenings')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>${list?`<section class="session-plan"><h3>${t('inThisSession')}</h3><ol>${list}</ol></section>`:''}`;
 }
 function renderRepertoire(){
   const el=document.getElementById('repertoirePanel'), entries=repertoire.entries();
   if(!entries.length){
-    el.innerHTML=starterForm()+(legacyProgress().length?`<p class="home-note legacy-welcome">${t('legacyWelcome')} <button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></p>`:'');
+    el.innerHTML=starterForm();
     return;
   }
   const groups=[['w','repWhite'],['e4','repBlackE4'],['d4','repBlackD4'],['other','repOther']];
@@ -3059,16 +3118,15 @@ function renderRepertoire(){
 }
 function renderPromotionOverview(){
   const summary=promotionSummary();
-  const cards=[2,3,4,5].map(rank=>`<li><span class="promotion-piece" aria-hidden="true">${RANKS[rank].icon}</span><strong>${summary.byRank[rank]}</strong><span>${t('rank'+rank)}</span></li>`).join('');
-  document.getElementById('promotionOverview').innerHTML=`<div class="promotion-heading"><div><h2 id="promotionTitle">${t('promotionTitle')}</h2><p>${t('promotionScope')}</p></div><div class="promotion-total"><strong>${summary.total}</strong><span>${t('promotionTotal')}</span></div></div><ul class="promotion-ranks" aria-label="${t('promotionBreakdown')}">${cards}</ul><p class="home-note">${t('promotionBreakdownNote')}</p><details class="promotion-help"><summary>${t('promotionHow')}</summary><p>${t('promotionCounting')}</p></details>${summary.earlier?`<p class="promotion-history"><b>${t('promotionEarlier',{n:summary.earlier})}</b> ${t('promotionEarlierNote')}</p>`:''}`;
+  const cards=[1,2,3,4,5].map(rank=>`<li><div class="rank-stage-head"><span class="promotion-piece" aria-hidden="true">${RANKS[rank].icon}</span><h3>${t('rank'+rank)}</h3><strong aria-label="${t('rankCount',{n:summary.byRank[rank]})}">${summary.byRank[rank]}</strong></div><p>${t('rankRule'+rank)}</p></li>`).join('');
+  document.getElementById('promotionOverview').innerHTML=`<div class="promotion-heading"><div><h2 id="promotionTitle">${t('promotionTitle')}</h2><p>${t('promotionScope')}</p></div><div class="promotion-total"><strong>${summary.total}</strong><span>${t('promotionTotal')}</span></div></div><ol class="promotion-ranks" aria-label="${t('promotionBreakdown')}">${cards}</ol><p class="home-note">${t('promotionBreakdownNote')}</p><div class="rank-explainer"><p><b>${t('rankRecallTitle')}</b> ${t('rankRecallBody')}</p><p><b>${t('rankReviewTitle')}</b> ${t('rankReviewBody')}</p><p><b>${t('rankKeepTitle')}</b> ${t('rankKeepBody')}</p></div><p class="rank-total-note">${t('promotionCounting')}</p>`;
 }
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
   const totalRuns=trained.reduce((n,[,v])=>n+v.runs,0), reviews=trained.reduce((n,[,v])=>n+countValue(v.reviewAttempts),0);
   document.getElementById('summaryBar').innerHTML=`<div class="home-heading"><h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p></div><div class="progress-stats"><div><b>${trained.length}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
   renderPromotionOverview(); renderHeatmap();
-  const legacy=legacyProgress();
-  document.getElementById('earlierProgress').innerHTML=legacy.length?`<details class="earlier-progress"><summary>${t('earlierProgress',{n:legacy.length})}</summary><p>${t('legacyProgressNote')}</p><ul>${legacy.map(x=>`<li><div><b>${lnName(DATA.openings[x.oi].lines[x.li])}</b><span>${opName(DATA.openings[x.oi])} · ${t('legacyDrills',{n:x.runs})}</span></div><span class="rank-chip r${x.rank}">${RANKS[x.rank].icon} ${t('rank'+x.rank)}</span></li>`).join('')}</ul></details>`:'';
+
 }
 
 function renderExplore(){
@@ -3120,7 +3178,7 @@ function renderExplore(){
     const h=document.createElement('div'); h.className='group-head';
     // Only the heading text is the toggle (a real button: native keyboard + focus);
     // the rest of the full-width row is inert, so hover/click land on the words.
-    h.innerHTML=`<button type="button" class="group-toggle" aria-expanded="${!isC}"><span class="caret">${isC?'▸':'▾'}</span>${group.label}<span class="g-count">${t('opCount',{n:group.members.length})}</span></button>`;
+    h.innerHTML=`<button type="button" class="group-toggle" aria-expanded="${!isC}"><span class="caret">${isC?'▸':'▾'}</span>${group.label}</button><span class="g-count">${t('opCount',{n:group.members.length})}</span>`;
     h.querySelector('.group-toggle').onclick=()=>{ collapsed[group.id]=!isC; localStorage.setItem('otGroups',JSON.stringify(collapsed)); refreshMenuKeepScroll(); };
     grid.appendChild(h);
     if(!isC) group.members.forEach(({op,oi,onlyFav,filter})=>{ grid.appendChild(buildOpCard(op,oi,filter||(onlyFav?(l=>lineFavs.has(op,l)):null))); });
@@ -3131,13 +3189,16 @@ function renderExplore(){
     const visibleLines=op.lines.map((line,li)=>({line,li})).filter(x=>!lineFilter||lineFilter(x.line));
     const sides=[...new Set(visibleLines.map(x=>preferredSide(oi,x.li)))];
     const tag=`<span class="side-tag ${sides[0]==='w'?'side-w':'side-b'}">${sides.map(side=>t(side==='w'?'white':'black')).join(' / ')}</span>`;
+    const firstMoves=[...new Set(visibleLines.map(x=>x.line.moves[0]?.san).filter(Boolean))];
+    const firstMoveLabel=firstMoves.map(move=>'1.'+move).join(' / ');
+    const moveTag=firstMoves.length?`<span class="first-move-tag" title="${t('openingFirstMove')}">${medalText(sides.length===1&&sides[0]==='b'?t('openingAgainst',{move:firstMoveLabel}):firstMoveLabel)}</span>`:'';
     const isFav=favs.has(op.name);
     const star=`<button class="fav-btn${isFav?' on':''}" title="${t(isFav?'favRemove':'favAdd')}" aria-label="${t(isFav?'favRemove':'favAdd')}">${isFav?'★':'☆'}</button>`;
     const ranks=visibleLines.map(x=>lineRank(oi,x.li));
     const rankSum=ranks.reduce((a,b)=>a+b,0), rankMax=visibleLines.length*5;
     const icons=ranks.map(r=>r?RANKS[r].icon:'○').join(' ');
     const prog=`<div class="op-prog-row"><div class="op-prog"><div class="op-prog-fill${rankSum===rankMax?' full':''}" style="width:${Math.round(100*rankSum/rankMax)}%"></div></div><span class="op-prog-n" title="${t('rankBarTip')}">${icons}</span></div>`;
-    card.innerHTML=`<h2><span class="ico">${op.icon}</span>${opName(op)}${tag}${star}</h2>${prog}<div class="desc">${opDesc(op)}</div>`;
+    card.innerHTML=`<h2><span class="ico">${op.icon}</span><span class="op-name">${opName(op)}</span>${star}</h2><div class="op-tags">${tag}${moveTag}</div>${prog}<div class="desc">${opDesc(op)}</div>`;
     const fb=card.querySelector('.fav-btn');
     if(fb) fb.onclick=(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); toggleFav(op.name); };
     card.onclick=()=>quickStart(oi,visibleLines.map(x=>x.li));
@@ -3164,16 +3225,14 @@ function renderExplore(){
       const btns=document.createElement('div'); btns.className='ln-btns';
       btns.appendChild(lb); btns.appendChild(db); btns.appendChild(pb);
       const side=preferredSide(oi,li), added=repertoire.has(oi,li,side);
-      const add=document.createElement('button'); add.className='rep-toggle';
+      const add=document.createElement('button'); add.type='button'; add.className='rep-toggle';
       add.dataset.repId=lessonId(oi,li)+':'+side; add.setAttribute('aria-pressed',String(added));
-      add.setAttribute('aria-label',t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')}));
-      const saveLabel=document.createElement('span');saveLabel.className='rep-save-label';saveLabel.textContent=t(added?'repAdded':'repAdd');
-      const sideLabel=document.createElement('span');sideLabel.className='rep-save-side';
-      const swatch=document.createElement('span');swatch.className='side-swatch '+(side==='w'?'white':'black');swatch.setAttribute('aria-hidden','true');
-      sideLabel.append(swatch,document.createTextNode(t(side==='w'?'white':'black')));add.append(saveLabel,sideLabel);
+      const saveLabel=t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')});
+      add.setAttribute('aria-label',saveLabel); add.title=saveLabel;
+      const saveIcon=document.createElement('span'); saveIcon.setAttribute('aria-hidden','true'); saveIcon.textContent=added?'✓':'+';
+      add.appendChild(saveIcon);
       add.onclick=e=>{e.stopPropagation();toggleRepertoireLine(oi,li,side);};
-      btns.appendChild(add);
-      row.appendChild(btns);
+      row.append(add,btns);
       card.appendChild(row);
     });
     return card;
@@ -3275,7 +3334,7 @@ function buildLineSel(){
     op.lines.forEach((l,li)=>{ html+=`<option value="${oi}:${li}">${lnName(l)}</option>`; });
     html+='</optgroup>';
   });
-  sel.innerHTML=html;
+  sel.innerHTML=html; fitSelectText(sel);
 }
 function onLineSel(v){
   const [oi,li]=v.split(':').map(Number);
@@ -3285,7 +3344,7 @@ function onLineSel(v){
   else startDrill(oi,li,side);
 }
 function syncLineSel(){
-  const sel=document.getElementById('lineSel'); if(sel) sel.value=curOp+':'+curLine;
+  const sel=document.getElementById('lineSel'); if(sel){sel.value=curOp+':'+curLine;fitSelectText(sel);}
 }
 function curLastU(){
   if(mode==='play') return playHist.length?playHist[playHist.length-1].u:null;
@@ -3380,7 +3439,7 @@ function startFreePlay(side){
   document.getElementById('colorRow').style.display='flex';
   renderColorSeg();
   document.getElementById('lineTitle').innerHTML=`${t('fullGame')}<small id="openingName">${t('makeFirstMove',{side: side==='w'?t('white'):t('black')})}</small>`;
-  const sel=document.getElementById('lineSel'); if(sel) sel.value='';
+  const sel=document.getElementById('lineSel'); if(sel){sel.value='';fitSelectText(sel);}
   updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
   setComment(t('playFromStart'));
