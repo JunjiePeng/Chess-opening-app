@@ -909,7 +909,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G41</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G42</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1472,7 +1472,7 @@ Object.assign(I18N_EN, {
   libraryMatchCount:'{openings} · {lines}',
   libraryNoResults:'No lines match these filters. Try another combination or clear the filters.',
   homeNavigation:'Main navigation',
-  navTest:'Test',
+  navTest:'Test your openings',
   testTitle:'How much can you recall?',
   testIntro:'Choose the lines you want to know, then play them from memory. Build a custom test or use your repertoire.',
   testDefaultName:'My repertoire test',
@@ -1780,7 +1780,7 @@ Object.assign(I18N.zh, {
   libraryMatchCount:'{openings} · {lines}',
   libraryNoResults:'没有符合当前筛选条件的变例。试试其他组合，或清除筛选。',
   homeNavigation:'主导航',
-  navTest:'测试',
+  navTest:'开局自测',
   testTitle:'你能记住多少？',
   testIntro:'选择想掌握的变例，再凭记忆走出来。你可以自选测试内容，也可以使用我的开局库。',
   testDefaultName:'我的开局测试',
@@ -3021,7 +3021,7 @@ const testStore={
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G41';
+const BUILD='G42';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
