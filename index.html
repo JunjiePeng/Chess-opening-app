@@ -29,6 +29,8 @@
   --page-max-width: 1600px; /* keep the whole section central on large screens */
 }
 * { margin:0; padding:0; box-sizing:border-box; }
+/* Keep the shared shell in place when switching between short and scrolling pages. */
+html { scrollbar-gutter:stable; }
 body { background:var(--bg); color:var(--text); font-family:'Figtree','Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.5; min-height:100vh; }
 ::selection { background:rgba(208,131,72,.3); }
 a { color:#e0a878; } a:hover { color:#ecc39a; }
@@ -889,6 +891,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div id="todayBar"></div>
     <div id="repertoirePanel" hidden></div>
     <div id="testPanel" hidden></div>
+    <div id="progressHeading" class="home-heading" hidden></div>
     <div id="achievementEntry"></div>
     <div id="findRow">
       <input id="searchBox" data-i18n-label="searchPh" type="search" autocomplete="off" data-i18n-ph="searchPh">
@@ -906,7 +909,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G40</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G41</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -3018,7 +3021,7 @@ const testStore={
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G40';
+const BUILD='G41';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -3967,6 +3970,7 @@ function showMenu(view){
   document.getElementById('todayBar').hidden=menuView!=='practice';
   document.getElementById('repertoirePanel').hidden=menuView!=='practice';
   document.getElementById('testPanel').hidden=menuView!=='test';
+  document.getElementById('progressHeading').hidden=!progress;
   document.getElementById('summaryBar').hidden=!progress;
   document.getElementById('promotionOverview').hidden=!progress;
   document.getElementById('heatmapBox').hidden=!progress;
@@ -4148,7 +4152,8 @@ function renderPromotionOverview(){
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
   const totalRuns=trained.reduce((n,[,v])=>n+v.runs,0), reviews=trained.reduce((n,[,v])=>n+countValue(v.reviewAttempts),0);
-  document.getElementById('summaryBar').innerHTML=`<div class="home-heading"><h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p></div><div class="progress-stats"><div><b>${trained.length}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
+  document.getElementById('progressHeading').innerHTML=`<h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p>`;
+  document.getElementById('summaryBar').innerHTML=`<div class="progress-stats"><div><b>${trained.length}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
   renderPromotionOverview(); renderHeatmap();
 
 }
