@@ -770,6 +770,77 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   .test-explanation { grid-column:auto; }
 }
 
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+/* G38: persistent recall feedback, recoverable mistakes and a deliberate line boundary. */
+#testBoardStrip { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+#testBoardStrip .test-colour { border:1px solid #8c9c73; border-radius:999px; padding:6px 10px; font-size:.8rem; white-space:nowrap; }
+.test-feedback { --feedback:#d9c6aa; --feedback-bg:#34291f; order:1; padding:20px; border:1px solid #766044; border-radius:18px; background:var(--feedback-bg); }
+.test-feedback.correct,.test-feedback.recovered { --feedback:#d1e8b4; --feedback-bg:#2c3824; border-color:#738957; }
+.test-feedback.assisted { --feedback:#e1d2f3; --feedback-bg:#352d40; border-color:#9785a7; }
+.test-feedback.mismatch { --feedback:#ffcfac; --feedback-bg:#412e22; border-color:#c08a61; }
+.test-feedback-heading { display:flex; gap:12px; align-items:center; margin:10px 0; color:var(--feedback); }
+.test-feedback-heading h3 { font-size:1.15rem; line-height:1.4; overflow-wrap:anywhere; }
+.test-feedback-heading h3:focus { outline:none; }
+.test-feedback-icon { display:flex; flex:0 0 36px; height:36px; align-items:center; justify-content:center; border:1px solid currentColor; border-radius:50%; }
+.test-feedback-icon svg { width:22px; height:22px; }
+.test-turn { color:#e1d5c4; font-size:.83rem; font-weight:600; line-height:1.5; }
+.test-feedback-body { color:#f0e4d3; font-size:.95rem; line-height:1.65; }
+.test-feedback.completed { padding:24px 20px; }
+.test-feedback.completed .test-feedback-icon { flex-basis:46px; height:46px; }
+.test-feedback.completed h3 { font-size:1.3rem; }
+.test-line-summary { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+.test-line-summary strong { flex-basis:100%; color:var(--feedback); font-size:1.08rem; }
+.test-line-summary span { font-size:.8rem; color:#efe2d0; background:#ffffff0d; border:1px solid #ffffff30; border-radius:6px; padding:5px 8px; }
+.test-feedback-next { border-top:1px solid #ffffff25; padding-top:14px; margin-top:16px; font-size:.87rem; line-height:1.5; color:#e0d2c0; }
+#testNav { order:2; gap:8px; }
+#drill.testing #moveBox { order:3; }
+#testNextBtn { flex:1 0 100%; }
+#testHelpNote { flex:1 0 100%; margin:4px 0 0; color:#d0bea5; font-size:.8rem; line-height:1.55; }
+#testMoveProgress { margin-top:10px; }
+#testMoveProgress>span { color:#d8c5ab; font-size:.8rem; }
+.test-step-track { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.test-step-track>span { display:flex; align-items:center; justify-content:center; width:23px; height:21px; background:#4a3b2e; border:1px solid #7c6952; border-radius:5px; }
+.test-step-track .correct { color:#d6ebbe; background:#40522f; border-color:#91a775; }
+.test-step-track .recovered { color:#ffceaa; background:#64432e; border-color:#ca926c; }
+.test-step-track .assisted { color:#e4d3fa; background:#53425f; border-color:#ab94bd; }
+.test-step-track .current { outline:2px solid #f6dfbb; outline-offset:1px; }
+.test-step-track svg { width:15px; height:15px; }
+.test-board-cue { display:flex; justify-content:center; align-items:center; gap:8px; padding:10px 12px; margin-top:10px; background:#34291f; border:1px solid #766044; border-radius:10px; color:#f2dec1; font-size:.9rem; line-height:1.4; max-width:var(--bsize); overflow-wrap:anywhere; }
+.test-board-cue svg { width:20px; height:20px; flex-shrink:0; }
+.test-board-cue.correct,.test-board-cue.recovered { color:#dbedc4; border-color:#839565; background:#2c3824; }
+.test-board-cue.mismatch { color:#ffcfac; border-color:#c08a61; background:#412e22; }
+.test-board-cue.assisted { color:#e4d3fa; border-color:#9785a7; background:#352d40; }
+.sq.test-wrong { box-shadow:inset 0 0 0 4px #a63e20; }
+.sq.test-right { box-shadow:inset 0 0 0 4px #426529; }
+.sq.test-shown { box-shadow:inset 0 0 0 4px #6e5189; }
+.test-square-sign { position:absolute; top:2px; right:2px; display:flex; padding:2px; width:clamp(14px,calc(var(--bsize)/24),22px); height:clamp(14px,calc(var(--bsize)/24),22px); border-radius:50%; color:white; background:#426529; z-index:3; pointer-events:none; }
+.test-wrong .test-square-sign { background:#a63e20; }
+.test-shown .test-square-sign { background:#6e5189; }
+.test-square-sign svg { width:100%; height:100%; }
+.test-outcome { display:inline-flex; gap:6px; align-items:center; }
+.test-outcome svg { width:16px; height:16px; }
+.test-outcome.recovered { color:#e2edca; background:#35432b; }
+.test-outcome.assisted { color:#e4d3fa; background:#45364f; }
+.test-result-count { margin-top:10px; }
+.test-issue-list { list-style:none; padding:0; margin:14px 0 0; grid-column:1/-1; }
+.test-issue-list>li { padding:14px; margin:10px 0 0; border:1px solid #73563d; border-radius:12px; background:#30251c; }
+.test-issue-list h4 { color:#f3cf9f; font-size:1rem; margin-bottom:6px; }
+.test-issue-list p { margin:4px 0; }
+.test-issue-list summary { width:fit-content; max-width:100%; }
+@media(max-width:760px){
+  .test-feedback,.test-feedback.completed { padding:16px; }
+  .test-feedback-heading h3,.test-feedback.completed h3 { font-size:1.08rem; }
+  .test-feedback-body { font-size:.9rem; }
+  #testNav .act { font-size:.85rem; padding:10px 12px; }
+  .test-board-cue { font-size:.84rem; margin-top:8px; }
+  #drill.testing { padding-bottom:160px!important; }
+  #drill.testing #testNav { position:fixed; z-index:30; bottom:0; left:0; right:0; padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); background:#2c2219; border-top:1px solid #846a4d; box-shadow:0 -6px 22px #100b0766; justify-content:center; }
+  #testNav .act { flex:1 1 auto; }
+  #testHelpNote { text-align:center; margin:0; font-size:.73rem; }
+  #testFeedback { scroll-margin-top:20px; }
+  #testFeedbackHeading { scroll-margin-top:24px; scroll-margin-bottom:170px; }
+}
+
 </style>
 </head>
 <body>
@@ -809,7 +880,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G37</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G38</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -826,19 +897,26 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <div id="capTop" class="cap-tray"></div>
         <div class="board-wrap"><div id="board" role="group" data-i18n-label="boardHelp"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
         <div id="capBottom" class="cap-tray"></div>
+        <div id="testBoardCue" role="status" aria-live="polite" aria-atomic="true" hidden></div>
       </div>
     </div>
     <div class="side-panel">
       <div id="sessionStrip" class="session-strip" role="status" hidden></div>
       <div id="testBoardStrip" role="status" hidden></div>
+      <section id="testFeedback" aria-labelledby="testFeedbackHeading" hidden></section>
       <div id="testNav" class="btn-row" hidden>
         <button id="testNextBtn" class="act primary" onclick="nextTestLine()" data-i18n="testNextLine">Next line</button>
+        <button id="testRevealBtn" class="act" onclick="revealTestMove()" data-i18n="testReveal">Show move</button>
+        <button id="testPlayShownBtn" class="act primary" onclick="playShownTestMove()" hidden></button>
+        <button id="testRetrySaveBtn" class="act primary" onclick="resumeRecallTest()" data-i18n="testRetrySave" hidden>Retry saving</button>
         <button id="testSkipBtn" class="act" onclick="skipTestLine()" data-i18n="testSkipLine">Skip line</button>
-        <button class="act" onclick="showMenu('test')" data-i18n="testPause">Pause test</button>
+        <button id="testPauseBtn" class="act" onclick="showMenu('test')" data-i18n="testPause">Pause test</button>
+        <p id="testHelpNote" data-i18n="testHelpNote">Showing a move marks it as assisted. You can still finish the line.</p>
       </div>
       <div class="panel-box" id="titleBox">
         <div id="lineTitle"></div>
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
+        <div id="testMoveProgress" hidden></div>
         <div class="line-controls">
           <select id="lineSel" data-i18n-label="pickOpening" onchange="onLineSel(this.value)"></select>
           <div class="board-options" role="group" data-i18n-label="boardOptions">
@@ -1284,6 +1362,65 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
 });
 /* G26 product language: concrete practice, no waiting or perfect-day pressure. */
 Object.assign(I18N_EN, {
+  testRuleHelp:'Play from memory with the variation name visible. Board aids and explanations stay hidden; Show move is available if you get stuck.',
+  testRuleMismatch:'A mismatch lets you retry the same position. There is no attempt limit. Other legal moves may still be good chess.',
+  testRuleResults:'Finish each line at your own pace. Review first-try recall, recovered moves and assisted moves at the end. Pause whenever you need.',
+  testScoreRule:'First-try recall counts each position once. A retry or revealed answer marks only that move for review; your later moves still count. Skipped and unseen moves earn no recall credit. A fully recalled line needs every move correct first try, without help.',
+  testLinesRecalled:'Fully recalled lines',
+  testMovesAccurate:'{correct}/{total} tested moves correct first try',
+  testBoardRule:'Follow the named variation. A mismatch stays on this position so you can try again.',
+  testLineRecalled:'Line complete — fully recalled',
+  testLineRecorded:'Line saved for review',
+  testAnswersLater:'Your move-by-move review is available in the results.',
+  testRecalled:'Fully recalled',
+  testMismatch:'Needs another look',
+  testLineRecovered:'Line complete — recovered',
+  testLineAssisted:'Line complete — with help',
+  testLineSkipped:'Line skipped',
+  testCleanBody:'Every move came back without help. This line is looking strong.',
+  testRecoveredBody:'You worked through the tricky moves and finished from memory. Revisit the marked positions to make them stick.',
+  testAssistedBody:'You finished the line. The moves you revealed are saved for review, alongside the ones you recalled yourself.',
+  testSkippedBody:'Your attempts are saved. You can practise this line or include it in another test.',
+  testReveal:'Show move',
+  testHelpNote:'Showing a move marks it as assisted. You can still finish the line.',
+  testShownTitle:'Play {move}',
+  testShownBody:'Move from {from} to {to}, or use the button below. Only this move is marked as assisted.',
+  testShownPlayed:'{move} played — keep going',
+  testPlayShown:'Play {move} & continue',
+  testMismatchTitle:'{move} doesn’t follow this line',
+  testRetryBody:'Try again from the same position. One missed move does not end your line.',
+  testRetryAgain:'Take your time and try again, or show the move. This position still counts only once in your score.',
+  testIllegalBody:'Choose a legal move and try again. This tap does not affect your score.',
+  testCorrectTitle:'{move} — correct',
+  testBackOnTrack:'{move} — back on track',
+  testKeepGoing:'Keep going. Recall the next move after the reply.',
+  testFirstTryCount:'{n}/{total} moves correct first try',
+  testRecoveredCount:'{n} recovered',
+  testAssistedCount:'{n} with help',
+  testRemainingCount:'{n} unfinished',
+  testAllFinished:'That was the last line. Your results are ready when you are.',
+  testNextReady:'Take a moment, then continue to the next line.',
+  testMovesFinished:'{n}/{total} of your moves completed',
+  testTurnProgress:'{side} to move · Move {n} of {total}',
+  testSaveFailed:'Your last saved position is safe',
+  testRetrySave:'Retry saving',
+  testMoveProgress:'Progress through your moves',
+  testMoveFirstTry:'Correct first try',
+  testMoveRecovered:'Recovered after retry',
+  testMoveAssisted:'With help',
+  testMovePending:'Not tested yet',
+  testMoveRetry:'Retry this position',
+  testMoveLabel:'Move {n}: {status}',
+  testRecovered:'Completed after retry',
+  testAssisted:'Completed with help',
+  testIssueHeading:'Move {n} · {move}',
+  testIssueTries:'{n} mismatch attempt(s); each position counts once.',
+  testIssueRecovered:'You found the move yourself after retrying.',
+  testIssueAssisted:'You revealed this move.',
+  testIssueUnfinished:'You left this position unfinished.',
+  testCompletedCount:'Lines completed',
+  testReportEncourage:'Use the marked moves to choose what to practise next.',
+  testFullyRecalledCount:'{n} fully recalled without help',
   homeNavigation:'Main navigation',
   navTest:'Test',
   testTitle:'How much can you recall?',
@@ -1306,14 +1443,10 @@ Object.assign(I18N_EN, {
   testEmptyRepertoire:'Your repertoire is empty. Browse Openings here to choose test lines.',
   testHowItWorks:'How your test works',
   testRuleOrder:'Each chosen line and colour appears once, in a shuffled order. There is no timer.',
-  testRuleHelp:'The variation name stays visible. Hints, arrows, dots, evaluation and lesson explanations are hidden.',
-  testRuleMismatch:'Recall the named line from move one. The first mismatch or skip ends that line. Other legal moves may still be good chess.',
-  testRuleResults:'See your score and answers after the test. Pause and resume whenever you need.',
   testStart:'Start test',
   testSavePool:'Save this pool',
   testUpdatePool:'Update saved pool',
   testRankNote:'Tests show recall in this session. Your ranks and scheduled reviews stay separate.',
-  testScoreRule:'A line counts as recalled only when every move for your colour was correct on the first try. Move accuracy covers moves you attempted; later moves after a mismatch were not tested.',
   testPaused:'A test is in progress',
   testFinishedCount:'{n}/{total} lines finished',
   testResume:'Resume test',
@@ -1333,18 +1466,14 @@ Object.assign(I18N_EN, {
   testHistory:'Recent tests',
   testHistoryNote:'Your latest 20 results are saved on this device and included in Export progress.',
   testNoHistory:'Your first result will appear here after a test.',
-  testHistoryScore:'{n}/{total} lines recalled',
+  testHistoryScore:'{n}/{total} lines completed',
   testViewResults:'View results',
   testResults:'Test results',
-  testLinesRecalled:'Lines recalled',
-  testMovesAccurate:'{correct}/{total} attempted moves correct',
   testToRevisit:'Lines to revisit',
   testUntestedCount:'{n} line(s) were not attempted.',
   testRepeatPool:'Test this pool again',
   testRetestMissed:'Retest lines to revisit',
   testBackSetup:'Back to test setup',
-  testRecalled:'Recalled',
-  testMismatch:'Line mismatch',
   testSkipped:'Skipped',
   testUntested:'Not attempted',
   testPlayed:'You played <b>{move}</b>',
@@ -1353,10 +1482,6 @@ Object.assign(I18N_EN, {
   testReviewAnswer:'Review the idea',
   testLineNumber:'Line {n} of {total}',
   testYourMove:'Recall the next move for {side}.',
-  testBoardRule:'Follow the named variation from memory. Your first attempt counts; answers appear after the test.',
-  testLineRecalled:'Line recalled.',
-  testLineRecorded:'Line recorded for review.',
-  testAnswersLater:'Continue to the next line. You can review all answers when the test is finished.',
   testNextLine:'Next line',
   testSkipLine:'Skip line',
   testPause:'Pause test',
@@ -1518,6 +1643,65 @@ Object.assign(I18N_EN, {
 
 });
 Object.assign(I18N.zh, {
+  testRuleHelp:'保留变例名称，凭记忆走棋。棋盘辅助和讲解保持隐藏；卡住时可选择“显示着法”。',
+  testRuleMismatch:'走偏后可在原局面重试，次数不限。其他合法着法仍可能是好棋。',
+  testRuleResults:'按自己的节奏完成每条变例。结束后查看首次正确、重试找回和借助提示的着法；随时可以暂停。',
+  testScoreRule:'首次正确率按本方局面计数，每个局面只计一次。重试或查看答案只影响当前这一步，之后的着法仍正常计分。跳过与未测试的着法不计回忆成绩。整条变例需本方每步首次正确、未借助提示，才算完整回忆。',
+  testLinesRecalled:'完整回忆的变例',
+  testMovesAccurate:'已测试着法中 {correct}/{total} 步首次正确',
+  testBoardRule:'请回忆指定变例。走偏后会保留当前局面，方便重试。',
+  testLineRecalled:'本线完成 · 完整回忆',
+  testLineRecorded:'本线已记录，可供复习',
+  testAnswersLater:'结果页可逐步查看需要复习的着法。',
+  testRecalled:'完整回忆',
+  testMismatch:'需要复习',
+  testLineRecovered:'本线完成 · 已自行找回',
+  testLineAssisted:'本线完成 · 借助提示',
+  testLineSkipped:'已跳过本线',
+  testCleanBody:'每一步都独立回忆成功，这条变例掌握得不错。',
+  testRecoveredBody:'你通过重试自行找回了着法，完成整条变例。复习标记的局面，让记忆更牢固。',
+  testAssistedBody:'你已完成本线。查看过答案的着法与独立回忆的着法会分别记录，便于复习。',
+  testSkippedBody:'已保留你的尝试记录。你可以练习这条变例，或将它加入下一次测试。',
+  testReveal:'显示着法',
+  testHelpNote:'显示着法会将这一步标记为借助提示，之后仍可继续完成本线。',
+  testShownTitle:'请走 {move}',
+  testShownBody:'从 {from} 走到 {to}，也可点击下方按钮代走。仅这一步标记为借助提示。',
+  testShownPlayed:'已走 {move} · 请继续',
+  testPlayShown:'走 {move} 并继续',
+  testMismatchTitle:'{move} 不符合本线',
+  testRetryBody:'请在当前局面重试。一步走偏不会结束整条变例。',
+  testRetryAgain:'慢慢想，可以继续重试，也可显示着法。这个局面仍只计分一次。',
+  testIllegalBody:'请选择合法着法再试。这次点击不影响得分。',
+  testCorrectTitle:'{move} · 正确',
+  testBackOnTrack:'{move} · 已找回正确着法',
+  testKeepGoing:'请继续，等对方应着后回忆下一步。',
+  testFirstTryCount:'{n}/{total} 步首次正确',
+  testRecoveredCount:'{n} 步重试找回',
+  testAssistedCount:'{n} 步借助提示',
+  testRemainingCount:'{n} 步未完成',
+  testAllFinished:'这是最后一条变例。准备好后即可查看结果。',
+  testNextReady:'稍作停留，准备好后继续下一条变例。',
+  testMovesFinished:'本方已完成 {n}/{total} 步',
+  testTurnProgress:'轮到{side} · 第 {n}/{total} 步',
+  testSaveFailed:'已保留上次成功保存的局面',
+  testRetrySave:'重试保存',
+  testMoveProgress:'本方着法进度',
+  testMoveFirstTry:'首次正确',
+  testMoveRecovered:'重试找回',
+  testMoveAssisted:'借助提示',
+  testMovePending:'尚未测试',
+  testMoveRetry:'请重试此局面',
+  testMoveLabel:'第 {n} 步：{status}',
+  testRecovered:'重试后完成',
+  testAssisted:'借助提示完成',
+  testIssueHeading:'第 {n} 步 · {move}',
+  testIssueTries:'尝试走偏 {n} 次；每个局面只计分一次。',
+  testIssueRecovered:'你通过重试自行找回了着法。',
+  testIssueAssisted:'你查看了这一步的答案。',
+  testIssueUnfinished:'你尚未完成这个局面。',
+  testCompletedCount:'已完成的变例',
+  testReportEncourage:'根据标记的着法，选择接下来要练习的内容。',
+  testFullyRecalledCount:'其中 {n} 条完整独立回忆',
   homeNavigation:'主导航',
   navTest:'测试',
   testTitle:'你能记住多少？',
@@ -1540,14 +1724,10 @@ Object.assign(I18N.zh, {
   testEmptyRepertoire:'你的开局库还没有变例。可切换到全部开局，在这里选择测试内容。',
   testHowItWorks:'测试方式',
   testRuleOrder:'每个已选变例与执方组合出现一次，顺序随机，无时间限制。',
-  testRuleHelp:'保留变例名称，隐藏提示、箭头、圆点、评估条和课程讲解。',
-  testRuleMismatch:'从第一步回忆指定变例。首次走偏或跳过即结束该线。其他合法着法仍可能是好棋。',
-  testRuleResults:'测试结束后查看得分与答案，随时可以暂停或继续。',
   testStart:'开始测试',
   testSavePool:'保存题库',
   testUpdatePool:'更新题库',
   testRankNote:'测试反映本次回忆情况，等级与到期复习单独计算。',
-  testScoreRule:'只有本方每步都在首次尝试时正确，整条变例才计为已回忆。着法正确率仅统计尝试过的着法；走偏之后的后续着法未被测试。',
   testPaused:'有一场未完成的测试',
   testFinishedCount:'已完成 {n}/{total} 条',
   testResume:'继续测试',
@@ -1567,18 +1747,14 @@ Object.assign(I18N.zh, {
   testHistory:'最近的测试',
   testHistoryNote:'最近 20 次结果保存在此设备上，并包含在导出的进度文件中。',
   testNoHistory:'完成首次测试后，结果会显示在这里。',
-  testHistoryScore:'回忆出 {n}/{total} 条变例',
+  testHistoryScore:'已完成 {n}/{total} 条变例',
   testViewResults:'查看结果',
   testResults:'测试结果',
-  testLinesRecalled:'完整回忆的变例',
-  testMovesAccurate:'已尝试着法中 {correct}/{total} 步正确',
   testToRevisit:'需再练的变例',
   testUntestedCount:'另有 {n} 条变例未尝试。',
   testRepeatPool:'再次测试此题库',
   testRetestMissed:'重测需再练的变例',
   testBackSetup:'返回测试设置',
-  testRecalled:'完整回忆',
-  testMismatch:'偏离变例',
   testSkipped:'已跳过',
   testUntested:'未尝试',
   testPlayed:'你的着法：<b>{move}</b>',
@@ -1587,10 +1763,6 @@ Object.assign(I18N.zh, {
   testReviewAnswer:'查看思路',
   testLineNumber:'第 {n}/{total} 条',
   testYourMove:'请回忆{side}下一步。',
-  testBoardRule:'凭记忆走出指定变例。按首次尝试计分，测试后显示答案。',
-  testLineRecalled:'本线已完整回忆。',
-  testLineRecorded:'本线已记录，稍后回顾。',
-  testAnswersLater:'继续下一条变例，完成测试后可回顾全部答案。',
   testNextLine:'下一条变例',
   testSkipLine:'跳过此线',
   testPause:'暂停测试',
@@ -2660,8 +2832,8 @@ function renderSessionStrip(){
 
 
 /* ================= CUSTOM RECALL TESTS =================
-   Tests measure named-line recall now. They never write ranks or SRS grades.
-   Persist after every move; the saved cursor is the source of truth on resume. */
+   Tests measure first-try recall, with unlimited recovery and explicit assistance.
+   Persist the cursor and each missed position; retries never inflate the score. */
 function testSignature(item){const x=resolveLesson(item.id);return x?DATA.openings[x.oi].lines[x.li].moves.map(m=>m.u).join(' '):'';}
 function testMoves(item){const x=resolveLesson(item.id);return x?DATA.openings[x.oi].lines[x.li].moves:[];}
 function testOwnPly(item,p){return (p%2===0?'w':'b')===item.side;}
@@ -2672,17 +2844,39 @@ function testShuffle(items,random=Math.random){
   for(let i=out.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
   return out;
 }
+function testIssueList(issues,item,stop,checkContent=false){
+  if(!Array.isArray(issues)||issues.length>500)return null;
+  if(issues.some((x,i)=>!isRecord(x)||!Number.isInteger(x.ply)||x.ply<0||x.ply>stop||!testOwnPly(item,x.ply)||i>0&&x.ply<=issues[i-1].ply||typeof x.expectedSan!=='string'||x.expectedSan.length>30||typeof x.playedSan!=='string'||x.playedSan.length>30||!Number.isSafeInteger(x.attempts)||x.attempts<0||x.attempts>10000||typeof x.assisted!=='boolean'||!x.assisted&&!x.attempts||checkContent&&x.expectedSan!==testMoves(item)[x.ply]?.san))return null;
+  return issues.map(x=>({...x}));
+}
+function testLineStats(item,ply,issues=[]){
+  const done=testOwnCount(item,ply),resolved=issues.filter(x=>x.ply<ply);
+  return {correct:done-resolved.length,attempted:done+issues.filter(x=>x.ply===ply).length,total:testOwnCount(item),recovered:resolved.filter(x=>!x.assisted).length,assisted:resolved.filter(x=>x.assisted).length};
+}
 function cleanTestRun(run,active=false){
   if(!isRecord(run)||!/^test-[a-z0-9-]+$/.test(run.id||'')||typeof run.name!=='string'||!Number.isSafeInteger(run.startedAt)||run.startedAt<0||run.startedAt>8640000000000000||!Array.isArray(run.items)||!run.items.length||run.items.length>1000||!Array.isArray(run.results)||run.results.length>run.items.length||!['playing','between','complete'].includes(run.phase)||!Number.isInteger(run.ply)||run.ply<0)return null;
   const items=normalizeRepItems(run.items);if(items.length!==run.items.length)return null;
-  if(active&&run.items.some((x,i)=>x.signature!==testSignature(items[i])))return null;
-  if(run.results.some((r,i)=>!isRecord(r)||itemKey(r)!==itemKey(items[i])||!['recalled','missed','skipped','untested'].includes(r.outcome)||!Number.isInteger(r.stopPly)||r.stopPly<0||!Number.isInteger(r.correct)||r.correct<0||!Number.isInteger(r.total)||r.total<1||r.correct>r.total||typeof r.expectedSan!=='string'||typeof r.playedSan!=='string'))return null;
+  if(run.items.some(x=>typeof x.signature!=='string'||x.signature.length>4096)||active&&run.items.some((x,i)=>x.signature!==testSignature(items[i])))return null;
   const complete=run.results.length===items.length;
-  if((run.phase==='complete')!==complete||complete&&(!Number.isSafeInteger(run.finishedAt)||run.finishedAt<0||run.finishedAt>8640000000000000))return null;
+  if((run.phase==='complete')!==complete||complete&&(!Number.isSafeInteger(run.finishedAt)||run.finishedAt<0||run.finishedAt>8640000000000000)||!complete&&run.finishedAt!==null)return null;
   if(!complete&&run.ply>=testMoves(items[run.results.length]).length)return null;
   if(run.phase!=='playing'&&run.ply!==0||run.phase==='between'&&!run.results.length)return null;
-  if(active&&run.results.some((r,i)=>r.total!==testOwnCount(items[i])||r.stopPly>testMoves(items[i]).length||r.correct!==testOwnCount(items[i],r.stopPly)||r.outcome==='recalled'&&r.correct!==r.total))return null;
-  return {...run,name:run.name.slice(0,60),items:run.items.map((x,i)=>({...items[i],signature:x.signature})),results:run.results.map(r=>({...r}))};
+  const results=[];
+  for(const [i,r] of run.results.entries()){
+    if(!isRecord(r)||itemKey(r)!==itemKey(items[i])||!['recalled','recovered','assisted','missed','skipped','untested'].includes(r.outcome)||!Number.isInteger(r.stopPly)||r.stopPly<0||!Number.isInteger(r.correct)||r.correct<0||!Number.isInteger(r.total)||r.total<1||r.correct>r.total||typeof r.expectedSan!=='string'||typeof r.playedSan!=='string')return null;
+    // G37 reports remain readable, with their original first-mismatch boundary.
+    const issues=r.issues===undefined?(r.outcome==='missed'?[{ply:r.stopPly,expectedSan:r.expectedSan,playedSan:r.playedSan,attempts:1,assisted:false}]:[]):testIssueList(r.issues,items[i],r.stopPly,active);
+    const attempted=r.attempted??(r.correct+(r.outcome==='missed'?1:0));
+    if(!issues||!Number.isInteger(attempted)||attempted<r.correct||attempted>r.total)return null;
+    if(active){
+      const stats=testLineStats(items[i],r.stopPly,issues),finished=['recalled','recovered','assisted'].includes(r.outcome);
+      if(r.total!==stats.total||r.stopPly>testMoves(items[i]).length||r.correct!==stats.correct||attempted!==stats.attempted||finished&&r.stopPly!==testMoves(items[i]).length||r.outcome==='recalled'&&issues.length||r.outcome==='recovered'&&(!issues.length||issues.some(x=>x.assisted))||r.outcome==='assisted'&&!issues.some(x=>x.assisted))return null;
+    }
+    results.push({...r,issues,attempted});
+  }
+  const issues=run.issues===undefined?[]:testIssueList(run.issues,items[run.results.length]||items[0],run.ply,active);
+  if(!issues||run.phase!=='playing'&&issues.length)return null;
+  return {...run,name:run.name.slice(0,60),items:run.items.map((x,i)=>({...items[i],signature:x.signature})),results,issues};
 }
 const testStore={
   load(){
@@ -2690,40 +2884,55 @@ const testStore={
     const pools=(Array.isArray(raw.pools)?raw.pools:[]).filter(p=>isRecord(p)&&/^test-[a-z0-9-]+$/.test(p.id||'')&&typeof p.name==='string').slice(0,20).map(p=>({id:p.id,name:p.name.slice(0,60),items:normalizeRepItems(p.items)})).filter(p=>p.items.length);
     const history=(Array.isArray(raw.history)?raw.history:[]).map(r=>cleanTestRun(r)).filter(r=>r&&r.phase==='complete').slice(0,20);
     const active=cleanTestRun(raw.active,true);
-    return {v:1,pools,history,active:active?.phase!=='complete'?active:null};
+    return {v:2,pools,history,active:active?.phase!=='complete'?active:null};
   },
   save(d){localStorage.setItem('otTests',JSON.stringify(d));},
   start(name,items,random=Math.random){
     const d=this.load();if(d.active)throw new Error('active-test');
     const pool=normalizeRepItems(items);if(!pool.length)throw new Error('empty-pool');
-    d.active={id:testRunId(),name:name.slice(0,60),startedAt:Date.now(),finishedAt:null,items:testShuffle(pool,random).map(x=>({...x,signature:testSignature(x)})),results:[],ply:0,phase:'playing'};
+    d.active={id:testRunId(),name:name.slice(0,60),startedAt:Date.now(),finishedAt:null,items:testShuffle(pool,random).map(x=>({...x,signature:testSignature(x)})),results:[],issues:[],ply:0,phase:'playing'};
     this.save(d);return d.active;
   },
-  next(){const d=this.load();if(!d.active)return null;d.active.phase='playing';this.save(d);return d.active;},
-  record(d,outcome,playedSan=''){
-    const run=d.active,item=run.items[run.results.length],moves=testMoves(item),p=run.ply;
-    run.results.push({...item,outcome,stopPly:p,correct:testOwnCount(item,p),total:testOwnCount(item),expectedSan:testOwnPly(item,p)?moves[p]?.san||'':'',playedSan});
-    run.ply=0;run.phase=run.results.length===run.items.length?'complete':'between';
+  next(){const d=this.load();if(!d.active||d.active.phase!=='between')return null;d.active.phase='playing';this.save(d);return d.active;},
+  record(d,outcome){
+    const run=d.active,item=run.items[run.results.length],p=run.ply;
+    const stats=testLineStats(item,p,run.issues),issues=run.issues.map(x=>({...x}));
+    run.results.push({...item,outcome,stopPly:p,correct:stats.correct,attempted:stats.attempted,total:stats.total,issues,expectedSan:'',playedSan:''});
+    run.ply=0;run.issues=[];run.phase=run.results.length===run.items.length?'complete':'between';
     if(run.phase==='complete'){
       run.finishedAt=Date.now();d.history=[run,...d.history.filter(r=>r.id!==run.id)].slice(0,20);d.active=null;
     }
-    this.save(d);return run;
+    return run;
+  },
+  issue(run,playedSan,assisted=false){
+    const item=run.items[run.results.length],p=run.ply;
+    let issue=run.issues.find(x=>x.ply===p);
+    if(!issue){issue={ply:p,expectedSan:testMoves(item)[p].san,playedSan:'',attempts:0,assisted:false};run.issues.push(issue);}
+    if(assisted)issue.assisted=true;
+    else {issue.playedSan=playedSan.slice(0,30);issue.attempts=Math.min(10000,issue.attempts+1);}
+    return issue;
   },
   move(u,playedSan=''){
     const d=this.load(),run=d.active;if(!run||run.phase!=='playing')return null;
     const item=run.items[run.results.length],moves=testMoves(item),expected=moves[run.ply];
     if(!expected)return null;
-    const own=testOwnPly(item,run.ply);
-    if(u!==expected.u){if(!own)return null;return this.record(d,'missed',playedSan);}
-    run.ply++;
-    if(run.ply>=moves.length)return this.record(d,'recalled');
+    if(u!==expected.u){if(!testOwnPly(item,run.ply))return null;this.issue(run,playedSan);}
+    else {
+      run.ply++;
+      if(run.ply>=moves.length)this.record(d,run.issues.some(x=>x.assisted)?'assisted':run.issues.length?'recovered':'recalled');
+    }
     this.save(d);return run;
   },
-  skip(){const d=this.load();if(!d.active||d.active.phase!=='playing')return null;return this.record(d,'skipped');},
+  reveal(){
+    const d=this.load(),run=d.active;if(!run||run.phase!=='playing'||!testOwnPly(run.items[run.results.length],run.ply))return null;
+    this.issue(run,'',true);this.save(d);return run;
+  },
+  skip(){const d=this.load();if(!d.active||d.active.phase!=='playing')return null;const run=this.record(d,'skipped');this.save(d);return run;},
   end(){
-    let d=this.load(),run=d.active;if(!run)return null;
-    while(d.active){run=this.record(d,d.active.ply?'skipped':'untested');d=this.load();}
-    return run;
+    const d=this.load();let run=d.active;if(!run)return null;
+    // One atomic save: an interrupted write cannot leave an early-finished test half recorded.
+    while(d.active)run=this.record(d,d.active.phase==='playing'&&(d.active.ply||d.active.issues.length)?'skipped':'untested');
+    this.save(d);return run;
   },
   savePool(id,name,items){
     const d=this.load(),pool={id:id||testRunId(),name:name.slice(0,60),items:normalizeRepItems(items)};
@@ -2738,7 +2947,7 @@ const testStore={
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G37';
+const BUILD='G38';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -2753,8 +2962,14 @@ function validTestBackup(value){
   const id=v=>typeof v==='string'&&/^test-[a-z0-9-]+$/.test(v);
   const time=v=>Number.isSafeInteger(v)&&v>=0&&v<=8640000000000000;
   const items=list=>Array.isArray(list)&&list.length>0&&list.length<=1000&&list.every(x=>isRecord(x)&&typeof x.id==='string'&&/^[a-z0-9-]+$/.test(x.id)&&['w','b'].includes(x.side))&&new Set(list.map(x=>x.id+':'+x.side)).size===list.length;
-  const run=r=>isRecord(r)&&id(r.id)&&typeof r.name==='string'&&r.name.length<=60&&time(r.startedAt)&&items(r.items)&&r.items.every(x=>typeof x.signature==='string'&&x.signature.length<=4096)&&['playing','between','complete'].includes(r.phase)&&Number.isSafeInteger(r.ply)&&r.ply>=0&&r.ply<=1000&&Array.isArray(r.results)&&r.results.length<=r.items.length&&r.results.every((x,i)=>isRecord(x)&&x.id===r.items[i].id&&x.side===r.items[i].side&&['recalled','missed','skipped','untested'].includes(x.outcome)&&Number.isSafeInteger(x.stopPly)&&x.stopPly>=0&&Number.isSafeInteger(x.total)&&x.total>0&&Number.isSafeInteger(x.correct)&&x.correct>=0&&x.correct<=x.total&&typeof x.expectedSan==='string'&&typeof x.playedSan==='string')&&(r.phase!=='between'||r.results.length>0)&&((r.phase==='complete'&&r.results.length===r.items.length&&time(r.finishedAt))||(r.phase!=='complete'&&r.results.length<r.items.length&&r.finishedAt===null));
-  return isRecord(value)&&value.v===1&&Array.isArray(value.pools)&&value.pools.length<=20&&value.pools.every(p=>isRecord(p)&&id(p.id)&&typeof p.name==='string'&&p.name.length<=60&&items(p.items))&&Array.isArray(value.history)&&value.history.length<=20&&value.history.every(r=>run(r)&&r.phase==='complete')&&(value.active===null||run(value.active)&&value.active.phase!=='complete');
+  const issues=(list,side,stop)=>list===undefined||Array.isArray(list)&&list.length<=500&&list.every((x,i)=>isRecord(x)&&Number.isSafeInteger(x.ply)&&x.ply>=0&&x.ply<=stop&&(x.ply%2===0?'w':'b')===side&&(!i||x.ply>list[i-1].ply)&&typeof x.expectedSan==='string'&&x.expectedSan.length<=30&&typeof x.playedSan==='string'&&x.playedSan.length<=30&&Number.isSafeInteger(x.attempts)&&x.attempts>=0&&x.attempts<=10000&&typeof x.assisted==='boolean'&&(x.assisted||x.attempts>0));
+  const run=r=>{
+    if(!isRecord(r)||!id(r.id)||typeof r.name!=='string'||r.name.length>60||!time(r.startedAt)||!items(r.items)||!r.items.every(x=>typeof x.signature==='string'&&x.signature.length<=4096)||!['playing','between','complete'].includes(r.phase)||!Number.isSafeInteger(r.ply)||r.ply<0||r.ply>1000||!Array.isArray(r.results)||r.results.length>r.items.length)return false;
+    if(!r.results.every((x,i)=>isRecord(x)&&x.id===r.items[i].id&&x.side===r.items[i].side&&['recalled','recovered','assisted','missed','skipped','untested'].includes(x.outcome)&&Number.isSafeInteger(x.stopPly)&&x.stopPly>=0&&x.stopPly<=1000&&Number.isSafeInteger(x.total)&&x.total>0&&Number.isSafeInteger(x.correct)&&x.correct>=0&&x.correct<=x.total&&typeof x.expectedSan==='string'&&typeof x.playedSan==='string'&&(x.attempted===undefined||Number.isSafeInteger(x.attempted)&&x.attempted>=x.correct&&x.attempted<=x.total)&&issues(x.issues,x.side,x.stopPly)))return false;
+    if(r.phase!=='playing'&&(r.ply!==0||r.issues?.length)||r.phase==='between'&&!r.results.length||!issues(r.issues,r.items[r.results.length]?.side,r.ply))return false;
+    return r.phase==='complete'?r.results.length===r.items.length&&time(r.finishedAt):r.results.length<r.items.length&&r.finishedAt===null;
+  };
+  return isRecord(value)&&[1,2].includes(value.v)&&Array.isArray(value.pools)&&value.pools.length<=20&&value.pools.every(p=>isRecord(p)&&id(p.id)&&typeof p.name==='string'&&p.name.length<=60&&items(p.items))&&Array.isArray(value.history)&&value.history.length<=20&&value.history.every(r=>run(r)&&r.phase==='complete')&&(value.active===null||run(value.active)&&value.active.phase!=='complete');
 }
 
 function validateProgressBackup(o){
@@ -2877,6 +3092,9 @@ const SFX = {
   mate(){ this.tap(180,.55); this.tap(140,.45,.09); },   // neutral, heavy double tap for the mating move itself
   mateWin(){ [392,494,587,784].forEach((f,i)=>this.tone(f,.2,{vol:.09,delay:.15+i*.085})); },     // rising major — you won
   mateLose(){ [330,262,220].forEach((f,i)=>this.tone(f,.3,{vol:.07,delay:.18+i*.15})); },         // slow descending — subdued, not punishing
+  testCorrect(){ this.tone(523,.1,{vol:.035});this.tone(659,.12,{vol:.03,delay:.065}); },
+  testHelp(){ this.tone(440,.18,{vol:.04}); },
+  testSkip(){ this.tone(330,.16,{vol:.035});this.tone(392,.2,{vol:.03,delay:.12}); },
   error(){ this.tone(170,.1,{vol:.07}); this.tone(136,.14,{vol:.055,delay:.055}); },
   success(){ [392,494,587].forEach((f,i)=>this.tone(f,.16,{vol:.09,delay:i*.08})); },
   rankUp(){ [523,659,784,1047].forEach((f,i)=>this.tone(f,.16,{vol:.11,delay:i*.07})); this.tone(1568,.4,{vol:.05,delay:.34}); },
@@ -3372,6 +3590,7 @@ function render(lastU){
   if(hintSq && mode==='drill') highlightSq(hintSq);   // hint glow survives re-renders
   if(lastU && lastU===pendingAnim){ pendingAnim=null; animMove(lastU); }
   drawAnnots();
+  if(mode==='test')paintTestSquares();
 }
 
 /* ---- annotation overlay (arrows + key squares) ---- */
@@ -3420,75 +3639,133 @@ function drawAnnots(){
 }
 
 /* The test board shares legal move input, but never the drill's hint/grading path. */
-let testBoardRun=null,testBoardMessage='';
+let testBoardRun=null,testBoardMessage=null;
+function testIcon(kind){
+  const paths={correct:'m5 12 4 4L19 6',recovered:'M4 10a8 8 0 1 1 2 8M4 4v6h6',assisted:'M12 5c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Zm0 0v14',mismatch:'m7 7 10 10M17 7 7 17',skipped:'m9 5 7 7-7 7',ready:'M12 8v5m0 4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0'};
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[kind]||paths.ready}"/></svg>`;
+}
+function testSound(name){try{SFX[name]();}catch(e){/* Audio availability must never interrupt a saved test. */}}
+function testFeedbackState(){
+  const run=testBoardRun,finished=run.phase!=='playing',item=run.items[finished?run.results.length-1:run.results.length];
+  if(testBoardMessage?.kind==='error')return {kind:'mismatch',title:t('testSaveFailed'),body:t('testStorageError')};
+  if(finished){
+    const r=run.results.at(-1),kind={recalled:'correct',recovered:'recovered',assisted:'assisted',missed:'mismatch',skipped:'skipped'}[r.outcome]||'skipped';
+    return {kind,title:t({recalled:'testLineRecalled',recovered:'testLineRecovered',assisted:'testLineAssisted',missed:'testLineRecorded',skipped:'testLineSkipped'}[r.outcome]||'testLineSkipped'),body:t({recalled:'testCleanBody',recovered:'testRecoveredBody',assisted:'testAssistedBody',missed:'testSkippedBody',skipped:'testSkippedBody'}[r.outcome]||'testSkippedBody')};
+  }
+  const issue=run.issues.find(x=>x.ply===run.ply);
+  if(issue?.assisted){const mv=testMoves(item)[run.ply];return {kind:'assisted',title:t('testShownTitle',{move:mv.san}),body:t('testShownBody',{from:mv.u.slice(0,2),to:mv.u.slice(2,4)})};}
+  if(testBoardMessage?.kind==='illegal')return {kind:'mismatch',title:t('illegalMove'),body:t('testIllegalBody')};
+  if(issue)return {kind:'mismatch',title:t('testMismatchTitle',{move:issue.playedSan}),body:t(issue.attempts>1?'testRetryAgain':'testRetryBody')};
+  if(testBoardMessage?.kind==='correct')return {kind:testBoardMessage.assisted?'assisted':testBoardMessage.recovered?'recovered':'correct',title:t(testBoardMessage.assisted?'testShownPlayed':testBoardMessage.recovered?'testBackOnTrack':'testCorrectTitle',{move:testBoardMessage.move}),body:t('testKeepGoing')};
+  return {kind:'ready',title:t('testYourMove',{side:t(item.side==='w'?'white':'black')}),body:t('testBoardRule')};
+}
+function paintTestSquares(){
+  if(mode!=='test'||!testBoardRun)return;
+  const m=testBoardMessage;
+  const shown=testBoardRun.phase==='playing'&&testBoardRun.ply===ply&&testBoardRun.issues.find(x=>x.ply===testBoardRun.ply&&x.assisted);
+  const u=shown?lineMoves()[ply]?.u:m?.u;
+  if(!u)return;
+  const kind=shown?'shown':m?.kind==='mismatch'?'wrong':m?.kind==='correct'?(m.assisted?'shown':'right'):null;
+  if(!kind)return;
+  const square=boardEl.querySelector(`[data-sq="${u.slice(2,4)}"]`);if(!square)return;
+  square.classList.add('test-'+kind);
+  square.insertAdjacentHTML('beforeend',`<span class="test-square-sign" aria-hidden="true">${testIcon(kind==='shown'?'assisted':kind==='wrong'?'mismatch':'correct')}</span>`);
+}
 function renderTestBoard(){
   const run=testBoardRun;if(!run||mode!=='test')return;
-  const between=run.phase==='between',index=between?run.results.length-1:run.results.length,item=run.items[index],x=resolveLesson(item.id);
+  const finished=run.phase!=='playing',index=finished?run.results.length-1:run.results.length,item=run.items[index],x=resolveLesson(item.id),result=finished?run.results.at(-1):null;
+  const at=finished?result.stopPly:run.ply,issues=finished?result.issues:run.issues,stats=testLineStats(item,at,issues),done=testOwnCount(item,at);
+  const state=testFeedbackState(),currentIssue=issues.find(x=>x.ply===at),savingError=testBoardMessage?.kind==='error';
   document.getElementById('lineTitle').innerHTML=`${medalText(opName(DATA.openings[x.oi]))}<small>${medalText(lnName(DATA.openings[x.oi].lines[x.li]))} · ${t(item.side==='w'?'white':'black')}</small>`;
-  document.getElementById('testBoardStrip').innerHTML=`<b>${t('testLineNumber',{n:index+1,total:run.items.length})}</b><span>${medalText(run.name)}</span>`;
-  const key=between?(run.results.at(-1).outcome==='recalled'?'testLineRecalled':'testLineRecorded'):(testBoardMessage||(!isPlayerTurn()?'oppReplying':'testYourMove'));
-  setPrompt(t(key,{side:t(playerSide==='w'?'white':'black')}),between&&run.results.at(-1).outcome==='recalled'?'good':'');
-  setComment(t(between?'testAnswersLater':'testBoardRule'));
-  document.getElementById('testNextBtn').hidden=!between;
-  document.getElementById('testSkipBtn').hidden=between;
+  document.getElementById('testBoardStrip').innerHTML=`<div><b>${t('testLineNumber',{n:index+1,total:run.items.length})}</b><span>${medalText(run.name)}</span></div><strong class="test-colour">${t(item.side==='w'?'white':'black')}</strong>`;
+  const turn=finished?t('testMovesFinished',{n:done,total:stats.total}):!isPlayerTurn()?t('oppReplying'):t('testTurnProgress',{side:t(item.side==='w'?'white':'black'),n:Math.min(done+1,stats.total),total:stats.total});
+  const el=document.getElementById('testFeedback');el.hidden=false;el.className='test-feedback '+state.kind+(finished?' completed':'');
+  el.innerHTML=`<p class="test-turn">${turn}</p><div class="test-feedback-heading"><span class="test-feedback-icon">${testIcon(state.kind)}</span><h3 id="testFeedbackHeading" tabindex="-1">${medalText(state.title)}</h3></div><p class="test-feedback-body">${medalText(state.body)}</p>${finished?`<div class="test-line-summary"><strong>${t('testFirstTryCount',{n:result.correct,total:result.total})}</strong>${stats.recovered?`<span>${t('testRecoveredCount',{n:stats.recovered})}</span>`:''}${stats.assisted?`<span>${t('testAssistedCount',{n:stats.assisted})}</span>`:''}${done<stats.total?`<span>${t('testRemainingCount',{n:stats.total-done})}</span>`:''}</div><p class="test-feedback-next">${t(run.phase==='complete'?'testAllFinished':'testNextReady')}</p>`:''}`;
+  const cue=document.getElementById('testBoardCue');cue.hidden=false;cue.className='test-board-cue '+state.kind;
+  cue.innerHTML=`${testIcon(state.kind)}<span>${medalText(state.title)}</span>`;
+  const next=document.getElementById('testNextBtn');next.hidden=!finished;next.textContent=t(run.phase==='complete'?'testViewResults':'testNextLine');
+  document.getElementById('testSkipBtn').hidden=finished;
   document.getElementById('testSkipBtn').disabled=locked;
-  document.getElementById('progFill').style.width=100*(run.results.length)/run.items.length+'%';
+  document.getElementById('testPauseBtn').hidden=run.phase==='complete';
+  const help=document.getElementById('testRevealBtn');help.hidden=finished||!!currentIssue?.assisted;help.disabled=locked||savingError;
+  const play=document.getElementById('testPlayShownBtn');play.hidden=finished||!currentIssue?.assisted;play.disabled=locked||savingError;play.textContent=t('testPlayShown',{move:currentIssue?.expectedSan||''});
+  document.getElementById('testHelpNote').hidden=finished;
+  document.getElementById('testRetrySaveBtn').hidden=!savingError;
+  document.getElementById('progFill').style.width=100*done/stats.total+'%';
+  const progress=document.getElementById('testMoveProgress');progress.hidden=false;
+  progress.innerHTML=`<span>${t('testMovesFinished',{n:done,total:stats.total})}</span><div class="test-step-track" aria-label="${t('testMoveProgress')}">${testMoves(item).map((mv,p)=>{
+    if(!testOwnPly(item,p))return '';
+    const issue=issues.find(x=>x.ply===p),kind=issue?(issue.assisted?'assisted':'recovered'):p<at?'correct':'pending';
+    const label=t(p<at?(issue?issue.assisted?'testMoveAssisted':'testMoveRecovered':'testMoveFirstTry'):issue?'testMoveRetry':'testMovePending');
+    return `<span class="${kind}${p===at&&!finished?' current':''}" title="${t('testMoveLabel',{n:Math.floor(p/2)+1,status:label})}"><span class="sr-only">${t('testMoveLabel',{n:Math.floor(p/2)+1,status:label})}</span>${p<at?testIcon(issue?issue.assisted?'assisted':'recovered':'correct'):issue?testIcon(issue.assisted?'assisted':'mismatch'):''}</span>`;
+  }).join('')}</div>`;
   updateMoveList();
 }
 function resumeRecallTest(){
   const run=testStore.load().active;if(!run){showMenu('test');return;}
-  sessionActive=false;sessionItem=null;runGen++;Engine.abort();testBoardRun=run;testBoardMessage='';
+  sessionActive=false;sessionItem=null;runGen++;Engine.abort();testBoardRun=run;testBoardMessage=null;
   const index=run.phase==='between'?run.results.length-1:run.results.length,item=run.items[index],x=resolveLesson(item.id);
   curOp=x.oi;curLine=x.li;playerSide=item.side;mode='test';board=initBoard();selSq=null;aimSet=null;curAnnot=null;hintSq=null;learnGuide=null;
   ply=run.phase==='between'?run.results.at(-1).stopPly:run.ply;
   for(const mv of lineMoves().slice(0,ply))applyMove(mv.u);
   pendingAnim=null;locked=run.phase==='between';
   showAppView('board');document.getElementById('drill').classList.remove('play');
-  for(const id of ['doneBox','drillNav','learnNav','playNav','strengthRow','evalBarWrap'])document.getElementById(id).style.display='none';
-  document.getElementById('promptBox').style.display='block';document.getElementById('streakInfo').textContent='';showCapTrays(false);
+  for(const id of ['doneBox','drillNav','learnNav','playNav','promptBox','strengthRow','evalBarWrap'])document.getElementById(id).style.display='none';
+  document.getElementById('streakInfo').textContent='';showCapTrays(false);
   render(plyLastU());renderTestBoard();
   if(run.phase==='playing')testTick();
 }
 function acceptTestRun(run){
   if(!run)return;
-  testBoardRun=run;testBoardMessage='';
-  if(run.phase==='complete'){locked=true;testReportId=run.id;showMenu('test');document.getElementById('testResultHeading')?.focus();return;}
-  if(run.phase==='between'){locked=true;renderTestBoard();document.getElementById('testNextBtn').focus({preventScroll:true});return;}
+  const completed=run.results.length>(testBoardRun?.results.length||0);
+  testBoardRun=run;
+  if(run.phase!=='playing'){
+    locked=true;render(plyLastU());renderTestBoard();
+    if(completed){testSound(run.results.at(-1).outcome==='recalled'?'perfect':['recovered','assisted'].includes(run.results.at(-1).outcome)?'success':'testSkip');document.getElementById('testFeedbackHeading').focus();if(typeof window!=='undefined'&&window.innerWidth<=760)document.getElementById('testFeedback').scrollIntoView({block:'start'});}
+    return;
+  }
   testTick();
 }
+function testSaveError(){testBoardMessage={kind:'error'};locked=true;renderTestBoard();}
 function testTick(){
   if(mode!=='test'||testBoardRun?.phase!=='playing')return;
   if(isPlayerTurn()){locked=false;renderTestBoard();return;}
   locked=true;renderTestBoard();const g=runGen,id=testBoardRun.id,at=ply;
   setTimeout(()=>{
-    if(g!==runGen||mode!=='test'||testBoardRun?.id!==id||ply!==at)return;
+    if(g!==runGen||mode!=='test'||testBoardRun?.id!==id||testBoardRun.phase!=='playing'||ply!==at)return;
     const mv=lineMoves()[ply];
-    try{
-      const next=testStore.move(mv.u);if(!next)return;
-      const cap=isCapture(mv.u);applyMove(mv.u);ply++;playMoveSound(mv,cap);render(mv.u);acceptTestRun(next);
-    }catch(e){testBoardMessage='testStorageError';locked=true;renderTestBoard();}
-  },450);
+    let next;try{next=testStore.move(mv.u);}catch(e){testSaveError();return;}if(!next)return;
+    const cap=isCapture(mv.u);applyMove(mv.u);ply++;try{playMoveSound(mv,cap);}catch(e){}render(mv.u);acceptTestRun(next);
+  },650);
 }
 function attemptTestMove(u){
   if(mode!=='test'||locked||!isPlayerTurn()||testBoardRun?.phase!=='playing')return;
   const expected=lineMoves()[ply];if(!expected)return;
-  if(!legalTargetNames(u.slice(0,2)).includes(u.slice(2,4))){selSq=null;aimSet=null;testBoardMessage='illegalMove';render(plyLastU());renderTestBoard();return;}
-  // The current catalogue contains no promotion lessons; preserve a future promotion suffix.
-  const full=u===expected.u.slice(0,4)?expected.u:u;
-  const san=uciToSan(full);
-  try{
-    const next=testStore.move(full,san);if(!next)return;
-    selSq=null;aimSet=null;
-    if(full===expected.u){const cap=isCapture(full);applyMove(full);ply++;playMoveSound(expected,cap);render(full);}
-    else render(plyLastU());
-    acceptTestRun(next);
-  }catch(e){testBoardMessage='testStorageError';renderTestBoard();}
+  if(!legalTargetNames(u.slice(0,2)).includes(u.slice(2,4))){selSq=null;aimSet=null;testBoardMessage={kind:'illegal'};testSound('error');render(plyLastU());renderTestBoard();return;}
+  const full=u===expected.u.slice(0,4)?expected.u:u,san=uciToSan(full),oldIssue=testBoardRun.issues.find(x=>x.ply===ply);
+  let next;try{next=testStore.move(full,san);}catch(e){testSaveError();return;}if(!next)return;
+  selSq=null;aimSet=null;
+  if(full===expected.u){
+    const cap=isCapture(full);applyMove(full);ply++;testBoardMessage={kind:'correct',move:expected.san,u:full,recovered:!!oldIssue,assisted:!!oldIssue?.assisted};
+    try{playMoveSound(expected,cap);}catch(e){}if(next.phase==='playing')testSound(oldIssue?.assisted?'testHelp':'testCorrect');render(full);
+  }else{
+    testBoardMessage={kind:'mismatch',move:san,u:full};testSound('error');buzz([12,40,12]);render(plyLastU());
+  }
+  acceptTestRun(next);
 }
+function revealTestMove(){
+  if(mode!=='test'||locked||testBoardRun?.phase!=='playing')return;
+  try{const run=testStore.reveal();if(!run)return;testBoardRun=run;testBoardMessage=null;testSound('testHelp');render(plyLastU());renderTestBoard();document.getElementById('testPlayShownBtn').focus({preventScroll:true});}catch(e){testSaveError();}
+}
+function playShownTestMove(){if(testBoardRun?.issues.some(x=>x.ply===ply&&x.assisted))attemptTestMove(lineMoves()[ply].u);}
 function skipTestLine(){
   if(mode!=='test'||locked||testBoardRun?.phase!=='playing')return;
-  try{acceptTestRun(testStore.skip());}catch(e){testBoardMessage='testStorageError';renderTestBoard();}
+  try{testBoardMessage=null;acceptTestRun(testStore.skip());}catch(e){testSaveError();}
 }
-function nextTestLine(){try{testStore.next();resumeRecallTest();}catch(e){testBoardMessage='testStorageError';renderTestBoard();}}
+function nextTestLine(){
+  if(testBoardRun?.phase==='complete'){testReportId=testBoardRun.id;showMenu('test');document.getElementById('testResultHeading')?.focus();return;}
+  try{if(testStore.next())resumeRecallTest();}catch(e){testSaveError();}
+}
 
 /* ================= TEST SETUP & RESULTS ================= */
 let testDraft=null,testReportId=null,testQuery='',testColour='all',testSource='all',testNotice='';
@@ -3555,13 +3832,17 @@ function endRecallTest(){try{const run=testStore.end();if(run)testReportId=run.i
 function testDate(stamp){return new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(stamp);}
 function showTestReport(id){testReportId=id;renderTestPage();document.getElementById('testResultHeading')?.focus();}
 function testReportHTML(run){
-  const recalled=run.results.filter(r=>r.outcome==='recalled').length,untested=run.results.filter(r=>r.outcome==='untested').length;
-  const correct=run.results.reduce((n,r)=>n+r.correct,0),attempted=correct+run.results.filter(r=>r.outcome==='missed').length;
-  const review=run.results.filter(r=>r.outcome!=='recalled');
-  return `<section class="test-report" aria-labelledby="testResultHeading"><div class="home-heading"><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)}</p></div><div class="test-score-grid"><div><strong>${recalled}/${run.items.length}</strong><span>${t('testLinesRecalled')}</span></div><div><strong>${attempted?Math.round(100*correct/attempted)+'%':'—'}</strong><span>${t('testMovesAccurate',{correct,total:attempted})}</span></div><div><strong>${review.length}</strong><span>${t('testToRevisit')}</span></div></div><p class="home-note">${t('testScoreRule')}${untested?' '+t('testUntestedCount',{n:untested}):''}</p><div class="home-actions"><button class="act primary" onclick="retryTestReport(false)">${t('testRepeatPool')}</button>${review.length?`<button class="act" onclick="retryTestReport(true)">${t('testRetestMissed')}</button>`:''}<button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div><div class="test-result-lines">${run.results.map(r=>{
+  const recalled=run.results.filter(r=>r.outcome==='recalled').length,completed=run.results.filter(r=>['recalled','recovered','assisted'].includes(r.outcome)).length;
+  const correct=run.results.reduce((n,r)=>n+r.correct,0),attempted=run.results.reduce((n,r)=>n+r.attempted,0),review=run.results.filter(r=>r.outcome!=='recalled');
+  const untested=run.results.filter(r=>r.outcome==='untested').length;
+  return `<section class="test-report" aria-labelledby="testResultHeading"><div class="home-heading"><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)} · ${t('testReportEncourage')}</p></div><div class="test-score-grid"><div><strong>${completed}/${run.items.length}</strong><span>${t('testCompletedCount',{n:completed,total:run.items.length})}</span><span>${t('testFullyRecalledCount',{n:recalled})}</span></div><div><strong>${attempted?Math.round(100*correct/attempted)+'%':'—'}</strong><span>${t('testMovesAccurate',{correct,total:attempted})}</span></div><div><strong>${review.length}</strong><span>${t('testToRevisit')}</span></div></div><p class="home-note">${t('testScoreRule')}${untested?' '+t('testUntestedCount',{n:untested}):''}</p><div class="home-actions"><button class="act primary" onclick="retryTestReport(false)">${t('testRepeatPool')}</button>${review.length?`<button class="act" onclick="retryTestReport(true)">${t('testRetestMissed')}</button>`:''}<button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div><div class="test-result-lines">${run.results.map(r=>{
     const x=resolveLesson(r.id),op=DATA.openings[x.oi],line=op.lines[x.li],clean=r.outcome==='recalled';
-    const num=Math.floor(r.stopPly/2)+1+(r.side==='w'?'.':'…');
-    return `<article class="test-result-line"><div><h3>${medalText(lnName(line))}</h3><p>${medalText(opName(op))} · ${t(r.side==='w'?'white':'black')}</p><span class="test-outcome${clean?' recalled':''}">${t({recalled:'testRecalled',missed:'testMismatch',skipped:'testSkipped',untested:'testUntested'}[r.outcome])}</span></div><div>${r.outcome==='missed'?`<p>${t('testPlayed',{move:medalText(num+r.playedSan)})}</p><p>${t('testExpected',{move:medalText(num+r.expectedSan)})}</p>`:''}${!clean?`<button class="mini" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('testPractiseLine')}</button>`:''}</div>${!clean&&r.expectedSan?`<details class="test-explanation"><summary>${t('testReviewAnswer')}</summary><p>${line.moves[r.stopPly]?.san===r.expectedSan?mvC(line.moves[r.stopPly]):lnIntro(line)}</p></details>`:''}</article>`;
+    const recovered=r.issues.filter(x=>x.ply<r.stopPly&&!x.assisted).length,assisted=r.issues.filter(x=>x.assisted).length;
+    const kind={recalled:'correct',recovered:'recovered',assisted:'assisted',missed:'mismatch',skipped:'skipped',untested:'ready'}[r.outcome];
+    return `<article class="test-result-line"><div><h3>${medalText(lnName(line))}</h3><p>${medalText(opName(op))} · ${t(r.side==='w'?'white':'black')}</p><span class="test-outcome ${r.outcome}">${testIcon(kind)}${t({recalled:'testRecalled',recovered:'testRecovered',assisted:'testAssisted',missed:'testMismatch',skipped:'testSkipped',untested:'testUntested'}[r.outcome])}</span><p class="test-result-count">${t('testFirstTryCount',{n:r.correct,total:r.total})}${recovered?' · '+t('testRecoveredCount',{n:recovered}):''}${assisted?' · '+t('testAssistedCount',{n:assisted}):''}</p></div><div>${!clean?`<button class="mini" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('testPractiseLine')}</button>`:''}</div>${r.issues.length?`<ol class="test-issue-list">${r.issues.map(issue=>{
+      const num=Math.floor(issue.ply/2)+1+(r.side==='w'?'.':'…'),same=line.moves[issue.ply]?.san===issue.expectedSan&&testSignature(r)===r.signature;
+      return `<li><h4>${t('testIssueHeading',{n:Math.floor(issue.ply/2)+1,move:medalText(issue.expectedSan)})}</h4>${issue.playedSan?`<p>${t('testPlayed',{move:medalText(num+issue.playedSan)})}</p>`:''}<p>${t('testExpected',{move:medalText(num+issue.expectedSan)})}</p><p>${t(issue.assisted?'testIssueAssisted':issue.ply<r.stopPly?'testIssueRecovered':'testIssueUnfinished')}${issue.attempts>1?' '+t('testIssueTries',{n:issue.attempts}):''}</p>${same?`<details class="test-explanation"><summary>${t('testReviewAnswer')}</summary><p>${mvC(line.moves[issue.ply])}</p></details>`:''}</li>`;
+    }).join('')}</ol>`:''}</article>`;
   }).join('')}</div></section>`;
 }
 function retryTestReport(missedOnly){
@@ -3574,7 +3855,7 @@ function renderTestPage(){
   if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);return;}
   testReportId=null;
   const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
-  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p><div class="test-setup-layout"><section class="test-builder" aria-labelledby="testPoolHeading"><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="newTestPool()">${t('testNewPool')}</button></div><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><div class="test-pool-tools"><button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button><button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section><aside class="test-ready"><h3>${t('testHowItWorks')}</h3><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><div class="test-start-actions"><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div><p class="home-note">${t(d.active?'testResumeFirst':'testRankNote')}</p></aside></div><section class="test-saved"><h3>${t('testSavedPools')}</h3>${d.pools.length?`<div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div>`:`<p class="home-note">${t('testNoPools')}</p>`}</section><section class="test-history"><h3>${t('testHistory')}</h3><p class="home-note">${t('testHistoryNote')}</p>${d.history.length?d.history.map(r=>`<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>x.outcome==='recalled').length,total:r.items.length})}</p></div><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></article>`).join(''):`<p class="home-note">${t('testNoHistory')}</p>`}</section>`;
+  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p><div class="test-setup-layout"><section class="test-builder" aria-labelledby="testPoolHeading"><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="newTestPool()">${t('testNewPool')}</button></div><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><div class="test-pool-tools"><button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button><button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section><aside class="test-ready"><h3>${t('testHowItWorks')}</h3><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><div class="test-start-actions"><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div><p class="home-note">${t(d.active?'testResumeFirst':'testRankNote')}</p></aside></div><section class="test-saved"><h3>${t('testSavedPools')}</h3>${d.pools.length?`<div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div>`:`<p class="home-note">${t('testNoPools')}</p>`}</section><section class="test-history"><h3>${t('testHistory')}</h3><p class="home-note">${t('testHistoryNote')}</p>${d.history.length?d.history.map(r=>`<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></article>`).join(''):`<p class="home-note">${t('testNoHistory')}</p>`}</section>`;
   renderTestPoolResults();updateTestSummary();fitAllSelects();
 }
 
@@ -3591,6 +3872,7 @@ function showAppView(view){
   document.getElementById('drill').classList.toggle('testing',inBoard&&mode==='test');
   document.getElementById('testBoardStrip').hidden=!inBoard||mode!=='test';
   document.getElementById('testNav').hidden=!inBoard||mode!=='test';
+  for(const id of ['testFeedback','testBoardCue','testMoveProgress'])document.getElementById(id).hidden=!inBoard||mode!=='test';
   promoPending=null;
   const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
   if(inBoard){ renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
