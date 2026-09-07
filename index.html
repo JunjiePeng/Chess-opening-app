@@ -972,6 +972,127 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  .coach-actions .act { width:100%; }
 }
 
+/* G46: application-styled filter menus, shared by library, repertoire and tests. */
+.filter-trigger { display:inline-flex; align-items:center; justify-content:space-between; gap:12px; width:fit-content; max-width:100%; min-width:0; min-height:44px; padding:10px 12px; border:1px solid #765e46; border-radius:10px; background:#2a2017; color:#e8d7bf; font:inherit; font-size:.88rem; line-height:1.35; text-align:left; cursor:pointer; }
+.filter-trigger .filter-value { min-width:0; overflow-wrap:anywhere; }
+.filter-trigger>svg { width:14px; height:14px; flex-shrink:0; opacity:.8; transition:transform .15s; }
+.filter-trigger:hover { color:#fff0d8; border-color:#a58056; background:#493726; }
+.filter-trigger:focus-visible { outline:2px solid #f0b575; outline-offset:3px; }
+.filter-trigger[aria-expanded="true"] { color:#ffdcab; background:#493726; border-color:#d6a36f; }
+.filter-trigger[aria-expanded="true"]>svg { transform:rotate(180deg); }
+.filter-trigger.is-filtered { color:#ffd19a; font-weight:600; }
+.filter-field { display:flex; flex-direction:column; align-items:flex-start; gap:8px; min-width:0; max-width:100%; }
+.filter-field>label { font-size:.88rem; color:#ddc6a8; }
+.library-filters>.filter-field { display:flex; flex:0 1 auto; flex-direction:row; align-items:center; gap:0; }
+.library-filters>.filter-field+.filter-field { border-left:1px solid var(--line); }
+.library-filters .filter-trigger { border:0; border-radius:20px; background:transparent; padding:10px 12px; font-size:.85rem; }
+.library-filters .filter-trigger:hover,.library-filters .filter-trigger[aria-expanded="true"] { background:#ffffff09; }
+.library-filters .filter-trigger.is-filtered { background:#e3a05f0d; }
+.library-filters .filter-trigger:focus-visible { outline-offset:-3px; }
+.test-filters>.filter-field,.quick-add-fields>.filter-field { flex:0 1 auto; }
+.test-filters .filter-field>label,.quick-add-fields .filter-field>label { display:block; flex:0 0 auto; }
+.filter-popup { position:fixed; z-index:1200; box-sizing:border-box; padding:8px; border:1px solid #8a6a49; border-radius:16px; color:#f3e2cb; background:#30261d; box-shadow:0 14px 42px #120c0899,0 2px 6px #120c0844; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#8c6b4b transparent; }
+.filter-popup-heading { padding:6px 10px 9px; color:#c8b093; font-size:.73rem; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+.filter-option { display:flex; align-items:center; gap:10px; min-height:44px; padding:10px; border:1px solid transparent; border-radius:9px; font-size:.92rem; line-height:1.4; cursor:pointer; overflow-wrap:anywhere; }
+.filter-option.is-active { background:#493827; border-color:#806243; }
+.filter-option[aria-selected="true"] { color:#ffdaaa; background:#65472955; font-weight:600; }
+.filter-option[aria-selected="true"].is-active { background:#65472988; border-color:#b58454; }
+.filter-option-dot { width:13px; height:13px; border:1px solid #937a5c; border-radius:50%; flex-shrink:0; }
+.filter-option[aria-selected="true"] .filter-option-dot { border:4px solid #efb777; background:#2c2117; }
+@media(max-width:760px){ .library-filters .filter-trigger { padding:9px 10px; gap:8px; font-size:.82rem; } }
+@media(prefers-reduced-motion:reduce){ .filter-trigger>svg { transition:none; } }
+
+.coach-message { align-self:center; }
+.coach-score>.test-score-state { display:inline-block; width:fit-content; color:#f1c99a; border:1px solid #9e744d; border-radius:16px; padding:3px 10px; font-size:.76rem; margin:0 0 12px; font-weight:600; }
+/* G47: start with a preview; customise only when needed. */
+.test-launch { border:1px solid var(--line); border-radius:20px; background:var(--panel); padding:24px; }
+.test-format-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+.test-format-row h3 { font-size:1.2rem; }
+.test-size-choices { display:flex; flex-wrap:wrap; gap:6px; }
+.test-size-choices button { display:inline-flex; align-items:center; gap:8px; min-height:42px; padding:9px 13px; border:1px solid #766048; border-radius:24px; background:transparent; color:var(--dim); font:inherit; font-size:.9rem; cursor:pointer; }
+.test-size-choices button[aria-pressed="true"] { background:#ead0a2; color:#2b2117; border-color:#ead0a2; font-weight:600; }
+.test-size-choices button span { opacity:.8; font-size:.8rem; }
+.test-size-choices button:hover { border-color:#e8ba85; }
+.test-size-choices button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.test-launch-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,.48fr); gap:30px; padding-top:20px; }
+.test-preview-source { color:#c7b397; font-size:.87rem; margin-bottom:10px; line-height:1.6; }
+.test-selection-preview { max-height:330px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
+.test-selection-list { margin:0; padding:0; list-style:none; }
+.test-selection-list li { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #6a543733; }
+.test-selection-list li:last-child { border-bottom:0; }
+.test-preview-piece { display:flex; align-items:center; justify-content:center; flex:0 0 34px; height:38px; font-size:1.8rem; color:#f3d7b0; background:#483727; border-radius:9px; }
+.test-selection-list li>div { flex:1; min-width:0; }
+.test-selection-list b { display:block; font-size:1rem; overflow-wrap:anywhere; }
+.test-selection-list li>div>span { display:block; font-size:.86rem; line-height:1.6; color:var(--dim); margin-top:4px; }
+.test-preview-remove { flex-shrink:0; min-width:36px; min-height:40px; background:none; border:0; border-radius:9px; color:#cbb394; font:inherit; font-size:1.3rem; cursor:pointer; }
+.test-preview-remove:hover { background:#ffffff0a; color:var(--text); }
+.test-sample-learn { margin-top:14px; }
+.test-launch-actions { border-left:1px solid var(--line); padding-left:28px; align-self:start; }
+.test-launch-actions .test-selection-count { border:0; padding:0; margin:0 0 14px; font-size:1.03rem; }
+.test-launch-actions>.act { width:100%; min-height:48px; }
+.test-launch-actions .home-note { margin-top:12px; }
+.test-launch-actions button:disabled { opacity:.5; cursor:default; }
+.test-how { margin-top:14px; }
+.test-how>summary,.test-save-details>summary,.test-collection>summary { width:fit-content; max-width:100%; cursor:pointer; color:#e6bc89; line-height:1.6; }
+.test-how>summary { font-size:.85rem; }
+.test-how ol { margin:12px 0; padding-left:18px; font-size:.88rem; line-height:1.65; color:var(--dim); }
+.test-how li+li { margin-top:10px; }
+.test-how p { color:var(--dim); font-size:.84rem; line-height:1.6; }
+.test-save-details { padding-top:16px; margin-top:20px; border-top:1px solid var(--line); font-size:.87rem; }
+.test-save-fields { display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px; margin:14px 0 4px; }
+.test-save-fields .test-name-label { margin:0; flex:0 1 400px; }
+.test-save-fields input { width:100%; min-height:44px; padding:10px 12px; border:1px solid #765e46; border-radius:10px; font:inherit; background:var(--bg); color:var(--text); }
+.test-line-editor { margin-top:20px; }
+.test-line-editor .test-builder-heading { flex-wrap:wrap; }
+.test-collection { margin-top:24px; padding-top:20px; border-top:1px solid var(--line); }
+.test-collection>summary { font-weight:600; }
+.test-collection>summary>span { display:inline-block; margin-left:8px; color:var(--dim); font-size:.84rem; font-weight:400; }
+.test-collection article { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; padding:16px; border:1px solid var(--line); border-radius:14px; background:var(--panel); }
+.test-collection h4 { overflow-wrap:anywhere; }
+.test-collection article>div { min-width:0; }
+.test-collection article p { color:var(--dim); font-size:.86rem; margin-top:5px; line-height:1.6; }
+.test-collection .test-saved-grid article>div:last-child { display:flex; gap:12px; align-items:center; }
+.test-history-result { display:flex; align-items:center; gap:18px; }
+.test-history-result>span { font-size:1.1rem; color:#edc99d; }
+.test-history-result small { display:block; font-size:.75rem; color:var(--dim); margin-top:3px; }
+/* The animated ring is decorative; its accessible description always holds the final score. */
+.coach-hero { grid-template-columns:minmax(0,1fr) minmax(260px,.48fr); }
+.coach-score { text-align:center; }
+.test-score-ring { position:relative; width:160px; height:160px; margin:0 auto; }
+.test-score-ring svg { width:100%; height:100%; overflow:visible; }
+.test-score-ring circle { fill:none; stroke-width:8; }
+.test-ring-track { stroke:#6b594044; }
+.test-ring-fill { stroke:#eeb97c; stroke-linecap:round; }
+.is-perfect .test-ring-fill { stroke:#c6dba7; }
+.test-score-ring>strong { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:2.65rem; font-variant-numeric:tabular-nums; letter-spacing:-.03em; }
+.coach-score>.coach-score-label { margin-top:8px; }
+.test-coverage { margin:16px auto 10px; max-width:240px; text-align:left; }
+.test-coverage>p { display:flex; justify-content:space-between; gap:12px; font-size:.8rem; margin:0 0 6px; }
+.test-coverage b { color:#e8d2b2; }
+.test-coverage-track { height:5px; border-radius:4px; overflow:hidden; background:#6b594055; }
+.test-coverage-track>span { display:block; height:100%; background:#adbe91; }
+.test-coverage small { display:block; font-size:.78rem; margin-top:5px; color:var(--dim); }
+.coach-breakdown-caption { color:var(--dim); font-size:.81rem; margin-bottom:9px; }
+.coach-breakdown li b { color:#f3dec1; font-weight:600; }
+.test-line-score { margin-top:12px; max-width:380px; color:#ead2b0; font-size:.84rem; line-height:1.6; }
+.test-line-score>div { height:5px; margin:7px 0; border-radius:4px; background:#6b594055; overflow:hidden; }
+.test-line-score i { display:block; height:100%; background:#bacd9f; }
+.test-line-score small { color:var(--dim); }
+@media(max-width:760px){
+ .test-launch { padding:18px; }
+ .test-launch-grid { grid-template-columns:1fr; gap:18px; }
+ .test-launch-actions { border-left:0; border-top:1px solid var(--line); padding:18px 0 0; }
+ .test-size-choices button { font-size:.83rem; padding:9px 11px; }
+ .test-selection-preview { max-height:275px; }
+ .coach-hero { grid-template-columns:1fr; }
+ .coach-message .coach-emblem { display:none; }
+ .coach-message h3 { font-size:1.35rem; }
+ .coach-message p { font-size:.94rem; }
+ .test-score-ring { width:136px; height:136px; }
+ .test-score-ring>strong { font-size:2.35rem; }
+ .coach-score { padding-top:16px; }
+}
+
 </style>
 </head>
 <body>
@@ -1015,7 +1136,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G45</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G47</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -2302,6 +2423,71 @@ Object.assign(I18N.zh, {
   coachAIRefresh: '重试',
   coachChanged: '这节课的内容在测试后有更新。下方记录的走法属于之前的版本。'
 });
+
+/* G47: clearer test setup and honest score denominators. */
+Object.assign(I18N_EN, {
+  testTitle:'Put your openings to the test.',
+  testIntro:'Pick your lines. Play from memory. Find your next step.',
+  testReadyHeading:'Your next test',
+  testFormatLabel:'Test format',
+  testQuickLabel:'Quick check',
+  testFullLabel:'Full pool',
+  testCustomLabel:'Choose lines',
+  testSampleNote:'New here? Try one short Italian Game line as White.',
+  testCustomNote:'Your selection — change any line before starting.',
+  testFromRepertoire:'From your repertoire.',
+  testFromLearning:'From lines you’ve already learned or practised.',
+  testLearnSample:'Learn this line first',
+  testTrySample:'Try this test',
+  testShortRules:'No timer. Retry when needed; help is always available.',
+  testChooseFirst:'Choose at least one line to begin.',
+  testRemoveChoice:'Remove {line} as {side} from this test',
+  testSaveSelection:'Save this selection',
+  testDoneChoosing:'Done choosing',
+  testSampleName:'First test · Italian Game',
+  testQuickName:'Quick check',
+  testFullName:'Full-pool test',
+  testScoreNotYet:'No moves tested yet',
+  testScoreAccessible:'{percent}% first-try recall: {correct} of {total} tested moves.',
+  testCoverage:'Test coverage',
+  testCoverageMoves:'{n}/{total} selected moves tested',
+  testLineRecall:'{percent}% first try · {correct}/{total} tested moves',
+  testUnseenMoves:'{n} moves not tested',
+  testPartialResult:'Partial result',
+  testWholePool:'Across all selected moves'
+});
+Object.assign(I18N.zh, {
+  testTitle:'检验你的开局准备。',
+  testIntro:'选好路线，凭记忆走棋，找到下一步练习的方向。',
+  testReadyHeading:'这次测什么',
+  testFormatLabel:'测试形式',
+  testQuickLabel:'快速自测',
+  testFullLabel:'全部路线',
+  testCustomLabel:'自选路线',
+  testSampleNote:'初次尝试？先用白方测试一条简短的意大利开局路线。',
+  testCustomNote:'这是你的选择，开始前可随时调整。',
+  testFromRepertoire:'来自你的开局库。',
+  testFromLearning:'来自你已经学过或练过的路线。',
+  testLearnSample:'先学这条路线',
+  testTrySample:'试试这次自测',
+  testShortRules:'不计时。可以重试，卡住时也可以查看走法。',
+  testChooseFirst:'至少选择一条路线即可开始。',
+  testRemoveChoice:'从本次测试移除「{line}」（{side}）',
+  testSaveSelection:'保存这组路线',
+  testDoneChoosing:'选好了',
+  testSampleName:'初次自测 · 意大利开局',
+  testQuickName:'快速自测',
+  testFullName:'全部路线自测',
+  testScoreNotYet:'尚未测试走法',
+  testScoreAccessible:'首次回忆正确率 {percent}%，已测试 {total} 步，一次走对 {correct} 步。',
+  testCoverage:'测试覆盖率',
+  testCoverageMoves:'已测试所选走法中的 {n}/{total} 步',
+  testLineRecall:'首次正确率 {percent}% · 已测 {total} 步，一次走对 {correct} 步',
+  testUnseenMoves:'{n} 步未测试',
+  testPartialResult:'部分测试结果',
+  testWholePool:'所选全部走法的表现'
+});
+
 function t(key, vars){
   let s = (I18N[LANG] && I18N[LANG][key]!=null) ? I18N[LANG][key] : (I18N_EN[key]!=null?I18N_EN[key]:key);
   if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
@@ -3443,11 +3629,36 @@ function testCoachPayload(run,history=[]){
         context:testMoves(r).slice(0,x.ply+1).map(m=>m.san).join(' '),explanation:mvC(testMoves(r)[x.ply]).replace(/<[^>]*>/g,'')}))}))};
 }
 
+/* G47: useful starting selections; a preview never records test activity. */
+function testAvailablePool(){
+  const saved=repertoire.load().items;if(saved.length)return {source:'saved',items:saved};
+  const records=store.load(),completed=new Set(testMilestoneStats().completed),items=[];
+  DATA.openings.forEach((op,oi)=>op.lines.forEach((line,li)=>{
+    const sides=['w','b'].filter(side=>records[lineKey(oi,li,side)]?.runs>0||completed.has(line.id+':'+side));
+    if(!sides.length&&records['lesson:'+line.id]?.learned)sides.push(preferredSide(oi,li));
+    sides.forEach(side=>items.push({id:line.id,side}));
+  }));
+  if(items.length)return {source:'learning',items:normalizeRepItems(items)};
+  return {source:'sample',items:normalizeRepItems([{id:'italian-game-1',side:'w'}])};
+}
+function testQuickSelection(items,history=[]){
+  const recent=new Map();
+  for(const run of history)for(const r of run.results){
+    if(r.attempted>0&&r.signature===testSignature(r))recent.set(itemKey(r),Math.max(recent.get(itemKey(r))||0,run.finishedAt));
+  }
+  return normalizeRepItems(items).map((item,index)=>({item,index,last:recent.get(itemKey(item))||0}))
+    .sort((a,b)=>a.last-b.last||a.index-b.index).slice(0,3).map(x=>x.item);
+}
+function testScoreNumbers(run){
+  const sum=key=>run.results.reduce((n,r)=>n+r[key],0),correct=sum('correct'),attempted=sum('attempted'),total=sum('total');
+  return {correct,attempted,total,recall:attempted?Math.round(100*correct/attempted):null,coverage:total?Math.round(100*attempted/total):0};
+}
+
 /* ================= PROGRESS BACKUP (export / import file) =================
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G45';
+const BUILD='G47';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4271,19 +4482,62 @@ function nextTestLine(){
 /* ================= TEST SETUP & RESULTS ================= */
 let testDraft=null,testReportId=null,testQuery='',testColour='all',testSource='all',testNotice='';
 const testExpanded=new Map();
-function ensureTestDraft(){if(!testDraft)testDraft={id:null,name:'',items:repertoire.load().items.map(x=>({...x}))};}
-function testDraftName(){return testDraft.name.trim()||t('testDefaultName');}
-function testPoolGroups(){
-  const normalize=s=>(s||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,''),q=normalize(testQuery),saved=new Set(repertoire.entries().map(itemKey)),selected=new Set(testDraft.items.map(itemKey));
-  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,sides:['w','b'].filter(side=>(testColour==='all'||side===testColour)&&(testSource==='all'||(testSource==='selected'?selected:saved).has(line.id+':'+side)))}))
-    .filter(x=>x.sides.length&&[op.name,op.nameZh,x.line.name,x.line.nameZh].some(n=>normalize(n).includes(q)))})).filter(g=>g.lines.length);
+let testSetupMode='quick',testEditorOpen=false,testSaveOpen=false;
+function ensureTestDraft(){
+  if(!testDraft)testDraft={id:null,name:'',items:[]};
+  if(testSetupMode==='custom'||testDraft.id)return;
+  const pool=testAvailablePool();
+  if(testSetupMode==='full'&&pool.items.length<=3)testSetupMode='quick';
+  testDraft.items=testSetupMode==='full'?pool.items.map(x=>({...x})):testQuickSelection(pool.items,testStore.load().history);
+}
+function selectTestSetup(mode){
+  if(!['quick','full','custom'].includes(mode))return;
+  testSetupMode=mode;testEditorOpen=mode==='custom';testNotice='';
+  if(mode!=='custom')testDraft={id:null,name:'',items:mode==='quick'?testQuickSelection(testAvailablePool().items,testStore.load().history):testAvailablePool().items.map(x=>({...x}))};
+  else {testSource='all';testQuery='';testColour='all';}
+  renderTestPage();
+  if(mode==='custom')document.getElementById('testSearch')?.focus();
+  else document.querySelector(`[data-test-size="${mode}"]`)?.focus({preventScroll:true});
+}
+function testSelectionHTML(){
+  if(!testDraft.items.length)return `<p class="home-note">${t('testChooseFirst')}</p>`;
+  return `<ul class="test-selection-list">${testDraft.items.map((item,i)=>{
+    const x=resolveLesson(item.id),op=DATA.openings[x.oi],line=op.lines[x.li];
+    return `<li><span class="test-preview-piece" aria-hidden="true">${item.side==='w'?'♙':'♟'}</span><div><b>${medalText(lnName(line))}</b><span>${medalText(opName(op))} · ${t(item.side==='w'?'white':'black')}</span></div><button class="test-preview-remove" type="button" aria-label="${medalText(t('testRemoveChoice',{line:lnName(line),side:t(item.side==='w'?'white':'black')}))}" onclick="removeTestChoice(${i})">×</button></li>`;
+  }).join('')}</ul>`;
+}
+function removeTestChoice(index){
+  if(!Number.isInteger(index)||index<0||index>=testDraft.items.length)return;
+  testDraft.items.splice(index,1);testSetupMode='custom';
+  renderTestPoolResults();updateTestSummary();
+  const next=document.querySelectorAll('.test-preview-remove')[Math.min(index,testDraft.items.length-1)];
+  (next||document.querySelector('[data-test-size="custom"]'))?.focus({preventScroll:true});
 }
 function updateTestSummary(){
   const n=testDraft.items.length;
   document.getElementById('testSelectionCount').textContent=t('testSelectionCount',{lines:t(n===1?'quickAddCountOne':'quickAddCount',{n}),moves:testDraft.items.reduce((sum,x)=>sum+testOwnCount(x),0)});
-  const active=!!testStore.load().active;
-  document.getElementById('testStartBtn').disabled=!n||active;
+  document.getElementById('testStartBtn').disabled=!n||!!testStore.load().active;
   document.getElementById('testSavePoolBtn').disabled=!n;
+  const pool=testAvailablePool(),sample=pool.source==='sample'&&testSetupMode==='quick';
+  document.querySelector('.test-preview-source').textContent=t(sample?'testSampleNote':testSetupMode==='custom'?'testCustomNote':pool.source==='saved'?'testFromRepertoire':'testFromLearning');
+  document.getElementById('testStartBtn').textContent=t(sample?'testTrySample':'testStart');
+  const learn=document.querySelector('.test-sample-learn');if(learn)learn.hidden=!sample;
+  const preview=document.getElementById('testSelectionPreview');if(preview){const top=preview.scrollTop;preview.innerHTML=testSelectionHTML();preview.scrollTop=top;}
+  document.querySelectorAll('[data-test-size]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.testSize===testSetupMode)));
+}
+function testLaunchHTML(pool,active){
+  const sample=pool.source==='sample'&&testSetupMode==='quick';
+  return `<section class="test-launch" aria-labelledby="testReadyHeading"><div class="test-format-row"><h3 id="testReadyHeading" tabindex="-1">${testDraft.name?medalText(testDraft.name):t('testReadyHeading')}</h3><div class="test-size-choices" role="group" aria-label="${t('testFormatLabel')}"><button type="button" data-test-size="quick" aria-pressed="${testSetupMode==='quick'}" onclick="selectTestSetup('quick')">${t('testQuickLabel')} <span>${Math.min(3,pool.items.length)}</span></button>${pool.items.length>3?`<button type="button" data-test-size="full" aria-pressed="${testSetupMode==='full'}" onclick="selectTestSetup('full')">${t('testFullLabel')} <span>${pool.items.length}</span></button>`:''}<button type="button" data-test-size="custom" aria-pressed="${testSetupMode==='custom'}" aria-expanded="${testEditorOpen}" aria-controls="testLineEditor" onclick="selectTestSetup('custom')">${t('testCustomLabel')}</button></div></div>
+  <div class="test-launch-grid"><div><p class="test-preview-source">${t(sample?'testSampleNote':testSetupMode==='custom'?'testCustomNote':pool.source==='saved'?'testFromRepertoire':'testFromLearning')}</p><div id="testSelectionPreview" class="test-selection-preview">${testSelectionHTML()}</div>${sample?`<button class="linklike test-sample-learn" onclick="learnTestSample()">${t('testLearnSample')}</button>`:''}</div><div class="test-launch-actions"><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t(sample?'testTrySample':'testStart')}</button><p class="home-note">${t(active?'testResumeFirst':'testShortRules')}</p><details class="test-how"><summary>${t('testHowItWorks')}</summary><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p>${t('testRankNote')}</p></details></div></div>
+  <details id="testSaveDetails" class="test-save-details"${testSaveOpen?' open':''} ontoggle="if(this.isConnected)testSaveOpen=this.open"><summary>${t('testSaveSelection')}</summary><div class="test-save-fields"><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div></details></section>`;
+}
+function learnTestSample(){const item=testDraft.items[0],x=item&&resolveLesson(item.id);if(x)startLearn(x.oi,x.li,item.side);}
+
+function testDraftName(){return testDraft.name.trim()||t(testSetupMode==='quick'?(testAvailablePool().source==='sample'?'testSampleName':'testQuickName'):testSetupMode==='full'?'testFullName':'testDefaultName');}
+function testPoolGroups(){
+  const normalize=s=>(s||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,''),q=normalize(testQuery),saved=new Set(repertoire.entries().map(itemKey)),selected=new Set(testDraft.items.map(itemKey));
+  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,sides:['w','b'].filter(side=>(testColour==='all'||side===testColour)&&(testSource==='all'||(testSource==='selected'?selected:saved).has(line.id+':'+side)))}))
+    .filter(x=>x.sides.length&&[op.name,op.nameZh,x.line.name,x.line.nameZh].some(n=>normalize(n).includes(q)))})).filter(g=>g.lines.length);
 }
 function renderTestPoolResults(){
   const el=document.getElementById('testPoolResults');if(!el)return;
@@ -4300,12 +4554,14 @@ function updateTestFilter(){
   testExpanded.clear();renderTestPoolResults();
 }
 function toggleTestChoice(oi,li,side,on){
+  testSetupMode='custom';
   const item={id:lessonId(oi,li),side};testDraft.items=testDraft.items.filter(x=>itemKey(x)!==itemKey(item));if(on)testDraft.items.push(item);
   const scroll=document.getElementById('testPoolResults').scrollTop;
   renderTestPoolResults();document.getElementById('testPoolResults').scrollTop=scroll;
   (document.querySelector(`[data-test-key="${itemKey(item)}"]`)||document.getElementById('testSearch')).focus({preventScroll:true});updateTestSummary();
 }
 function toggleTestGroup(oi){
+  testSetupMode='custom';
   const group=testPoolGroups().find(g=>g.oi===oi);if(!group)return;
   const items=group.lines.flatMap(x=>x.sides.map(side=>({id:x.line.id,side}))),keys=new Set(items.map(itemKey)),selected=new Set(testDraft.items.map(itemKey));
   const remove=items.every(x=>selected.has(itemKey(x)));
@@ -4313,18 +4569,18 @@ function toggleTestGroup(oi){
   const scroll=document.getElementById('testPoolResults').scrollTop;renderTestPoolResults();document.getElementById('testPoolResults').scrollTop=scroll;
   document.querySelector(`[data-test-group="${oi}"]`)?.focus({preventScroll:true});updateTestSummary();
 }
-function fillTestFromRepertoire(){testDraft.items=repertoire.load().items.map(x=>({...x}));renderTestPoolResults();updateTestSummary();}
-function clearTestPool(){testDraft.items=[];renderTestPoolResults();updateTestSummary();}
+function fillTestFromRepertoire(){testSetupMode='custom';testDraft.items=repertoire.load().items.map(x=>({...x}));renderTestPoolResults();updateTestSummary();}
+function clearTestPool(){testSetupMode='custom';testDraft.items=[];renderTestPoolResults();updateTestSummary();}
 function saveTestPool(){
-  try{const p=testStore.savePool(testDraft.id,testDraftName(),testDraft.items);testDraft.id=p.id;testNotice='testPoolSaved';renderTestPage();document.getElementById('testSavePoolBtn').focus({preventScroll:true});}
+  try{const p=testStore.savePool(testDraft.id,testDraftName(),testDraft.items);testDraft.id=p.id;testDraft.name=p.name;testSetupMode='custom';testNotice='testPoolSaved';renderTestPage();document.getElementById('testSavePoolBtn').focus({preventScroll:true});}
   catch(e){testNotice=e.message==='pool-limit'?'testPoolLimit':'testStorageError';renderTestPage();}
 }
 function loadTestPool(id){
   const p=testStore.load().pools.find(p=>p.id===id);if(!p)return;
-  testDraft={...p,items:p.items.map(x=>({...x}))};testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='testPoolLoaded';renderTestPage();document.getElementById('testName').focus();
+  testSetupMode='custom';testEditorOpen=false;testSaveOpen=false;testDraft={...p,items:p.items.map(x=>({...x}))};testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='testPoolLoaded';renderTestPage();document.getElementById('testReadyHeading').focus();
 }
 function removeTestPool(id){try{testStore.removePool(id);if(testDraft?.id===id)testDraft.id=null;testNotice='testPoolRemoved';renderTestPage();}catch(e){testNotice='testStorageError';renderTestPage();}}
-function newTestPool(){testDraft={id:null,name:'',items:[]};testSource='all';testColour='all';testQuery='';testNotice='';testReportId=null;renderTestPage();document.getElementById('testName').focus();}
+function newTestPool(){testSetupMode='custom';testEditorOpen=true;testDraft={id:null,name:'',items:[]};testSource='all';testColour='all';testQuery='';testNotice='';testReportId=null;renderTestPage();document.getElementById('testReadyHeading').focus();}
 function startRecallTest(){
   try{testStore.start(testDraftName(),testDraft.items);testNotice='';testReportId=null;resumeRecallTest();}
   catch(e){testNotice=e.message==='active-test'?'testResumeFirst':'testStorageError';renderTestPage();}
@@ -4334,6 +4590,32 @@ function testDate(stamp){return new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{
 function showTestReport(id){testReportId=id;menuScrollY=0;renderTestPage();document.getElementById('testResultHeading')?.focus({preventScroll:true});window.scrollTo(0,0);}
 
 function testCoachMove(r){const x=r.issues[0];return Math.floor(x.ply/2)+1+(r.side==='w'?'.':'…')+x.expectedSan;}
+function testScoreHTML(run){
+ const s=testScoreNumbers(run),label=s.recall===null?t('testScoreNotYet'):t('testScoreAccessible',{percent:s.recall,correct:s.correct,total:s.attempted});
+ return `<div class="coach-score">${run.results.some(r=>!['recalled','recovered','assisted'].includes(r.outcome))?`<span class="test-score-state">${t('testPartialResult')}</span>`:''}<div class="test-score-ring" role="img" aria-label="${medalText(label)}"${s.recall===null?'':` data-score="${s.recall}"`}><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="test-ring-track" cx="60" cy="60" r="51"/><circle class="test-ring-fill" cx="60" cy="60" r="51" pathLength="100" stroke-dasharray="${s.recall||0} 100" transform="rotate(-90 60 60)"/></svg><strong data-test-percent aria-hidden="true">${s.recall===null?'—':s.recall+'%'}</strong></div><span class="coach-score-label">${t('coachFirstTry')}</span><p>${t('coachTestedMoves',{correct:s.correct,total:s.attempted})}</p><div class="test-coverage"><p><span>${t('testCoverage')}</span><b>${s.coverage}%</b></p><div class="test-coverage-track" aria-hidden="true"><span style="width:${s.coverage}%"></span></div><small>${t('testCoverageMoves',{n:s.attempted,total:s.total})}</small></div><p>${t('coachCompleted',{n:run.results.filter(r=>['recalled','recovered','assisted'].includes(r.outcome)).length,total:run.items.length})} · ${t('coachClean',{n:run.results.filter(r=>r.outcome==='recalled').length})}</p></div>`;
+}
+const animatedTestScores=new Set();
+function animateTestScore(run){
+ const el=document.querySelector('.test-score-ring[data-score]');if(!el)return;
+ const key=run.id+':'+run.finishedAt,media=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+ if(animatedTestScores.has(key)||media?.matches)return;
+ if(animatedTestScores.size>=40)animatedTestScores.delete(animatedTestScores.values().next().value);animatedTestScores.add(key);
+ const target=Number(el.dataset.score),number=el.querySelector('[data-test-percent]'),arc=el.querySelector('.test-ring-fill');
+ let start=null;number.textContent='0%';arc.setAttribute('stroke-dasharray','0 100');
+ function frame(now){
+   if(!el.isConnected)return;
+   if(start===null)start=now;
+   const progress=media?.matches?1:Math.min(1,(now-start)/650),value=target*(1-Math.pow(1-progress,3));
+   number.textContent=Math.round(value)+'%';arc.setAttribute('stroke-dasharray',value+' 100');
+   if(progress<1)requestAnimationFrame(frame);
+ }
+ requestAnimationFrame(frame);
+}
+function testLineScoreHTML(r){
+ const rate=r.attempted?Math.round(100*r.correct/r.attempted):null;
+ return `<div class="test-line-score"><span>${rate===null?t('testScoreNotYet'):t('testLineRecall',{percent:rate,correct:r.correct,total:r.attempted})}</span><div aria-hidden="true"><i style="width:${rate||0}%"></i></div>${r.attempted<r.total?`<small>${t('testUnseenMoves',{n:r.total-r.attempted})}</small>`:''}</div>`;
+}
+
 function testCoachLabel(r){const x=resolveLesson(r.id);return lnName(DATA.openings[x.oi].lines[x.li])+' · '+t(r.side==='w'?'white':'black');}
 function testReportHTML(run){
  const f=testCoachFacts(run,testStore.load().history),focus=f.focus,issue=focus?.issues[0];
@@ -4343,8 +4625,8 @@ function testReportHTML(run){
  const segments=[['first',f.correct,'coachLegendClean'],['recovered',f.recovered,'coachLegendRecovered'],['assisted',f.assisted,'coachLegendAssisted'],['unresolved',f.unresolved,'coachLegendUnresolved'],['unseen',f.unseen,'coachLegendUnseen']].filter(x=>x[1]);
  const trend=f.trend?`<p class="coach-trend">${t(f.trend.now>f.trend.before?'coachTrendUp':f.trend.now<f.trend.before?'coachTrendDown':'coachTrendSame',{n:Math.abs(f.trend.now-f.trend.before)})}</p>`:'';
  return `<section class="test-report" aria-labelledby="testResultHeading"><div class="coach-report-heading"><div><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)}</p></div><button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div>
- <div class="coach-hero ${mood==='Perfect'?'is-perfect':''}"><div class="coach-message"><span class="coach-emblem" aria-hidden="true">${testIcon(mood==='Perfect'?'correct':f.attempted?'recovered':'ready')}</span><h3>${t('coach'+mood)}</h3><p>${t('coach'+mood+'Body')}</p>${trend}</div><div class="coach-score"><strong>${f.rate===null?'—':f.rate+'%'}</strong><span>${t('coachFirstTry')}</span><p>${t('coachTestedMoves',{correct:f.correct,total:f.attempted})}</p><p>${t('coachCompleted',{n:f.completed,total:f.rows.length})} · ${t('coachClean',{n:f.clean.length})}</p></div></div>
- <div class="coach-breakdown"><div class="coach-meter" aria-hidden="true">${segments.map(([kind,n])=>`<span class="${kind}" style="width:${100*n/f.total}%"></span>`).join('')}</div><ul aria-label="${t('coachBreakdown')}">${segments.map(([kind,n,key])=>`<li><i class="${kind}" aria-hidden="true"></i>${t(key,{n})}</li>`).join('')}</ul></div>
+ <div class="coach-hero ${mood==='Perfect'?'is-perfect':''}"><div class="coach-message"><span class="coach-emblem" aria-hidden="true">${testIcon(mood==='Perfect'?'correct':f.attempted?'recovered':'ready')}</span><h3>${t('coach'+mood)}</h3><p>${t('coach'+mood+'Body')}</p>${trend}</div>${testScoreHTML(run)}</div>
+ <div class="coach-breakdown"><p class="coach-breakdown-caption">${t('testWholePool')}</p><div class="coach-meter" aria-hidden="true">${segments.map(([kind,n])=>`<span class="${kind}" style="width:${100*n/f.total}%"></span>`).join('')}</div><ul aria-label="${t('coachBreakdown')}">${segments.map(([kind,n,key])=>`<li><i class="${kind}" aria-hidden="true"></i>${t(key,{n})} <b>${Math.round(100*n/f.total)}%</b></li>`).join('')}</ul></div>
  <div class="coach-insights"><article><h3>${t('coachStrength')}</h3><p>${medalText(strength)}</p></article><article><h3>${t('coachFocus')}</h3><p>${medalText(next)}</p></article></div>
  ${focus?testCoachFocusHTML(focus):''}
  <div class="home-actions coach-actions">${f.review.length?`<button class="act primary" title="${t('coachFocusPool')}" onclick="retryTestReport('focus')">${t('coachRetestFocus')}</button>`:''}${f.unfinished.length?`<button class="act ${!f.review.length?'primary':''}" onclick="retryTestReport('unfinished')">${t('coachFinishPool')}</button>`:''}<button class="act ${!f.review.length&&!f.unfinished.length?'primary':''}" onclick="retryTestReport(false)">${t('testRepeatPool')}</button></div>
@@ -4395,7 +4677,7 @@ function testResultLinesHTML(run){return run.results.map(r=>{
     const x=resolveLesson(r.id),op=DATA.openings[x.oi],line=op.lines[x.li],clean=r.outcome==='recalled';
     const recovered=r.issues.filter(x=>x.ply<r.stopPly&&!x.assisted).length,assisted=r.issues.filter(x=>x.assisted).length;
     const kind={recalled:'correct',recovered:'recovered',assisted:'assisted',missed:'mismatch',skipped:'skipped',untested:'ready'}[r.outcome];
-    return `<article class="test-result-line"><div><h3>${medalText(lnName(line))}</h3><p>${medalText(opName(op))} · ${t(r.side==='w'?'white':'black')}</p><span class="test-outcome ${r.outcome}">${testIcon(kind)}${t({recalled:'testRecalled',recovered:'testRecovered',assisted:'testAssisted',missed:'testMismatch',skipped:'testSkipped',untested:'testUntested'}[r.outcome])}</span><p class="test-result-count">${t('testFirstTryCount',{n:r.correct,total:r.total})}${recovered?' · '+t('testRecoveredCount',{n:recovered}):''}${assisted?' · '+t('testAssistedCount',{n:assisted}):''}</p></div><div>${!clean?`<button class="mini" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('testPractiseLine')}</button>`:''}</div>${r.issues.length?`<ol class="test-issue-list">${r.issues.map(issue=>{
+    return `<article class="test-result-line"><div><h3>${medalText(lnName(line))}</h3><p>${medalText(opName(op))} · ${t(r.side==='w'?'white':'black')}</p><span class="test-outcome ${r.outcome}">${testIcon(kind)}${t({recalled:'testRecalled',recovered:'testRecovered',assisted:'testAssisted',missed:'testMismatch',skipped:'testSkipped',untested:'testUntested'}[r.outcome])}</span>${recovered||assisted?`<p class="test-result-count">${[recovered?t('testRecoveredCount',{n:recovered}):'',assisted?t('testAssistedCount',{n:assisted}):''].filter(Boolean).join(' · ')}</p>`:''}${testLineScoreHTML(r)}</div><div>${!clean?`<button class="mini" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('testPractiseLine')}</button>`:''}</div>${r.issues.length?`<ol class="test-issue-list">${r.issues.map(issue=>{
       const num=Math.floor(issue.ply/2)+1+(r.side==='w'?'.':'…'),same=line.moves[issue.ply]?.san===issue.expectedSan&&testSignature(r)===r.signature;
       return `<li><h4>${t('testIssueHeading',{n:Math.floor(issue.ply/2)+1,move:medalText(issue.expectedSan)})}</h4>${issue.playedSan?`<p>${t('testPlayed',{move:medalText(num+issue.playedSan)})}</p>`:''}<p>${t('testExpected',{move:medalText(num+issue.expectedSan)})}</p><p>${t(issue.assisted?'testIssueAssisted':issue.ply<r.stopPly?'testIssueRecovered':'testIssueUnfinished')}${issue.attempts>1?' '+t('testIssueTries',{n:issue.attempts}):''}</p>${same?`<details class="test-explanation"><summary>${t('testReviewAnswer')}</summary><p>${mvC(line.moves[issue.ply])}</p></details>`:''}</li>`;
     }).join('')}</ol>`:''}</article>`;
@@ -4403,15 +4685,18 @@ function testResultLinesHTML(run){return run.results.map(r=>{
 function retryTestReport(missedOnly){
   const run=testStore.load().history.find(r=>r.id===testReportId);if(!run)return;
   const f=testCoachFacts(run,testStore.load().history),rows=missedOnly==='focus'?f.review.slice(0,3):missedOnly==='unfinished'?f.unfinished:missedOnly?f.rows.filter(r=>r.outcome!=='recalled'):f.rows;
-  testDraft={id:null,name:run.name,items:rows.map(({id,side})=>({id,side}))};
+  testSetupMode='custom';testEditorOpen=false;testSaveOpen=false;testDraft={id:null,name:run.name,items:rows.map(({id,side})=>({id,side}))};
   testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='';renderTestPage();document.getElementById('testStartBtn').focus();
 }
 function renderTestPage(){
   ensureTestDraft();const el=document.getElementById('testPanel'),d=testStore.load(),report=d.history.find(r=>r.id===testReportId);
-  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();return;}
-  testReportId=null;
+  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();animateTestScore(report);return;}
+  testReportId=null;const pool=testAvailablePool();
   const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
-  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p><div class="test-setup-layout"><section class="test-builder" aria-labelledby="testPoolHeading"><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="newTestPool()">${t('testNewPool')}</button></div><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><div class="test-pool-tools"><button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button><button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section><aside class="test-ready"><h3>${t('testHowItWorks')}</h3><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><div class="test-start-actions"><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div><p class="home-note">${t(d.active?'testResumeFirst':'testRankNote')}</p></aside></div><section class="test-saved"><h3>${t('testSavedPools')}</h3>${d.pools.length?`<div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div>`:`<p class="home-note">${t('testNoPools')}</p>`}</section><section class="test-history"><h3>${t('testHistory')}</h3><p class="home-note">${t('testHistoryNote')}</p>${d.history.length?d.history.map(r=>`<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></article>`).join(''):`<p class="home-note">${t('testNoHistory')}</p>`}</section>`;
+  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p>${testLaunchHTML(pool,!!d.active)}
+  <section id="testLineEditor" class="test-builder test-line-editor" aria-labelledby="testPoolHeading"${testEditorOpen?'':' hidden'}><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="testEditorOpen=false;renderTestPage();document.getElementById('testStartBtn').focus()">${t('testDoneChoosing')}</button></div><div class="test-pool-tools">${repertoire.load().items.length?`<button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button>`:''}<button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section>
+  ${d.pools.length?`<details class="test-collection"><summary>${t('testSavedPools')} <span>${d.pools.length}</span></summary><div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div></details>`:''}
+  ${d.history.length?`<details class="test-collection test-history"><summary>${t('testHistory')} <span>${d.history.length}</span></summary><p class="home-note">${t('testHistoryNote')}</p>${d.history.map(r=>{const score=testScoreNumbers(r);return `<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><div class="test-history-result"><span>${score.recall===null?'—':score.recall+'%'} <small>${t('coachFirstTry')}</small></span><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></div></article>`;}).join('')}</details>`:''}`;
   renderTestPoolResults();updateTestSummary();fitAllSelects();
 }
 
@@ -4441,6 +4726,7 @@ function setMenuView(view){
   document.querySelector(`[data-home="${menuView}"]`)?.focus({preventScroll:true});
 }
 function showMenu(view){
+  closeFilterPicker();
   if(['explore','practice','test','progress'].includes(view)) menuView=view;
   runGen++; Engine.abort(); reviewQueue=null; sessionActive=false; sessionItem=null;
   showAppView('menu');
@@ -4474,6 +4760,114 @@ function showSelectedOpenings(){
   const heading=document.getElementById('selectedOpeningsHeading');
   if(heading){heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}
 }
+/* G46: branded filter pickers. The hidden selects retain the existing filter logic. */
+const FILTER_PICKERS=['libraryColour','libraryFirstMove','libraryStage','librarySort','quickAddSide','testSource','testColour'];
+let openFilterPicker=null;
+function enhanceFilterPickers(){
+  for(const id of FILTER_PICKERS){
+    const select=document.getElementById(id);if(!select)continue;
+    let trigger=document.getElementById(id+'Trigger');
+    if(!trigger){
+      const oldLabel=select.parentElement,field=document.createElement('div'),label=document.createElement('label');
+      field.className=(oldLabel.className+' filter-field').trim();
+      label.id=id+'Label';label.htmlFor=id+'Trigger';
+      if(oldLabel.closest('.library-filters'))label.className='sr-only';
+      for(const node of [...oldLabel.childNodes])if(node!==select)label.appendChild(node);
+      oldLabel.replaceWith(field);field.append(label,select);
+      select.hidden=true;select.tabIndex=-1;
+      trigger=document.createElement('button');trigger.id=id+'Trigger';trigger.type='button';trigger.className='filter-trigger';
+      trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+      trigger.setAttribute('aria-labelledby',id+'Label '+id+'Value');
+      if(select.getAttribute('aria-describedby'))trigger.setAttribute('aria-describedby',select.getAttribute('aria-describedby'));
+      trigger.innerHTML=`<span class="filter-value" id="${id}Value"></span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>`;
+      trigger.addEventListener('click',()=>openFilterPicker?.id===id?closeFilterPicker():showFilterPicker(id));
+      trigger.addEventListener('keydown',event=>filterPickerKeydown(event,id));
+      field.appendChild(trigger);
+    }
+    document.getElementById(id+'Value').textContent=select.selectedOptions[0]?.textContent||'';
+    trigger.classList.toggle('is-filtered',select.value!==(id==='librarySort'?'group':'all'));
+    trigger.disabled=select.disabled;
+  }
+}
+function closeFilterPicker(restoreFocus=false){
+  if(!openFilterPicker)return;
+  const {id,menu}=openFilterPicker;openFilterPicker=null;menu.remove();
+  const trigger=document.getElementById(id+'Trigger');
+  trigger?.setAttribute('aria-expanded','false');trigger?.removeAttribute('aria-activedescendant');trigger?.removeAttribute('aria-controls');
+  if(restoreFocus)trigger?.focus({preventScroll:true});
+}
+function positionFilterPicker(){
+  if(!openFilterPicker)return;
+  const {id,menu}=openFilterPicker,trigger=document.getElementById(id+'Trigger');
+  if(!trigger?.isConnected||!trigger.getClientRects().length){closeFilterPicker();return;}
+  const rect=trigger.getBoundingClientRect(),view=window.visualViewport;
+  const x=view?.offsetLeft||0,y=view?.offsetTop||0,w=view?.width||innerWidth,h=view?.height||innerHeight,pad=12,gap=8;
+  const width=Math.min(Math.max(rect.width,236),w-pad*2),below=y+h-rect.bottom-gap-pad,above=rect.top-y-gap-pad;
+  const down=below>=Math.min(menu.scrollHeight,340)||below>=above;
+  menu.style.width=width+'px';menu.style.maxHeight=Math.min(340,Math.max(100,down?below:above),h-pad*2)+'px';
+  menu.style.left=Math.max(x+pad,Math.min(rect.left,x+w-pad-width))+'px';
+  menu.style.top=Math.max(y+pad,Math.min(down?rect.bottom+gap:rect.top-gap-menu.offsetHeight,y+h-pad-menu.offsetHeight))+'px';
+}
+function showFilterPicker(id){
+  closeFilterPicker();
+  const select=document.getElementById(id),trigger=document.getElementById(id+'Trigger');if(!select||!trigger||select.disabled)return;
+  document.querySelectorAll('.library-filter-help[open]').forEach(el=>{el.open=false;});
+  const options=[...select.options].filter(o=>!o.disabled&&!o.hidden).map(o=>({value:o.value,text:o.textContent}));if(!options.length)return;
+  const menu=document.createElement('div');menu.id=id+'List';menu.className='filter-popup';menu.setAttribute('role','listbox');menu.setAttribute('aria-labelledby',id+'Label');
+  const heading=document.createElement('div');heading.className='filter-popup-heading';heading.textContent=document.getElementById(id+'Label').textContent;heading.setAttribute('aria-hidden','true');menu.appendChild(heading);
+  options.forEach((option,i)=>{
+    const row=document.createElement('div');row.id=id+'Option'+i;row.className='filter-option';row.setAttribute('role','option');row.setAttribute('aria-selected',String(option.value===select.value));
+    const dot=document.createElement('span');dot.className='filter-option-dot';dot.setAttribute('aria-hidden','true');
+    const name=document.createElement('span');name.textContent=option.text;row.append(dot,name);
+    row.addEventListener('pointermove',()=>setFilterPickerActive(i,false));
+    row.addEventListener('pointerdown',event=>event.preventDefault());
+    row.addEventListener('click',()=>chooseFilterOption(i));menu.appendChild(row);
+  });
+  const index=Math.max(0,options.findIndex(o=>o.value===select.value));
+  openFilterPicker={id,menu,options,index,typed:'',typedAt:0};document.body.appendChild(menu);
+  trigger.setAttribute('aria-controls',id+'List');trigger.setAttribute('aria-expanded','true');trigger.focus({preventScroll:true});positionFilterPicker();setFilterPickerActive(index);
+}
+function setFilterPickerActive(index,scroll=true){
+  if(!openFilterPicker)return;
+  const state=openFilterPicker;state.index=index;
+  for(const [i,row] of [...state.menu.querySelectorAll('[role="option"]')].entries())row.classList.toggle('is-active',i===index);
+  const row=document.getElementById(state.id+'Option'+index);document.getElementById(state.id+'Trigger')?.setAttribute('aria-activedescendant',row.id);
+  if(scroll){const top=row.offsetTop,bottom=top+row.offsetHeight;if(top<state.menu.scrollTop)state.menu.scrollTop=top;else if(bottom>state.menu.scrollTop+state.menu.clientHeight)state.menu.scrollTop=bottom-state.menu.clientHeight;}
+}
+function chooseFilterOption(index){
+  if(!openFilterPicker)return;
+  const {id,options}=openFilterPicker,option=options[index],select=document.getElementById(id);if(!option||!select)return;
+  const changed=select.value!==option.value;closeFilterPicker();select.value=option.value;enhanceFilterPickers();
+  if(changed)select.dispatchEvent(new Event('change',{bubbles:true}));
+  document.getElementById(id+'Trigger')?.focus({preventScroll:true});
+}
+function filterPickerKeydown(event,id){
+  if(event.ctrlKey||event.metaKey||event.altKey&&event.key!=='ArrowDown')return;
+  const key=event.key,isOpen=openFilterPicker?.id===id;
+  if(key==='Tab'){if(isOpen)closeFilterPicker();return;}
+  if(key==='Escape'){if(isOpen){event.preventDefault();closeFilterPicker(true);}return;}
+  if(['ArrowDown','ArrowUp','Home','End','Enter',' '].includes(key)){
+    event.preventDefault();if(!isOpen){showFilterPicker(id);if(openFilterPicker&&(key==='Home'||key==='End'))setFilterPickerActive(key==='Home'?0:openFilterPicker.options.length-1);return;}
+    const state=openFilterPicker,last=state.options.length-1;
+    if(key==='Enter'||key===' ')chooseFilterOption(state.index);
+    else setFilterPickerActive(key==='Home'?0:key==='End'?last:(state.index+(key==='ArrowDown'?1:last))%(last+1));
+    return;
+  }
+  if(key.length===1&&!event.altKey){
+    event.preventDefault();if(!isOpen)showFilterPicker(id);if(!openFilterPicker)return;
+    const state=openFilterPicker,now=Date.now();state.typed=now-state.typedAt>700?key:state.typed+key;state.typedAt=now;
+    const normalize=s=>s.normalize('NFKD').toLowerCase(),typed=normalize(state.typed),prefix=[...typed].every(c=>c===typed[0])?typed[0]:typed;
+    const order=state.options.map((_,i)=>(state.index+1+i)%state.options.length),match=order.find(i=>normalize(state.options[i].text).startsWith(prefix));
+    if(match!==undefined)setFilterPickerActive(match);
+  }
+}
+function initFilterPickers(){
+  document.addEventListener('pointerdown',event=>{if(openFilterPicker&&!openFilterPicker.menu.contains(event.target)&&!document.getElementById(openFilterPicker.id+'Trigger')?.contains(event.target))closeFilterPicker();});
+  document.addEventListener('focusin',event=>{if(openFilterPicker&&!openFilterPicker.menu.contains(event.target)&&event.target!==document.getElementById(openFilterPicker.id+'Trigger'))closeFilterPicker();});
+  document.addEventListener('scroll',event=>{if(openFilterPicker&&!openFilterPicker.menu.contains(event.target))closeFilterPicker();},true);
+  window.addEventListener('resize',positionFilterPicker);window.visualViewport?.addEventListener('resize',positionFilterPicker);
+}
+
 function fitSelectText(select){
   const option=select.options[select.selectedIndex]; if(!option) return;
   const style=getComputedStyle(select), measure=document.createElement('span');
@@ -4484,7 +4878,7 @@ function fitSelectText(select){
   select.style.width=Math.ceil(measure.getBoundingClientRect().width+padding)+'px';
   measure.remove();
 }
-function fitAllSelects(){document.querySelectorAll('select').forEach(fitSelectText);}
+function fitAllSelects(){enhanceFilterPickers();document.querySelectorAll('select:not([hidden])').forEach(fitSelectText);}
 window.addEventListener('resize',fitAllSelects);
 if(document.fonts) document.fonts.ready.then(fitAllSelects);
 function packName(pack){return t(pack.ids.length===1?'packLineCountOne':'packLineCount',{name:zhOn()?pack.zh:pack.en,n:pack.ids.length});}
@@ -5840,6 +6234,7 @@ function learnTryMove(u){
   }
 }
 
+initFilterPickers();
 renderMuteBtn();
 (function initColorSeg(){
   const w=document.querySelector('#colorRow [data-side="w"]'), b=document.querySelector('#colorRow [data-side="b"]');
