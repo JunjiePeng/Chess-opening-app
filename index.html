@@ -1101,9 +1101,54 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  .coach-score { padding-top:16px; }
 }
 
+/* Short, optional guides use the same warm palette as the learning screens. */
+.page-guide-btn { display:inline-flex; align-items:center; justify-content:center; flex:0 0 32px; width:32px; height:32px; padding:0; border:1px solid var(--line); border-radius:50%; background:transparent; color:var(--dim); font-family:inherit; font-weight:700; font-size:.95rem; line-height:1; cursor:pointer; }
+.page-guide-btn:hover { color:var(--text); border-color:var(--accent); background:var(--panel); }
+#pageGuideDialog { position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0; border:0; background:transparent; color:var(--text); overflow:hidden; }
+#pageGuideDialog::backdrop { background:rgba(12,9,5,.12); }
+#guideSpotlight { position:fixed; pointer-events:none; border:2px solid #edb16e; border-radius:12px; box-shadow:0 0 0 9999px rgba(12,9,5,.64); }
+#guideCard { position:fixed; box-sizing:border-box; border:1px solid #a27e53; border-radius:20px; background:#33291e; box-shadow:0 16px 60px #0007; padding:22px; overflow-y:auto; overscroll-behavior:contain; }
+.guide-top { display:flex; justify-content:space-between; align-items:center; gap:12px; color:#edc79c; font-size:.76rem; font-weight:700; letter-spacing:.03em; }
+#guideCount { flex-shrink:0; color:#c9b69b; font-weight:500; }
+#guideTitle { font-family:inherit; font-size:1.22rem; line-height:1.3; font-weight:750; margin:14px 0 9px; outline:none; }
+#guideBody { color:#e1d1bb; font-size:.96rem; line-height:1.65; margin:0; }
+.guide-navigation { display:flex; align-items:center; gap:8px; margin-top:18px; }
+.guide-navigation button { min-height:42px; }
+#guideSkip { margin-right:auto; padding:6px 0; font-size:.86rem; }
+#guideBack { padding:8px 10px; }
+#guideNext { padding:8px 17px; }
+#guideDots { display:flex; gap:5px; margin-top:16px; }
+#guideDots i { width:5px; height:5px; border-radius:50%; background:#766047; }
+#guideDots i.current { width:18px; border-radius:5px; background:var(--accent); }
+.guide-preferences { border-top:1px solid #584633; margin-top:16px; padding-top:12px; }
+.guide-preferences label { display:flex; gap:9px; align-items:center; font-size:.78rem; color:#c9b69b; cursor:pointer; min-height:28px; }
+#guideOff { width:15px; height:15px; flex-shrink:0; accent-color:var(--accent); }
+#guideReplayNote { color:#bda98e; font-size:.75rem; margin:5px 0 0; }
+@media(max-width:760px){
+ .header-controls { gap:7px; }
+ .page-guide-btn { flex-basis:28px; width:28px; height:28px; }
+ #guideCard { padding:18px; border-radius:18px; }
+ #guideTitle { font-size:1.12rem; margin-top:11px; }
+ #guideBody { font-size:.9rem; line-height:1.55; }
+ .guide-preferences { margin-top:12px; padding-top:9px; }
+ .guide-navigation { margin-top:14px; }
+ #guideDots { margin-top:12px; }
+}
+
 </style>
 </head>
 <body>
+<dialog id="pageGuideDialog" aria-labelledby="guideTitle" aria-describedby="guideBody">
+  <div id="guideSpotlight" aria-hidden="true"></div>
+  <section id="guideCard">
+    <div class="guide-top"><span id="guidePageName"></span><span id="guideCount"></span></div>
+    <div aria-live="polite" aria-atomic="true"><h2 id="guideTitle" tabindex="-1"></h2><p id="guideBody"></p></div>
+    <div id="guideDots" aria-hidden="true"></div>
+    <div class="guide-navigation"><button id="guideSkip" type="button" class="linklike" onclick="closePageGuide()"></button><button id="guideBack" type="button" class="act" onclick="movePageGuide(-1)"></button><button id="guideNext" type="button" class="act primary" onclick="movePageGuide(1)"></button></div>
+    <div class="guide-preferences"><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p></div>
+  </section>
+</dialog>
+
 <dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
 <div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 <div id="appShell" class="page-shell">
@@ -1113,6 +1158,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <p data-i18n="tagline">Your personal opening trainer</p>
   </div>
   <div class="header-controls">
+    <button id="pageGuideBtn" type="button" class="page-guide-btn" onclick="startPageGuide()" data-i18n-title="guideHelp" data-i18n-label="guideHelp">?</button>
     <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
     <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
   </div>
@@ -1143,7 +1189,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G52</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G53</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -2288,6 +2334,162 @@ Object.assign(I18N.zh, {
   legacyWelcome:'早期进度已保留。旧等级可在进度页查看，新的回忆进度按黑白分别记录。'
 });
 
+/* G53: short, bilingual first-visit guides. */
+Object.assign(I18N_EN, {
+  guideHelp:'Page guide',
+  guideStep:'{n} of {total}',
+  guideBack:'Back',
+  guideNext:'Next',
+  guideDone:'Got it',
+  guideSkip:'Skip guide',
+  guideOff:'Turn off automatic guides',
+  guideReplay:'Replay this page’s guide anytime with ?',
+  guidePageexplore:'OPENINGS',
+  guidePagepractice:'MY REPERTOIRE',
+  guidePagelearn:'LEARN',
+  guidePagedrill:'DRILL',
+  guidePagetest:'TEST YOUR OPENINGS',
+  guidePagetestPlay:'PLAY FROM MEMORY',
+  guidePagetestResults:'YOUR RESULTS',
+  guidePageprogress:'PROGRESS',
+  guidePageplay:'VS ENGINE',
+  guideFindTitle:'Find your first opening',
+  guideFindBody:'Browse the openings below, or search by name. Use the colour and first-move filters to narrow your choices.',
+  guideLearnTitle:'Start with one line',
+  guideLearnBody:'A line is a short sequence of opening moves. Choose Learn to understand it, then Drill to practise it from memory.',
+  guideSaveTitle:'Keep what you want to practise',
+  guideSaveBody:'Use + to add a line to My repertoire. Its bookmark shows it is saved. Stars simply pin your favourites in this library.',
+  guideRepertoireTitle:'Your personal practice list',
+  guideRepertoireBody:'Save the lines you want to use in your games. This page keeps them together and suggests what to practise next.',
+  guideStarterTitle:'Build a small starting set',
+  guideStarterBody:'Choose a White opening and replies to 1.e4 and 1.d4 as Black. These are introductory lines; you can add more whenever you’re ready.',
+  guideDailyTitle:'Preview today’s practice',
+  guideDailyBody:'Open daily practice to see the suggested lines before starting. You can change the selection and continue an unfinished session later.',
+  guideSavedTitle:'Pick up any saved line',
+  guideSavedBody:'Choose Learn to revisit the ideas, Drill to recall the moves, or Play to try the resulting position against the engine.',
+  guideAddTitle:'Add lines from here',
+  guideAddBody:'Add lines opens a quick search. Save a variation without leaving your repertoire; removing it never deletes your learning history.',
+  guideBoardTitle:'Follow the opening on the board',
+  guideBoardBody:'Tap a piece, then its destination square. In Learn, the arrow shows the next move; you can also advance with Next.',
+  guideIdeasTitle:'Understand the reason',
+  guideIdeasBody:'Read the explanation as the position changes. Highlighted moves and squares help you spot the key idea.',
+  guideLearnControlsTitle:'Go at your own pace',
+  guideLearnControlsBody:'Use Back and Next to review the line. When you’re ready, Drill This Line lets you try the moves from memory.',
+  guideSideTitle:'Choose the side you’re learning',
+  guideSideBody:'Select White or Black before you begin. You play that side’s moves; Debut handles the replies. Switching sides restarts the line.',
+  guideRecallTitle:'Recall the next move',
+  guideRecallBody:'Tap a piece, then a square to play the opening from memory. Dots show legal destinations, not the answer.',
+  guideHintTitle:'Get help when you need it',
+  guideHintBody:'Use Hint if you’re stuck. A correct drill without hints earns Knight; successful scheduled reviews take that line further up the ranks.',
+  guidePoolTitle:'Check what you’ll be tested on',
+  guidePoolBody:'The preview shows each line and your colour. Quick check uses a small selection; new users can try one sample line.',
+  guideChooseTitle:'Make the test your own',
+  guideChooseBody:'Choose lines lets you search openings and select White or Black for each variation. Remove anything you don’t want in this test.',
+  guideStartTestTitle:'Recall, then learn from the result',
+  guideStartTestBody:'Start when your selection looks right. There’s no timer, mistakes allow retries, and showing a move only marks that position as assisted.',
+  guideTestMovesTitle:'Play your side from memory',
+  guideTestMovesBody:'The line name and colour stay visible. Play the opening on the board; Debut supplies the other side’s moves.',
+  guideTestHelpTitle:'You can always keep going',
+  guideTestHelpBody:'Try again after a wrong move, or use Show move for help. Pause saves your place. Skip line leaves its remaining moves untested.',
+  guideTestFeedbackTitle:'Finish one line at a time',
+  guideTestFeedbackBody:'Each line gets a clear result. Take a moment, then choose Next line. After the last line, View results shows what to work on.',
+  guideScoreTitle:'Read your recall score',
+  guideScoreBody:'This percentage counts moves you got right on the first try, out of moves attempted. Coverage shows how much of your selected test you attempted.',
+  guideInsightsTitle:'Find one useful next step',
+  guideInsightsBody:'Your strengths and focus come from this test. Retries, hints and untested moves are kept separate, so you can see what needs attention.',
+  guideNextPracticeTitle:'Turn feedback into practice',
+  guideNextPracticeBody:'Review tricky positions in Learn, then retest the lines that need work. Expand the line review for move-by-move details.',
+  guideRanksTitle:'Ranks belong to your lines',
+  guideRanksBody:'Pawn means you have finished a lesson or drill. Knight records an unaided recall. These ranks track practice, not your chess rating.',
+  guideRankPathTitle:'Build lasting recall',
+  guideRankPathBody:'Successful due reviews earn Bishop, Rook and Queen. The guide lists each requirement, and promotion totals count the steps above Pawn.',
+  guideAchievementsTitle:'Celebrate useful habits',
+  guideAchievementsBody:'Open Achievements to see milestones for learning, recall, tests and practice days. Each milestone explains what counts.',
+  guideEngineBoardTitle:'Try your opening in a game',
+  guideEngineBoardBody:'Play freely against the engine after learning a line. Tap a piece and its destination; the game continues beyond the lesson.',
+  guideEngineSetupTitle:'Choose a comfortable challenge',
+  guideEngineSetupBody:'Adjust the strength slider to suit your practice. In a full game, the colour buttons let you start as White or Black.',
+  guideEngineOpeningTitle:'Start from an opening',
+  guideEngineOpeningBody:'Choose a line here to begin from its final position. Practise making your own decisions once the memorised moves run out.'
+});
+Object.assign(I18N.zh, {
+  guideHelp:'页面指南',
+  guideStep:'{n} / {total}',
+  guideBack:'上一步',
+  guideNext:'下一步',
+  guideDone:'开始使用',
+  guideSkip:'跳过指南',
+  guideOff:'不再自动显示指南',
+  guideReplay:'随时点击 ? 重看本页指南',
+  guidePageexplore:'全部开局',
+  guidePagepractice:'我的开局库',
+  guidePagelearn:'学习',
+  guidePagedrill:'操练',
+  guidePagetest:'开局自测',
+  guidePagetestPlay:'凭记忆走棋',
+  guidePagetestResults:'测试结果',
+  guidePageprogress:'进度',
+  guidePageplay:'人机对弈',
+  guideFindTitle:'找到你的第一个开局',
+  guideFindBody:'浏览下方开局，或按名称搜索。用执棋颜色和第一步筛选，找到想学的路线。',
+  guideLearnTitle:'先学一条路线',
+  guideLearnBody:'每条变例是一段开局走法。先点「学习」理解思路，再用「操练」练习回忆。',
+  guideSaveTitle:'保存想练习的路线',
+  guideSaveBody:'点击 + 把变例加入「我的开局库」；书签表示已保存。星标仅用于在开局列表中置顶收藏。',
+  guideRepertoireTitle:'你的专属练习清单',
+  guideRepertoireBody:'保存你想在对局中使用的变例。这里集中管理已选路线，并推荐下一步练习。',
+  guideStarterTitle:'从一小组路线开始',
+  guideStarterBody:'选择一套白方开局，以及黑方应对 1.e4 和 1.d4 的走法。这些是入门路线，之后可以随时扩充。',
+  guideDailyTitle:'先看看今天练什么',
+  guideDailyBody:'点击每日练习，先查看推荐路线再开始。你可以调整选择，也可以稍后继续未完成的练习。',
+  guideSavedTitle:'随时练习已保存的路线',
+  guideSavedBody:'用「学习」重温思路，用「操练」回忆走法，或用「对弈」从这条路线的最后局面继续下棋。',
+  guideAddTitle:'在这里直接添加',
+  guideAddBody:'点击添加路线即可快速搜索，无需返回开局页。移除已保存的变例不会删除学习记录。',
+  guideBoardTitle:'在棋盘上跟着走',
+  guideBoardBody:'点击棋子，再点击目标格。在学习模式中，箭头会指向下一步；也可以点击「下一步」前进。',
+  guideIdeasTitle:'理解每一步的原因',
+  guideIdeasBody:'随着局面变化阅读说明。高亮的走法和格子帮助你抓住关键思路。',
+  guideLearnControlsTitle:'按自己的节奏学习',
+  guideLearnControlsBody:'用「上一步」和「下一步」反复查看。准备好后，点击「操练此线」凭记忆走一遍。',
+  guideSideTitle:'选择你要练习的一方',
+  guideSideBody:'开始前选择白方或黑方。你走所选一方，Debut 自动应对。切换颜色会重新开始这条路线。',
+  guideRecallTitle:'回忆下一步走法',
+  guideRecallBody:'点击棋子和目标格，凭记忆走出开局。圆点只标示合法目标格，不代表正确答案。',
+  guideHintTitle:'卡住时可以求助',
+  guideHintBody:'想不起来时可以使用「提示」。无提示完成全对操练可获得马级，之后按时成功复习可继续晋级。',
+  guidePoolTitle:'确认这次测哪些路线',
+  guidePoolBody:'预览列出每条变例和你的执棋颜色。快速自测只选少量路线；新用户可以先试一条示例。',
+  guideChooseTitle:'自选测试范围',
+  guideChooseBody:'点击「自选路线」，搜索开局并为每条变例选择白方或黑方。你可以移除不想测试的路线。',
+  guideStartTestTitle:'先回忆，再从结果中学习',
+  guideStartTestBody:'确认范围后即可开始。不计时，走错可以重试，查看走法只会把当前这一步记为借助提示。',
+  guideTestMovesTitle:'凭记忆走好你的一方',
+  guideTestMovesBody:'变例名称和执棋颜色会一直显示。你在棋盘上回忆走法，另一方由 Debut 自动完成。',
+  guideTestHelpTitle:'卡住也能继续',
+  guideTestHelpBody:'走错后可以重试，或点击「显示走法」求助。暂停会保留位置；跳过此线会把剩余走法记为未测试。',
+  guideTestFeedbackTitle:'一条一条地完成',
+  guideTestFeedbackBody:'每条变例结束后都会显示结果。稍作回顾，再点「下一条变例」。最后点击「查看结果」，了解接下来练什么。',
+  guideScoreTitle:'看懂回忆得分',
+  guideScoreBody:'此百分比是已尝试走法中，首次就走对的比例。测试覆盖率表示所选走法中，你实际尝试了多少。',
+  guideInsightsTitle:'找到一个值得改进的地方',
+  guideInsightsBody:'优势和改进方向来自本次表现。重试、提示和未测试走法分别记录，帮助你看清哪里需要巩固。',
+  guideNextPracticeTitle:'把反馈变成下一次练习',
+  guideNextPracticeBody:'在学习模式重温难点，再测试需要巩固的路线。展开逐线回顾，可查看每一步的详细情况。',
+  guideRanksTitle:'每条路线都有自己的等级',
+  guideRanksBody:'兵级表示完成过学习或操练；马级表示完成过无提示回忆。这些等级记录练习成果，并非棋力等级分。',
+  guideRankPathTitle:'让记忆更牢固',
+  guideRankPathBody:'到期后成功复习可逐步升为象、车、后。这里列出各级要求；晋级总数统计兵级以上的升级步数。',
+  guideAchievementsTitle:'记录有价值的积累',
+  guideAchievementsBody:'打开成就页，查看学习、回忆、自测和练习天数的里程碑。每项成就都会说明如何计数。',
+  guideEngineBoardTitle:'把开局用到实战中',
+  guideEngineBoardBody:'学完路线后，可以与引擎自由对弈。点击棋子和目标格，把对局继续下去。',
+  guideEngineSetupTitle:'选择适合自己的难度',
+  guideEngineSetupBody:'用强度滑块调整练习难度。完整对局中，还可以选择执白或执黑开始。',
+  guideEngineOpeningTitle:'从学过的开局开始',
+  guideEngineOpeningBody:'在这里选择一条变例，从它的最后局面开始。记住的走法结束后，练习自己判断下一步。'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -2527,7 +2729,7 @@ function setLang(l){
   applyStaticI18n();
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
-  renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); renderRepertoireNotice();
+  renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); renderRepertoireNotice(); queuePageGuide();
   if(board) render(curLastU());
   buildLineSel(); renderSessionStrip(); renderRepertoireButton();
   if(document.getElementById('medalsOverlay')?.style.display==='flex') renderMedals();
@@ -3704,7 +3906,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G52';
+const BUILD='G53';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4724,14 +4926,178 @@ function retryTestReport(missedOnly){
 }
 function renderTestPage(){
   ensureTestDraft();const el=document.getElementById('testPanel'),d=testStore.load(),report=d.history.find(r=>r.id===testReportId);
-  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();animateTestScore(report);return;}
+  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();animateTestScore(report);queuePageGuide();return;}
   testReportId=null;const pool=testAvailablePool();
   const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
   el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p>${testLaunchHTML(pool,!!d.active)}
   <section id="testLineEditor" class="test-builder test-line-editor" aria-labelledby="testPoolHeading"${testEditorOpen?'':' hidden'}><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="testEditorOpen=false;renderTestPage();document.getElementById('testStartBtn').focus()">${t('testDoneChoosing')}</button></div><div class="test-pool-tools">${repertoire.load().items.length?`<button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button>`:''}<button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section>
   ${d.pools.length?`<details class="test-collection"><summary>${t('testSavedPools')} <span>${d.pools.length}</span></summary><div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div></details>`:''}
   ${d.history.length?`<details class="test-collection test-history"><summary>${t('testHistory')} <span>${d.history.length}</span></summary><p class="home-note">${t('testHistoryNote')}</p>${d.history.map(r=>{const score=testScoreNumbers(r);return `<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><div class="test-history-result"><span>${score.recall===null?'—':score.recall+'%'} <small>${t('coachFirstTry')}</small></span><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></div></article>`;}).join('')}</details>`:''}`;
-  renderTestPoolResults();updateTestSummary();fitAllSelects();
+  renderTestPoolResults();updateTestSummary();fitAllSelects();queuePageGuide();
+}
+
+/* ================= FIRST-VISIT PAGE GUIDES ================= */
+const GUIDE_PAGES=['explore','practice','learn','drill','test','testPlay','testResults','progress','play'];
+function normaliseGuidePrefs(value){
+  const valid=value && typeof value==='object' && !Array.isArray(value)?value:{};
+  return {version:1,seen:[...new Set((Array.isArray(valid.seen)?valid.seen:[]).filter(key=>GUIDE_PAGES.includes(key)))],disabled:valid.disabled===true};
+}
+function readGuidePrefs(){
+  try{return normaliseGuidePrefs(JSON.parse(localStorage.getItem('otGuides')));}catch(e){return normaliseGuidePrefs(null);}
+}
+let guidePrefs=readGuidePrefs(),activeGuide=null,guideFrame=0,guideLayoutFrame=0;
+function shouldOfferGuide(prefs,page){return GUIDE_PAGES.includes(page) && !prefs.disabled && !prefs.seen.includes(page);}
+function rememberGuide(page){
+  if(!guidePrefs.seen.includes(page))guidePrefs.seen.push(page);
+  saveGuidePrefs();
+}
+function saveGuidePrefs(){try{localStorage.setItem('otGuides',JSON.stringify(guidePrefs));}catch(e){/* Remember for this visit even when storage is blocked. */}}
+function setGuideAutomatic(disabled){guidePrefs.disabled=disabled===true;saveGuidePrefs();}
+function guidePage(){
+  if(document.getElementById('appShell').classList.contains('board-view'))return mode==='test'?'testPlay':mode;
+  return menuView==='test'&&document.querySelector('#testPanel .test-report')?'testResults':menuView;
+}
+function guideTarget(selectors){
+  for(const selector of selectors){
+    for(const el of document.querySelectorAll(selector)){
+      if(el.getClientRects().length && getComputedStyle(el).visibility!=='hidden')return el;
+    }
+  }
+  return null;
+}
+function pageGuideSteps(page){
+  const step=(key,...targets)=>({key,targets});
+  const steps={
+    explore:[step('guideFind','#searchBox'),step('guideLearn','#opGrid .op-card .ln-btns','#opGrid .op-card'),step('guideSave','#opGrid [data-rep-id]','#homeNav')],
+    practice:guideTarget(['#todayBar .daily-hero'])?
+      [step('guideDaily','#todayBar .daily-hero .home-actions'),step('guideSaved','#repertoirePanel .rep-line','#selectedOpeningsHeading'),step('guideAdd','#quickAddToggle')]:
+      [step('guideRepertoire','#selectedOpeningsHeading'),step('guideStarter','#repertoirePanel .rep-choices','#repertoirePanel form','#repertoirePanel'),step('guideAdd','#quickAddToggle')],
+    learn:[step('guideBoard','#board'),step('guideIdeas','#promptBox'),step('guideLearnControls','#learnNav')],
+    drill:[step('guideSide','#sideToggle'),step('guideRecall','#board'),step('guideHint','#drillNav')],
+    test:[step('guidePool','#testSelectionPreview'),step('guideChoose','[data-test-size="custom"]'),step('guideStartTest','#testStartBtn')],
+    testPlay:[step('guideTestMoves','#board'),step('guideTestHelp','#testNav'),step('guideTestFeedback','#testFeedback')],
+    testResults:[step('guideScore','.coach-score'),step('guideInsights','.coach-insights'),step('guideNextPractice','.coach-actions')],
+    progress:[step('guideRanks','#promotionOverview .promotion-ranks li'),step('guideRankPath','#promotionOverview .rank-explainer'),step('guideAchievements','.achievement-entry')],
+    play:[step('guideEngineBoard','#board'),step('guideEngineSetup','#eloSlider'),step('guideEngineOpening','#lineSel')]
+  };
+  return (steps[page]||[]).filter(item=>guideTarget(item.targets));
+}
+function queuePageGuide(){
+  if(typeof requestAnimationFrame!=='function')return;
+  cancelAnimationFrame(guideFrame);
+  guideFrame=requestAnimationFrame(()=>{
+    guideFrame=0;
+    const page=guidePage();
+    if(activeGuide){
+      if(activeGuide.page===page){renderPageGuide(false);return;}
+      closePageGuide(false);
+    }
+    startPageGuide(false);
+  });
+}
+function startPageGuide(manual=true){
+  const dialog=document.getElementById('pageGuideDialog'),page=guidePage();
+  if(!dialog || activeGuide || (!manual&&!shouldOfferGuide(guidePrefs,page)))return;
+  // Never stack a guide over a chooser, achievement board or other dialog.
+  if(document.querySelector('dialog[open]') || document.getElementById('appShell').inert)return;
+  const steps=pageGuideSteps(page);if(!steps.length)return;
+  activeGuide={page,steps,index:0,focus:document.activeElement,scrollX:window.scrollX,scrollY:window.scrollY,overflow:document.body.style.overflow,paddingBottom:document.body.style.paddingBottom};
+  rememberGuide(page);
+  renderPageGuide(false);
+  dialog.showModal();document.body.style.overflow='hidden';
+  placePageGuide(true);
+  document.getElementById('guideTitle').focus({preventScroll:true});
+}
+function renderPageGuide(focus=true){
+  if(!activeGuide)return;
+  const {page,steps,index}=activeGuide,item=steps[index];
+  document.getElementById('guidePageName').textContent=t('guidePage'+page);
+  document.getElementById('guideCount').textContent=t('guideStep',{n:index+1,total:steps.length});
+  document.getElementById('guideTitle').textContent=t(item.key+'Title');
+  document.getElementById('guideBody').textContent=t(item.key+'Body');
+  document.getElementById('guideBack').hidden=index===0;
+  document.getElementById('guideBack').textContent=t('guideBack');
+  document.getElementById('guideSkip').textContent=t('guideSkip');
+  document.getElementById('guideNext').textContent=t(index===steps.length-1?'guideDone':'guideNext');
+  document.getElementById('guideOffLabel').textContent=t('guideOff');
+  document.getElementById('guideOff').checked=guidePrefs.disabled;
+  document.getElementById('guideReplayNote').textContent=t('guideReplay');
+  document.getElementById('guideDots').innerHTML=steps.map((_,i)=>`<i${i===index?' class="current"':''}></i>`).join('');
+  if(document.getElementById('pageGuideDialog').open){
+    placePageGuide(focus);
+    if(focus)document.getElementById('guideTitle').focus({preventScroll:true});
+  }
+}
+function movePageGuide(delta){
+  if(!activeGuide)return;
+  const next=activeGuide.index+delta;
+  if(next>=activeGuide.steps.length){closePageGuide();return;}
+  activeGuide.index=Math.max(0,next);renderPageGuide();
+}
+function closePageGuide(restore=true){
+  if(!activeGuide)return;
+  const old=activeGuide;activeGuide=null;
+  cancelAnimationFrame(guideLayoutFrame);
+  document.getElementById('pageGuideDialog').close();
+  document.body.style.overflow=old.overflow;document.body.style.paddingBottom=old.paddingBottom;
+  if(restore && old.page===guidePage()){
+    window.scrollTo(old.scrollX,old.scrollY);
+    const target=old.focus!==document.body&&old.focus?.isConnected&&old.focus.getClientRects().length?old.focus:document.getElementById('pageGuideBtn');
+    target?.focus({preventScroll:true});
+  }
+}
+function placePageGuide(scroll=false){
+  if(!activeGuide)return;
+  const target=guideTarget(activeGuide.steps[activeGuide.index].targets),card=document.getElementById('guideCard'),ring=document.getElementById('guideSpotlight');
+  const viewport=window.visualViewport,w=viewport?.width||document.documentElement.clientWidth,h=viewport?.height||window.innerHeight;
+  const ox=viewport?.offsetLeft||0,oy=viewport?.offsetTop||0,gap=16,pad=12;
+  card.style.maxHeight=Math.max(100,h-pad*2)+'px';
+  card.style.width=Math.min(350,w-pad*2)+'px';
+  const ch=card.offsetHeight,cw=card.offsetWidth;
+  document.body.style.paddingBottom=(ch+32)+'px';
+  if(scroll && target)target.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
+  let r=target?.getBoundingClientRect(),left=ox+(w-cw)/2,top=oy+h-ch-pad;
+  const sideRoom=r && (ox+w-r.right>=cw+gap+pad || r.left-ox>=cw+gap+pad);
+  if(r && sideRoom && w>=640){
+    left=ox+w-r.right>=cw+gap+pad?r.right+gap:r.left-cw-gap;
+    top=Math.min(oy+h-ch-pad,Math.max(oy+pad,r.top));
+  }else if(r && getComputedStyle(target).position==='fixed'){
+    top=Math.max(oy+pad,r.top-ch-gap);
+  }else if(r && w>=760 && r.bottom+gap+ch<oy+h-pad){
+    left=Math.min(ox+w-cw-pad,Math.max(ox+pad,r.left));top=r.bottom+gap;
+  }else if(r && scroll){
+    // Leave room above the phone sheet for the highlighted control.
+    const available=Math.max(40,h-ch-pad-gap-pad),desired=oy+pad+Math.max(0,(available-Math.min(r.height,available))/2);
+    window.scrollBy(0,r.top-desired);r=target.getBoundingClientRect();
+  }
+  card.style.left=Math.max(ox+pad,left)+'px';card.style.top=Math.max(oy+pad,top)+'px';
+  ring.hidden=!r;
+  if(r){
+    const x=Math.max(ox+5,r.left-5),y=Math.max(oy+5,r.top-5);
+    ring.style.left=x+'px';ring.style.top=y+'px';
+    ring.style.width=Math.max(0,Math.min(ox+w-5,r.right+5)-x)+'px';
+    ring.style.height=Math.max(0,Math.min(oy+h-5,r.bottom+5)-y)+'px';
+  }
+}
+function scheduleGuideLayout(event){
+  if(!activeGuide)return;
+  cancelAnimationFrame(guideLayoutFrame);guideLayoutFrame=requestAnimationFrame(()=>placePageGuide(event?.type==='resize'));
+}
+function initPageGuides(){
+  const dialog=document.getElementById('pageGuideDialog');
+  dialog.addEventListener('cancel',e=>{e.preventDefault();closePageGuide();});
+  dialog.addEventListener('keydown',e=>{
+    if(e.key!=='Tab')return;
+    const controls=[...dialog.querySelectorAll('button,input')].filter(el=>!el.disabled&&el.getClientRects().length);
+    const first=controls[0],last=controls.at(-1);if(!first)return;
+    if(e.shiftKey&&(document.activeElement===first||document.activeElement.id==='guideTitle')){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
+  dialog.addEventListener('close',()=>{if(activeGuide)closePageGuide();});
+  window.addEventListener('resize',scheduleGuideLayout);
+  window.addEventListener('scroll',scheduleGuideLayout,{passive:true,capture:true});
+  window.visualViewport?.addEventListener('resize',scheduleGuideLayout);
+  window.visualViewport?.addEventListener('scroll',scheduleGuideLayout);
 }
 
 /* ================= MENU ================= */
@@ -4752,6 +5118,7 @@ function showAppView(view){
   const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
   if(inBoard){ syncBoardOptions(); renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
   else if(wasBoard) requestAnimationFrame(()=>{ if(document.getElementById('menu').style.display!=='none') window.scrollTo(0,menuScrollY); });
+  queuePageGuide();
 }
 let menuView='explore';
 const expandedOpeningCards=new Set();
@@ -6289,6 +6656,7 @@ renderAnnotBtn();
 renderAimBtn();
 renderEvalBtn();
 setupSwipeBack();
+initPageGuides();
 showMenu();
 // Offline shell: the manifest alone doesn't make a PWA work offline — the
 // service worker does. file:// and headless test stubs are skipped.
@@ -6302,6 +6670,7 @@ function setupSwipeBack(){
   if(typeof document==='undefined' || !document.addEventListener) return;
   let s=null;
   document.addEventListener('touchstart', e=>{
+    if(document.querySelector('dialog[open]')){ s=null; return; }
     if(e.touches.length!==1){ s=null; return; }
     const x=e.touches[0].clientX;
     const el=e.target;

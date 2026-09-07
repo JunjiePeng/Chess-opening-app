@@ -6,7 +6,7 @@
    never delays rendering). Other cross-origin requests (the Stockfish CDN)
    are left untouched — the engine degrades gracefully offline.
    Bump CACHE together with the build tag in index.html when releasing. */
-const CACHE = 'debut-g52';
+const CACHE = 'debut-g53';
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 const SHELL = ['./', './index.html', './manifest.webmanifest?v=G24', './icon-192.png?v=G24', './icon-512.png?v=G24', './icon-maskable-512.png?v=G24', './apple-touch-icon.png?v=G18', './favicon-32.png?v=G23'];
 
