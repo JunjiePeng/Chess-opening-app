@@ -497,6 +497,12 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   #drill.layout { padding:4px 0 14px; }                      /* board runs edge to edge like chess.com mobile */
   #drill { gap:8px; }
   #boardCol { --bsize:min(calc(100cqw - var(--board-extra, 0px)), calc(100dvh - 250px - env(safe-area-inset-top, 0px))); }
+  /* Hidden evaluation takes no phone space; when shown, balance its left slot. */
+  #drill.play { --board-extra:0px; }
+  #drill.play #evalBarWrap { display:none !important; }
+  #drill.play.eval-visible { --board-extra:56px; }
+  #drill.play.eval-visible #evalBarWrap { display:block !important; }
+  #drill.play.eval-visible #boardCol::after { content:''; width:20px; flex:0 0 20px; }
   #board { border-radius:12px; }
   .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; padding:0 10px; box-sizing:border-box; }
   .panel-box { padding:10px 14px; }
@@ -1136,7 +1142,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G47</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G48</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -2624,9 +2630,34 @@ function pieceSVG(p){
 }
 let board, curOp=null, curLine=null, playerSide='w', ply=0, selSq=null, misses=0, mistakesThisRun=0, locked=false;
 let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
-let showAims = typeof localStorage!=='undefined' && localStorage.getItem('otAims')==='1';
+/* Board aids belong to their mode: learning guidance must not inherit drill settings. */
+const BOARD_OPTION_DEFAULTS={learn:{arrows:true,dots:false},drill:{arrows:false,dots:true},play:{arrows:false,dots:false},test:{arrows:false,dots:false}};
+function boardOptionKey(kind,view){return (kind==='arrows'?'otArrows':'otAims')+view[0].toUpperCase()+view.slice(1);}
+function readBoardOption(kind,view){
+  if(view==='test')return false;
+  try{
+    const value=localStorage.getItem(boardOptionKey(kind,view));
+    if(value==='0'||value==='1')return value==='1';
+    // Existing engine preferences remain valid; Learn and Drill get their own defaults.
+    if(view==='play'){
+      const legacy=localStorage.getItem(kind==='arrows'?'otArrows':'otAims');
+      if(legacy==='0'||legacy==='1')return legacy==='1';
+    }
+  }catch{}
+  return BOARD_OPTION_DEFAULTS[view]?.[kind]??false;
+}
+function saveBoardOption(kind,value){
+  if(mode==='test')return;
+  try{localStorage.setItem(boardOptionKey(kind,mode),value?'1':'0');}catch{}
+}
+function syncBoardOptions(){
+  showAnnots=readBoardOption('arrows',mode);showAims=readBoardOption('dots',mode);
+  renderAnnotBtn();renderAimBtn();
+}
+let showAims = readBoardOption('dots',mode);
 function toggleAims(){
-  showAims=!showAims; localStorage.setItem('otAims',showAims?'1':'0');
+  if(mode==='test')return;
+  showAims=!showAims; saveBoardOption('dots',showAims);
   renderAimBtn();
   if(!showAims) aimSet=null;
   else if(selSq) aimSet=new Set(legalTargetNames(selSq));
@@ -3658,7 +3689,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G47';
+const BUILD='G48';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4305,9 +4336,10 @@ function render(lastU){
 }
 
 /* ---- annotation overlay (arrows + key squares) ---- */
-let showAnnots = typeof localStorage!=='undefined' && localStorage.getItem('otArrows')==='1';
+let showAnnots = readBoardOption('arrows',mode);
 function toggleAnnots(){
-  showAnnots=!showAnnots; localStorage.setItem('otArrows',showAnnots?'1':'0');
+  if(mode==='test')return;
+  showAnnots=!showAnnots; saveBoardOption('arrows',showAnnots);
   renderAnnotBtn(); drawAnnots();
 }
 function renderAnnotBtn(){
@@ -4716,7 +4748,7 @@ function showAppView(view){
   for(const id of ['testFeedback','testBoardCue','testMoveProgress'])document.getElementById(id).hidden=!inBoard||mode!=='test';
   promoPending=null;
   const picker=document.getElementById('promoPicker'); if(picker) picker.style.display='none';
-  if(inBoard){ renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
+  if(inBoard){ syncBoardOptions(); renderSessionStrip(); renderRepertoireButton(); renderEvalBtn(); window.scrollTo(0,0); }
   else if(wasBoard) requestAnimationFrame(()=>{ if(document.getElementById('menu').style.display!=='none') window.scrollTo(0,menuScrollY); });
 }
 let menuView='explore';
@@ -5403,6 +5435,7 @@ function updateOpeningName(){
 let showEvalBar = false;   // always starts off — the toggle lasts for the session only
 let evalSeq=0;
 function renderEvalBtn(){
+  document.getElementById('drill')?.classList.toggle('eval-visible',mode==='play'&&showEvalBar);
   const b=document.getElementById('evalBtn'); if(!b) return;
   b.hidden=mode!=='play'; b.textContent=t(showEvalBar?'evalOn':'evalOff');
   b.setAttribute('aria-pressed',String(showEvalBar));
@@ -5429,8 +5462,8 @@ async function updateEvalBar(){
   const wrap=document.getElementById('evalBarWrap'); if(!wrap) return;
   const myseq=++evalSeq;   // EVERY position/screen change retires in-flight analyses, even on early-return paths
   if(mode!=='play'){ wrap.style.display='none'; return; }
-  // In play mode the bar always keeps its layout slot; only visibility toggles,
-  // so switching it on/off never shifts the board.
+  // Desktop keeps the evaluation slot stable. Phone CSS frees it when hidden
+  // and balances both sides when shown, keeping the board centred.
   wrap.style.display='block';
   wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
   if(!showEvalBar) return;
