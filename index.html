@@ -1142,7 +1142,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G48</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G49</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1791,6 +1791,8 @@ Object.assign(I18N_EN, {
   quickAddGroupLabel:'Add {n} matching lines from {opening} to My repertoire',
   quickAddAllSaved:'All added',
   quickAddSavedLabel:'All matching lines from {opening} are in My repertoire',
+  favNoticeAdded:'Added to favourites',
+  favNoticeRemoved:'Removed from favourites',
   repNoticeAdded:'Added to My repertoire',
   repNoticeRemoved:'Removed from My repertoire',
   repNoticeMany:'{n} lines added to My repertoire',
@@ -2116,6 +2118,8 @@ Object.assign(I18N.zh, {
   quickAddGroupLabel:'将「{opening}」中匹配的 {n} 条变例加入我的开局库',
   quickAddAllSaved:'已全部添加',
   quickAddSavedLabel:'「{opening}」中匹配的变例均已加入我的开局库',
+  favNoticeAdded:'已加入收藏',
+  favNoticeRemoved:'已取消收藏',
   repNoticeAdded:'已加入我的开局库',
   repNoticeRemoved:'已从我的开局库移除',
   repNoticeMany:'已将 {n} 条变例加入我的开局库',
@@ -2700,8 +2704,16 @@ function refreshMenuKeepScroll(){
   showMenu();
   if(typeof window!=='undefined') window.scrollTo(0,y);
 }
-function toggleFav(name){ favs.toggle(name); refreshMenuKeepScroll(); }
-function toggleLineFav(op,line){ lineFavs.toggle(op,line); refreshMenuKeepScroll(); }
+function toggleFav(name){
+  favs.toggle(name); refreshMenuKeepScroll();
+  const oi=DATA.openings.findIndex(op=>op.name===name);
+  if(oi>=0)showFavouriteNotice(favs.has(name),oi);
+}
+function toggleLineFav(op,line){
+  lineFavs.toggle(op,line); refreshMenuKeepScroll();
+  const oi=DATA.openings.indexOf(op),li=op.lines.indexOf(line);
+  if(oi>=0&&li>=0)showFavouriteNotice(lineFavs.has(op,line),oi,li);
+}
 
 /* Stable content IDs identify lessons; recall and schedules also identify the
    side being trained. Keep pre-G26 records intact as earlier, combined history. */
@@ -3689,7 +3701,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G48';
+const BUILD='G49';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4931,16 +4943,19 @@ const quickAdd={open:false,query:'',side:'all',expanded:new Map()};
 let repertoireNotice=null, repertoireNoticeTimer=0;
 function renderRepertoireNotice(){
   const el=document.getElementById('repertoireToast'); if(!el||!repertoireNotice) return;
-  const {added,oi,li,side,count}=repertoireNotice, op=DATA.openings[oi];
-  const title=t(count>1?'repNoticeMany':added?'repNoticeAdded':'repNoticeRemoved',{n:count});
-  const detail=li===null?opName(op):t('repNoticeDetail',{line:lnName(op.lines[li]),side:t(side==='w'?'white':'black')});
+  const {kind,added,oi,li,side,count}=repertoireNotice, op=DATA.openings[oi];
+  const favourite=kind==='favourite';
+  const title=t(favourite?(added?'favNoticeAdded':'favNoticeRemoved'):count>1?'repNoticeMany':added?'repNoticeAdded':'repNoticeRemoved',{n:count});
+  const detail=li===null?opName(op):favourite?lnName(op.lines[li])+' · '+opName(op):t('repNoticeDetail',{line:lnName(op.lines[li]),side:t(side==='w'?'white':'black')});
   el.hidden=false; el.innerHTML=`<b>${medalText(title)}</b><span>${medalText(detail)}</span>`;
 }
-function showRepertoireNotice(added,oi,li,side,count=1){
-  repertoireNotice={added,oi,li,side,count}; renderRepertoireNotice();
+function showSelectionNotice(notice){
+  repertoireNotice=notice; renderRepertoireNotice();
   clearTimeout(repertoireNoticeTimer);
   repertoireNoticeTimer=setTimeout(()=>{document.getElementById('repertoireToast').hidden=true;repertoireNotice=null;},4000);
 }
+function showRepertoireNotice(added,oi,li,side,count=1){showSelectionNotice({added,oi,li,side,count});}
+function showFavouriteNotice(added,oi,li=null){showSelectionNotice({kind:'favourite',added,oi,li});}
 function refreshRepertoireSelection(){
   const inBoard=document.getElementById('drill').style.display!=='none';
   if(inBoard){renderRepertoireButton();renderSessionStrip();if(mode==='drill'&&document.getElementById('doneBox').style.display==='block')renderDoneBox();return;}
