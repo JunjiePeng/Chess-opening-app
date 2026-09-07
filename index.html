@@ -6,6 +6,7 @@
 <title>Debut — Chess Opening Trainer</title>
 <!-- Install-to-home-screen / app metadata -->
 <link rel="manifest" href="manifest.webmanifest?v=G24">
+<meta name="debut-test-coach" content="">
 <meta name="theme-color" content="#241b12">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=G18">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=G23">
@@ -381,6 +382,9 @@ button.act.primary:hover { background:var(--accent-hover); }
 .ach-empty h3, .ach-mystery h4 { color:var(--text); margin:10px 0 6px; font-size:1rem; }
 .ach-empty p, .ach-mystery p { font-size:.875rem; line-height:1.6; }
 .ach-empty > .medal-symbol, .ach-mystery > .medal-symbol { margin:auto; color:var(--accent); width:32px; height:32px; }
+.ach-counting { margin-top:24px; }
+.ach-counting summary { width:fit-content; cursor:pointer; color:var(--dim); font-size:.875rem; padding:6px 0; }
+.ach-counting .ach-footnote { margin-top:8px; }
 .ach-footnote { margin-top:24px; font-size:.8125rem; line-height:1.5; color:var(--dim); }
 @media (max-width:700px){
   #medalsOverlay { padding:8px; padding-top:max(8px,env(safe-area-inset-top)); padding-bottom:max(8px,env(safe-area-inset-bottom)); }
@@ -570,6 +574,40 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .today-item b,.today-item span:not(.today-index) { display:block; }
 .today-item span:not(.today-index) { color:#c7b89f; font-size:.88rem; margin-top:3px; }
 .today-item.complete .today-index { color:#d5e5c5; background:#3d4d30; }
+/* Preview the daily selection before opening the board. */
+.daily-preview { margin:auto; width:min(640px,calc(100% - 24px)); max-width:calc(100% - 24px); max-height:calc(100dvh - 32px); color-scheme:dark; padding:0; color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:20px; box-shadow:0 20px 70px #0008; }
+.daily-preview[open] { display:flex; flex-direction:column; }
+.daily-preview::backdrop { background:rgba(10,6,2,.72); }
+.daily-preview-head { display:flex; flex-shrink:0; align-items:flex-start; gap:16px; padding:22px 24px 18px; border-bottom:1px solid var(--line); }
+.daily-preview-head>div { flex:1; min-width:0; }
+.daily-preview-head h2 { font-size:1.35rem; line-height:1.3; }
+.daily-preview-head p { margin-top:8px; color:#cfc0ac; font-size:.92rem; }
+.daily-preview-close { flex:0 0 auto; width:36px; height:36px; border:1px solid var(--line); border-radius:50%; background:var(--panel); color:var(--text); font:inherit; font-size:1.4rem; cursor:pointer; }
+.daily-preview-body { min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:20px 24px; }
+.daily-preview-body h3 { font-size:.95rem; margin-bottom:10px; }
+.daily-choices { display:grid; gap:8px; list-style:none; padding:0; }
+.daily-choice { display:flex; gap:12px; align-items:flex-start; padding:13px; border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+.daily-choice:has(input:checked) { border-color:var(--accent); background:#392b1f; }
+.daily-choice input { width:18px; height:18px; flex:0 0 auto; margin-top:4px; accent-color:var(--accent); cursor:pointer; }
+.daily-choice label { display:block; min-width:0; cursor:pointer; }
+.daily-choice b,.daily-choice label>span { display:block; overflow-wrap:anywhere; }
+.daily-choice b { font-size:.94rem; }
+.daily-choice label>span { margin-top:3px; font-size:.9rem; color:#d8c7b0; }
+.daily-choice .daily-choice-meta { color:#c1d0b4; font-size:.83rem; }
+.daily-other { margin-top:20px; }
+.daily-other:first-child { margin-top:0; }
+.daily-other>summary { width:fit-content; cursor:pointer; color:#e8b786; padding:6px 0; }
+.daily-preview-search { display:block; width:100%; min-height:42px; margin:12px 0; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel); color:var(--text); font:inherit; }
+.daily-preview-foot { flex-shrink:0; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; padding:16px 24px max(16px,env(safe-area-inset-bottom,0px)); border-top:1px solid var(--line); background:var(--panel); }
+.daily-preview-count { color:#d8c7b0; font-size:.9rem; }
+.daily-preview-error { flex-basis:100%; color:#efc09d; font-size:.9rem; }
+.daily-preview .act:disabled { opacity:.45; cursor:not-allowed; }
+@media(max-width:480px){
+  .daily-preview-head,.daily-preview-body { padding:16px; }
+  .daily-preview-foot { padding:14px 16px max(14px,env(safe-area-inset-bottom,0px)); }
+  .daily-preview-head h2 { font-size:1.2rem; }
+  .daily-preview-foot>.act { width:100%; }
+}
 .home-footer { display:flex; flex-wrap:wrap; align-items:center; gap:12px; border-top:1px solid var(--line); padding-top:20px; margin-top:24px; }
 .home-footer p { color:#c7b89f; margin-right:auto; }
 #todayBar:not([hidden]) + #repertoirePanel { margin-top:32px; padding-top:32px; border-top:1px solid var(--line); }
@@ -660,8 +698,9 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .earlier-progress li { display:flex; justify-content:space-between; gap:16px; padding:12px 0; border-top:1px solid var(--line); align-items:center; }
 .earlier-progress li b,.earlier-progress li div>span { display:block; }
 .earlier-progress li div>span { font-size:.86rem; color:#c7b79f; }
-.ach-overview-simple { display:flex; gap:18px; align-items:center; padding:20px; }
-.ach-overview-simple>.medal-symbol { width:42px; height:42px; color:#e4ab6b; flex:0 0 auto; }
+.ach-overview-simple { display:flex; gap:12px; align-items:center; padding:12px 0; }
+.ach-overview-simple h3 { font-size:1.05rem; }
+.ach-overview-simple>.medal-symbol { width:32px; height:32px; color:#e4ab6b; flex:0 0 auto; }
 .ach-overview-simple p,.ach-history-note { color:#cdbda7; margin-top:6px; line-height:1.6; }
 .ach-history-note { margin-bottom:20px; }
 .session-strip { background:#343e2b; color:#d1dfc1; padding:10px 12px; border:1px solid #4c5e3c; border-radius:12px; font-size:.85rem; display:flex; gap:5px 10px; flex-wrap:wrap; align-items:center; order:-1; }
@@ -867,9 +906,76 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   .library-filters select { font-size:.82rem; padding:9px; }
 }
 
+/* G45: actionable test coaching, with optional detail. */
+.coach-report-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:22px; }
+.coach-report-heading>div { min-width:0; }
+.coach-report-heading h2 { font-size:1.4rem; overflow-wrap:anywhere; margin:6px 0; }
+.coach-report-heading p { color:var(--dim); font-size:.86rem; }
+.coach-report-heading button { flex-shrink:0; }
+.coach-hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(230px,.6fr); gap:30px; border-radius:18px; padding:28px; background:linear-gradient(125deg,#403526,#302b20); border:1px solid #74654c; }
+.coach-hero.is-perfect { background:linear-gradient(125deg,#3d472f,#303225); border-color:#74855b; }
+.coach-emblem { display:flex; width:40px; height:40px; align-items:center; justify-content:center; background:#4b583a; color:#deedc9; border-radius:50%; margin-bottom:14px; }
+.coach-emblem svg { width:24px; height:24px; }
+.coach-message h3 { font-family:Caprasimo,serif; font-weight:400; font-size:clamp(1.4rem,2.5vw,2rem); line-height:1.3; }
+.coach-message p { color:#e1d2bc; font-size:1rem; line-height:1.7; margin-top:10px; max-width:65ch; }
+.coach-message .coach-trend { color:#d0e1b8; font-size:.9rem; }
+.coach-score { align-self:center; border-left:1px solid #766750; padding-left:30px; }
+.coach-score strong { display:block; color:#f6d3a2; font-size:3.4rem; line-height:1.1; letter-spacing:-.04em; }
+.coach-score>span { display:block; font-weight:700; margin:8px 0; }
+.coach-score p { color:var(--dim); font-size:.88rem; line-height:1.6; margin-top:6px; }
+.coach-breakdown { margin:20px 0 24px; }
+.coach-meter { display:flex; height:9px; overflow:hidden; background:#514536; border-radius:6px; }
+.coach-meter .first,.coach-breakdown i.first { background:#b9d095; }
+.coach-meter .recovered,.coach-breakdown i.recovered { background:#e8bd7e; }
+.coach-meter .assisted,.coach-breakdown i.assisted { background:#c1b5df; }
+.coach-meter .unresolved,.coach-breakdown i.unresolved { background:#e7a08a; }
+.coach-meter .unseen,.coach-breakdown i.unseen { background:#82796c; }
+.coach-breakdown ul { display:flex; flex-wrap:wrap; gap:8px 20px; list-style:none; margin-top:10px; padding:0; font-size:.84rem; color:var(--dim); }
+.coach-breakdown li { display:flex; align-items:center; gap:7px; }
+.coach-breakdown i { display:inline-block; width:8px; height:8px; border-radius:2px; }
+.coach-insights { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin:22px 0; }
+.coach-insights article { padding-left:14px; border-left:3px solid #a5ba83; }
+.coach-insights article+article { border-color:#e3a05f; }
+.coach-insights h3 { font-size:.95rem; margin-bottom:7px; color:#f0dfc5; }
+.coach-insights p { font-size:.96rem; line-height:1.7; color:var(--dim); overflow-wrap:anywhere; }
+.coach-focus { background:#2b241b; border:1px solid #796043; border-radius:14px; padding:22px; margin:24px 0; }
+.coach-focus-top { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.coach-focus-top>div { min-width:0; }
+.coach-focus h3 { font-size:1.12rem; margin:6px 0; overflow-wrap:anywhere; }
+.coach-focus p { line-height:1.75; color:var(--dim); }
+.coach-key-move { font-size:1.6rem; color:#ffdda9; background:#493827; padding:12px 18px; border-radius:12px; white-space:nowrap; }
+.coach-focus .coach-evidence { color:#e3ba8f; font-size:.9rem; margin:14px 0; }
+.coach-idea { border-top:1px solid var(--line); padding-top:14px; }
+.coach-idea h4 { font-size:.84rem; color:#e3ba8f; }
+.coach-idea p { max-width:85ch; }
+.coach-focus .home-actions { margin-top:18px; }
+.coach-actions { margin:22px 0; }
+.coach-line-review,.coach-score-help,.coach-ai { border-top:1px solid var(--line); padding:16px 0; }
+.coach-line-review>summary,.coach-score-help>summary,.coach-ai>summary { width:fit-content; max-width:100%; cursor:pointer; color:#edc99d; line-height:1.6; }
+.coach-line-review .test-result-lines { margin-top:14px; }
+.coach-line-review .test-result-line:first-child { border-top:0; }
+.coach-score-help p,.coach-ai p { margin:12px 0; line-height:1.7; max-width:85ch; color:var(--dim); }
+.coach-score-help { font-size:.88rem; padding-bottom:0; }
+.coach-ai .coach-ai-note { font-size:.8rem; color:#c6cba9; }
+.coach-ai .coach-ai-intro { color:var(--text); font-size:1.08rem; }
+.coach-ai h4 { margin-top:20px; }
+@media(max-width:760px){
+ .coach-hero { grid-template-columns:1fr; padding:20px; gap:20px; }
+ .coach-score { border-left:0; border-top:1px solid #766750; padding:18px 0 0; }
+ .coach-score strong { font-size:2.6rem; }
+ .coach-insights { grid-template-columns:1fr; gap:18px; }
+ .coach-focus { padding:16px; }
+ .coach-focus-top { align-items:flex-start; flex-direction:column; gap:12px; }
+ .coach-key-move { font-size:1.3rem; padding:8px 12px; }
+ .coach-report-heading { flex-wrap:wrap; }
+ .coach-report-heading h2 { font-size:1.2rem; }
+ .coach-actions .act { width:100%; }
+}
+
 </style>
 </head>
 <body>
+<dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
 <div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
 <div id="appShell" class="page-shell">
 <header>
@@ -909,7 +1015,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G42</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G45</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1220,7 +1326,7 @@ Object.assign(I18N_EN, {
   achKeepExploring:'Keep exploring',
   achKeepExploringBody:'There is always another opening to enjoy. Explore your collection at your own pace.',
   achEmptyTitle:'Your collection starts here',
-  achEmptyBody:'Finish your first learning line to earn First Steps. Your earned achievements will appear here.',
+  achEmptyBody:'Finish a lesson, drill or test line to earn First Steps.',
   achNextGoals:'Next goals',
   achAll:'All',
   achFilters:'Filter achievements',
@@ -1355,7 +1461,7 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   achKeepExploring:'继续探索',
   achKeepExploringBody:'每个开局都有值得发现的乐趣。按自己的节奏继续探索吧。',
   achEmptyTitle:'从这里开始收藏',
-  achEmptyBody:'完成第一条学习变例，即可获得“第一步”。已获得的成就都会显示在这里。',
+  achEmptyBody:'完成一条学习、操练或测试变例，即可获得“第一步”。',
   achNextGoals:'下一目标',
   achAll:'全部',
   achFilters:'筛选成就',
@@ -1576,12 +1682,24 @@ Object.assign(I18N_EN, {
   allCaughtUp:'You’re up to date.',
   nextReviewDate:'Your next review is on {date}. You can still practise any selected line.',
   freePracticeBody:'Choose a line whenever you’d like to practise.',
-  startSession:'Start today’s session',
+  dailyPreviewTitle:'Choose today’s practice',
+  dailyPreviewHint:'Keep the suggested lines or choose others from your repertoire.',
+  dailySuggested:'Suggested for today',
+  dailyRemaining:'Continue with',
+  dailyOtherLines:'Other lines in my repertoire',
+  dailyAlreadyDone:'Already completed: {n}. Your progress is saved.',
+  dailySelectionCount:'{n} / {max} lines selected',
+  dailyStart:'Start practice',
+  dailyContinue:'Continue practice',
+  dailyNoMatches:'No saved lines match your search.',
+  dailyChoicesChanged:'Your session or repertoire changed. Check the updated choices before starting.',
+  dailySaveFailed:'Couldn’t save your session. Please try again.',
+  startSession:'Choose today’s practice',
   resumeSession:'Continue session',
   sessionFinished:'Practice complete. Nicely done.',
   sessionFinishedBody:'You’ve finished this session. Your next reviews will appear here when they’re due.',
   sessionProgress:'{n} of {total} steps complete',
-  dailyLimit:'Up to 5 due reviews and one new learning step. Pause whenever you need.',
+  dailyLimit:'Suggested: up to 5 due reviews and 1 new learning step.',
   backlogNote:'{n} more review(s) can wait for another session. No need to do everything today.',
   selectedLines:'Selected lines',
   practiceDaysLabel:'Practice days',
@@ -1664,19 +1782,24 @@ Object.assign(I18N_EN, {
   achConsistency:'Practice that lasts',
   achReps:'Drill milestones',
   achReviews:'Scheduled reviews',
-  achSessions:'Daily sessions',
+  achSessions:'Daily practice',
   achReviewCount:'Scheduled reviews completed',
   achSessionCount:'Days with a completed session',
   achSuccessfulReviews:'Successful scheduled reviews of one line',
   achPracticeColors:'Colours practised',
+  achRecallLines:'Lines from memory',
+  achRecallCount:'Distinct lines · White / Black counted separately',
+  achTestDays:'Test practice',
+  achTestDayCount:'Days with a completed test',
+  achCounting:'How milestones count',
   achEarnedCount:'{n} milestones earned',
-  achFocusNote:'Build your own repertoire. Practice days add up, and breaks are welcome.',
+  achFocusNote:'Learn your lines, practise them, and check what you remember.',
   achHistory:'Earlier achievements',
   achHistoryNote:'These achievements are retired from new goals. Everything you earned stays here, with its original date.',
   achNoHistory:'No earlier achievements to show.',
   achAll:'Milestones',
   achKeepExploringBody:'Your progress stays with you. Follow your repertoire at your own pace.',
-  achFootnote:'Drill totals count the first completed attempt per line, colour and day. Scheduled reviews count when due, even with mistakes. A daily session counts once per day.',
+  achFootnote:'Recall milestones count each line and colour once across drills and tests. Test-day goals require finishing every selected line; hints and retries are welcome, skipped lines do not count. Completing a test line also counts as a practice day. Daily sessions and tests count at most once per day for their day-based goals. Scheduled reviews count when due, even with mistakes. Breaks never erase earned milestones.',
   tipEngMove:'Let the engine play this move for you',
   rankCount:'Lines at this rank: {n}',
   rankRule1:'Finish a lesson or drill.',
@@ -1884,12 +2007,24 @@ Object.assign(I18N.zh, {
   allCaughtUp:'复习已跟上。',
   nextReviewDate:'下次复习在 {date}。你也可以随时练习已选变例。',
   freePracticeBody:'想练习时，随时选择一条变例。',
-  startSession:'开始今日练习',
+  dailyPreviewTitle:'选择今日练习',
+  dailyPreviewHint:'保留推荐变例，或从你的开局库中另选。',
+  dailySuggested:'今日推荐',
+  dailyRemaining:'接着练习',
+  dailyOtherLines:'开局库中的其他变例',
+  dailyAlreadyDone:'已完成 {n} 项，进度已保留。',
+  dailySelectionCount:'已选 {n}/{max} 条变例',
+  dailyStart:'开始练习',
+  dailyContinue:'继续练习',
+  dailyNoMatches:'没有找到符合条件的已存变例。',
+  dailyChoicesChanged:'练习或开局库已更改，请确认更新后的选择再开始。',
+  dailySaveFailed:'未能保存本次练习，请重试。',
+  startSession:'选择今日练习',
   resumeSession:'继续练习',
   sessionFinished:'今日练习完成。',
   sessionFinishedBody:'本次练习已完成。下次复习到期时，会在这里提醒你。',
   sessionProgress:'已完成 {n}/{total} 项',
-  dailyLimit:'最多 5 条到期复习，加一项新学习。随时可以暂停。',
+  dailyLimit:'建议内容：最多 5 条到期复习，加 1 项新学习。',
   backlogNote:'另有 {n} 条复习可以留到下次。今天不必全部完成。',
   selectedLines:'已选变例',
   practiceDaysLabel:'累计练习日',
@@ -1976,15 +2111,20 @@ Object.assign(I18N.zh, {
   achReviewCount:'已完成到期复习',
   achSessionCount:'完成今日练习的天数',
   achSuccessfulReviews:'同一变例的全对到期复习',
-  achPracticeColors:'已操练的执方',
+  achPracticeColors:'已练习的执方',
+  achRecallLines:'凭记忆走出变例',
+  achRecallCount:'不同变例 · 白方与黑方分别计数',
+  achTestDays:'开局自测',
+  achTestDayCount:'完成测试的天数',
+  achCounting:'里程碑如何计数',
   achEarnedCount:'已获得 {n} 个里程碑',
-  achFocusNote:'建立自己的开局库。练习日不断积累，休息也没关系。',
+  achFocusNote:'学会变例，坚持练习，再检验记住了多少。',
   achHistory:'早期成就',
   achHistoryNote:'这些成就已退出新目标。你已获得的成就及原始日期会一直保留在这里。',
   achNoHistory:'暂无早期成就。',
   achAll:'里程碑',
   achKeepExploringBody:'进步会一直保留。按自己的节奏练习开局库中的变例。',
-  achFootnote:'操练总数按每天每条变例、每个执方的首次完成计数。到期复习即使有失误也计入练习。今日练习每天最多计一次。',
+  achFootnote:'回忆里程碑按变例与执方去重，操练和测试不重复计数。测试天数要求走完所有已选变例，可以使用提示或重试，跳过的变例不算完成。完成一条测试变例也算一个练习日。今日练习和测试的天数目标每天各计一次。到期复习即使有失误也计入练习。休息不会抹去已获得的里程碑。',
   tipEngMove:'让引擎替你走这一步',
   rankCount:'该等级变例数：{n}',
   rankRule1:'完成课文或走完一次操练。',
@@ -2040,6 +2180,128 @@ function validSrsRecord(v){ return isRecord(v) && Number.isFinite(v.s) && v.s>0 
 
 let LANG = (typeof localStorage!=='undefined' && localStorage.getItem('otLang')) || 'en';
 if(LANG!=='zh' && LANG!=='en') LANG='en';
+
+/* G45 test coaching */
+Object.assign(I18N_EN, {
+  coachPerfect: 'A confident Debut.',
+  coachPerfectBody: 'Every selected line came back without help. Enjoy that result — then try the same pool again on another day.',
+  coachStrong: 'Your preparation is taking shape.',
+  coachStrongBody: 'You recalled most tested moves first try. A little focused practice on the marked positions can make the next run smoother.',
+  coachBuilding: 'You’re building something solid.',
+  coachBuildingBody: 'Keep the moves you know, and work on the ones that interrupted your flow. You now have a clear place to start.',
+  coachStarting: 'A useful first step.',
+  coachStartingBody: 'This test has shown you where to begin. Learn one tricky line, then try recalling it again.',
+  coachPartial: 'A useful checkpoint.',
+  coachPartialBody: 'Your attempted moves are saved. Finish the remaining lines when you’re ready for a fuller picture.',
+  coachUntested: 'Ready when you are.',
+  coachUntestedBody: 'No moves were tested yet. Choose a line you’ve learned and give it a try.',
+  coachFirstTry: 'First-try recall',
+  coachTestedMoves: '{correct} of {total} tested moves',
+  coachCompleted: '{n}/{total} lines finished',
+  coachClean: '{n} fully recalled',
+  coachBreakdown: 'Your moves at a glance',
+  coachLegendClean: '{n} first try',
+  coachLegendRecovered: '{n} recovered',
+  coachLegendAssisted: '{n} with help',
+  coachLegendUnresolved: '{n} unresolved',
+  coachLegendUnseen: '{n} not tested',
+  coachStrength: 'What went well',
+  coachStrengthClean: 'Fully recalled: {lines}.',
+  coachStrengthRecovered: 'Recovered from memory: {n}. You found your way through after retrying — build on that.',
+  coachStrengthMoves: 'Moves recalled first try: {n}. Build from those familiar positions.',
+  coachStrengthStart: 'You’ve identified the next moves to learn. Start with one line and keep the next test small.',
+  coachFocus: 'Your next step',
+  coachFocusMoves: 'Review the idea behind {move}, then drill this line without help.',
+  coachFocusUnfinished: 'Finish the remaining lines ({n}). Untested moves tell us nothing about your recall yet.',
+  coachFocusClean: 'Test the same pool on another day to check what stays with you. You can also try the opposite colour.',
+  coachFocusChanged: 'Some lesson content has changed. Learn the current version before testing those lines again.',
+  coachPriority: 'Start here',
+  coachRepeatMove: 'Needed a retry or hint in {n} of your last comparable attempts.',
+  coachRecoverMove: 'You found this move after a retry.',
+  coachHelpMove: 'You used Show move here.',
+  coachOpenMove: 'This position was left unfinished.',
+  coachWhy: 'The idea to remember',
+  coachLearnMove: 'Review this position',
+  coachDrillLine: 'Drill this line',
+  coachRetestFocus: 'Test focus lines',
+  coachFocusPool: 'Selects up to 3 lines that needed retries or hints.',
+  coachFinishPool: 'Test unfinished lines',
+  coachAllLines: 'Line-by-line review ({n})',
+  coachScoreHelp: 'How this score works',
+  coachTrendUp: '{n} percentage points higher than your previous completed test of this exact pool.',
+  coachTrendDown: '{n} percentage points lower than your previous completed test of this exact pool. Revisit the marked moves before trying again.',
+  coachTrendSame: 'The same first-try recall as your previous completed test of this exact pool.',
+  coachAI: 'AI coach',
+  coachAIConsent: 'Get a personalised practice plan. Sends this result’s move summary and selected lesson explanations to OpenAI; your test name and full history stay on this device.',
+  coachAIGet: 'Get AI insights',
+  coachAILoading: 'Looking at your test…',
+  coachAIError: 'AI coaching is unavailable right now. Your results and move review are ready below.',
+  coachAILimit: 'AI coaching is busy. Try again later; you can use your move review now.',
+  coachAINote: 'AI suggestions · based on this test',
+  coachAIPlan: 'Try this next',
+  coachAIRefresh: 'Try again',
+  coachChanged: 'This lesson has changed since this test. The recorded moves below belong to the earlier version.'
+});
+Object.assign(I18N.zh, {
+  coachPerfect: '自信开局，从容前行。',
+  coachPerfectBody: '所有所选路线都独立回忆出来了。为这次表现感到高兴吧，改天再测一次，看看哪些走法记得更牢。',
+  coachStrong: '你的开局准备，正在成形。',
+  coachStrongBody: '大部分受测走法都一次想起了。针对标记的位置练一练，下次会更顺畅。',
+  coachBuilding: '一步一步，打好基础。',
+  coachBuildingBody: '保留已经熟悉的走法，集中练习让你卡住的位置。这次测试已经帮你找到下一步的方向。',
+  coachStarting: '这是一个有用的起点。',
+  coachStartingBody: '这次测试找到了值得练习的地方。先学懂一条有难度的路线，再试着独立回忆。',
+  coachPartial: '先记录这一步。',
+  coachPartialBody: '已尝试的走法都已保存。准备好后完成剩余路线，就能更全面地了解自己的回忆情况。',
+  coachUntested: '准备好，就开始。',
+  coachUntestedBody: '还没有测试任何走法。选一条学过的路线，试着从记忆中走出来。',
+  coachFirstTry: '首次回忆正确率',
+  coachTestedMoves: '已测试 {total} 步，一次走对 {correct} 步',
+  coachCompleted: '已完成 {n}/{total} 条路线',
+  coachClean: '{n} 条完全独立回忆',
+  coachBreakdown: '走法表现一览',
+  coachLegendClean: '{n} 步一次走对',
+  coachLegendRecovered: '{n} 步重试后想起',
+  coachLegendAssisted: '{n} 步借助提示',
+  coachLegendUnresolved: '{n} 步尚未解决',
+  coachLegendUnseen: '{n} 步未测试',
+  coachStrength: '做得好的地方',
+  coachStrengthClean: '完全独立回忆：{lines}。',
+  coachStrengthRecovered: '你在重试后自己想起了 {n} 步。这些努力值得肯定，也可以成为下一次的基础。',
+  coachStrengthMoves: '你一次想起了 {n} 步。接下来，就从这些熟悉的位置继续巩固。',
+  coachStrengthStart: '你已经找到了接下来要学的走法。先专注一条路线，下次也可以少量测试。',
+  coachFocus: '下一步练什么',
+  coachFocusMoves: '理解 {move} 背后的思路，再不借助提示练习这条路线。',
+  coachFocusUnfinished: '完成剩余 {n} 条路线。未测试的走法，还不能说明你的回忆情况。',
+  coachFocusClean: '改天用同一组路线再测一次，看看能否保持。也可以尝试另一种执子颜色。',
+  coachFocusChanged: '部分课程内容已有更新。先学当前版本，再测试这些路线。',
+  coachPriority: '从这里开始',
+  coachRepeatMove: '在最近可比较的测试中，有 {n} 次在此处需要重试或提示。',
+  coachRecoverMove: '你在重试后自己想起了这一步。',
+  coachHelpMove: '你在这里使用了显示走法。',
+  coachOpenMove: '这个位置还没有完成。',
+  coachWhy: '记住这一步的思路',
+  coachLearnMove: '复习这个位置',
+  coachDrillLine: '练习这条路线',
+  coachRetestFocus: '测试重点路线',
+  coachFocusPool: '选出最多 3 条需要重试或提示的路线。',
+  coachFinishPool: '测试未完成路线',
+  coachAllLines: '逐条查看结果（{n}）',
+  coachScoreHelp: '分数如何计算',
+  coachTrendUp: '比上一次完成相同路线组测试时提高了 {n} 个百分点。',
+  coachTrendDown: '比上一次完成相同路线组测试时降低了 {n} 个百分点。先复习标记的走法，再试一次。',
+  coachTrendSame: '首次回忆正确率与上一次完成相同路线组测试时相同。',
+  coachAI: 'AI 教练',
+  coachAIConsent: '获取个性化练习建议。会将本次结果的走法摘要和部分课程解释发送给 OpenAI；测试名称和完整历史记录保留在本设备。',
+  coachAIGet: '获取 AI 建议',
+  coachAILoading: '正在分析本次测试…',
+  coachAIError: 'AI 教练暂时无法使用。你仍可查看测试结果和下方的走法复习。',
+  coachAILimit: 'AI 教练目前较忙，请稍后再试。你可以先复习标记的走法。',
+  coachAINote: 'AI 建议 · 基于本次测试',
+  coachAIPlan: '接下来这样练',
+  coachAIRefresh: '重试',
+  coachChanged: '这节课的内容在测试后有更新。下方记录的走法属于之前的版本。'
+});
 function t(key, vars){
   let s = (I18N[LANG] && I18N[LANG][key]!=null) ? I18N[LANG][key] : (I18N_EN[key]!=null?I18N_EN[key]:key);
   if(vars) for(const k in vars) s = s.split('{'+k+'}').join(vars[k]);
@@ -2438,8 +2700,8 @@ function readyRailHTML(items){
    celebrate effort, patience, breadth, or wit — retention claims remain the
    rank ladder's job. Unlocks ratchet forever; toasts never interrupt a board. */
 const HISTORIC_MEDALS=[
- {id:'first_steps', t:'b', en:'First Steps', zh:'第一步', ce:'Finish your first line', cz:'走完第一条线', test:S=>S.lines.some(x=>x.r>=1)},
- {id:'clean_sheet', t:'b', en:'Clean Sheet', zh:'零失误', ce:'A perfect drill with no hints', cz:'不用提示，全对操练一次', test:S=>S.ev==='drill'&&S.d.clean},
+ {id:'first_steps', t:'b', en:'First Steps', zh:'第一步', ce:'Finish your first lesson, drill or test line', cz:'完成第一条学习、操练或测试变例', test:S=>S.lines.some(x=>x.r>=1)||S.testCompleted.length>0},
+ {id:'clean_sheet', t:'b', series:'recall', goal:1, en:'From Memory', zh:'凭记忆走出', ce:'Recall 1 line in a drill or test with no mistakes or hints', cz:'在操练或测试中，不出错、不用提示地完成 1 条变例', test:S=>S.recalled.length>=1},
  {id:'first_rook', t:'s', en:'First Rook', zh:'首个车', ce:'Promote any line to ♜', cz:'任一条线升为 ♜', test:S=>S.lines.some(x=>x.r>=4)},
  {id:'first_queen', t:'g', series:'queens', goal:1, en:'First Queen', zh:'首个后', ce:'Crown any line ♛', cz:'任一条线加冕为 ♛', test:S=>S.lines.some(x=>x.r>=5)},
  {id:'queens3', t:'g', series:'queens', goal:3, en:'Royal Court', zh:'三后临朝', ce:'Crown three lines ♛', cz:'三条线加冕为 ♛', test:S=>S.lines.filter(x=>x.r>=5).length>=3},
@@ -2485,16 +2747,24 @@ const HISTORIC_MEDALS=[
  {id:'bilingual', t:'b', sec:1, en:'Bilingual Student', zh:'双语棋手', ce:'Finish a Learn or Drill line in each language', cz:'用中英文各完成一条学习或操练', test:S=>S.ctr.langs.length>=2},
  {id:'safekeeper', t:'b', en:'Safekeeper', zh:'有备无患', ce:'Export a progress backup', cz:'导出一次进度备份', test:S=>S.ev==='export'},
 ];
-const ACTIVE_LEGACY_IDS=['first_steps','clean_sheet','days30','days100','reps10','reps100','reps500'];
+const ACTIVE_LEGACY_IDS=['first_steps','clean_sheet','days30','days100'];
 const MEDALS=HISTORIC_MEDALS.filter(m=>ACTIVE_LEGACY_IDS.includes(m.id)).concat([
- {id:'practice_days3', t:'b', series:'days', goal:3, en:'Finding Your Rhythm', zh:'找到节奏', ce:'Train on 3 days, with breaks welcome', cz:'累计训练 3 天，随时可以休息', test:S=>S.totalDays>=3},
- {id:'practice_days10', t:'b', series:'days', goal:10, en:'Making Time', zh:'积少成多', ce:'Train on 10 days, at your own pace', cz:'按自己的节奏，累计训练 10 天', test:S=>S.totalDays>=10},
+ {id:'recall5', t:'b', series:'recall', goal:5, en:'A Solid Start', zh:'稳健起步', ce:'Recall 5 different lines in drills or tests with no mistakes or hints', cz:'在操练或测试中，不出错、不用提示地完成 5 条不同变例', test:S=>S.recalled.length>=5},
+ {id:'recall15', t:'s', series:'recall', goal:15, en:'Growing Confidence', zh:'渐有把握', ce:'Recall 15 different lines in drills or tests with no mistakes or hints', cz:'在操练或测试中，不出错、不用提示地完成 15 条不同变例', test:S=>S.recalled.length>=15},
+ {id:'recall30', t:'g', series:'recall', goal:30, en:'Opening Confidence', zh:'开局有底', ce:'Recall 30 different lines in drills or tests with no mistakes or hints', cz:'在操练或测试中，不出错、不用提示地完成 30 条不同变例', test:S=>S.recalled.length>=30},
+ {id:'practice_days3', t:'b', series:'days', goal:3, en:'Finding Your Rhythm', zh:'找到节奏', ce:'Practise on 3 days, with breaks welcome', cz:'累计练习 3 天，随时可以休息', test:S=>S.totalDays>=3},
+ {id:'practice_days10', t:'b', series:'days', goal:10, en:'Making Time', zh:'积少成多', ce:'Practise on 10 days, at your own pace', cz:'按自己的节奏，累计练习 10 天', test:S=>S.totalDays>=10},
  {id:'reviews5', t:'b', series:'reviews', goal:5, en:'Review Routine', zh:'复习有方', ce:'Complete 5 scheduled reviews; mistakes count as practice', cz:'完成 5 次到期复习，有失误也算练习', test:S=>S.ctr.reviews>=5},
  {id:'reviews25', t:'s', series:'reviews', goal:25, en:'Steady Practice', zh:'稳步练习', ce:'Complete 25 scheduled reviews', cz:'完成 25 次到期复习', test:S=>S.ctr.reviews>=25},
  {id:'reviews100', t:'g', series:'reviews', goal:100, en:'A Review Habit', zh:'温故知新', ce:'Complete 100 scheduled reviews', cz:'完成 100 次到期复习', test:S=>S.ctr.reviews>=100},
- {id:'session_first', t:'b', series:'sessions', goal:1, en:'A Good Session', zh:'今日有收获', ce:'Finish a Today session from your repertoire', cz:'完成一次来自个人开局库的今日练习', test:S=>S.ctr.sessions>=1},
- {id:'sessions10', t:'s', series:'sessions', goal:10, en:'Time Well Spent', zh:'日积月累', ce:'Finish a Today session on 10 different days', cz:'在 10 个不同的日子完成今日练习', test:S=>S.ctr.sessions>=10},
- {id:'practice_both', t:'b', en:'Ready for Either Colour', zh:'黑白皆可', ce:'Complete a drill as White and a drill as Black', cz:'执白与执黑各完成一次操练', test:S=>S.ctr.sides.length===2},
+ {id:'session_first', t:'b', series:'sessions', goal:1, en:'A Good Session', zh:'今日有收获', ce:'Finish a daily-practice session with your chosen lines', cz:'完成一次由你选择变例的今日练习', test:S=>S.ctr.sessions>=1},
+ {id:'sessions3', t:'b', series:'sessions', goal:3, en:'Building a Routine', zh:'渐入佳境', ce:'Finish daily practice on 3 different days', cz:'在 3 个不同的日子完成今日练习', test:S=>S.ctr.sessions>=3},
+ {id:'sessions10', t:'s', series:'sessions', goal:10, en:'Time Well Spent', zh:'日积月累', ce:'Finish daily practice on 10 different days', cz:'在 10 个不同的日子完成今日练习', test:S=>S.ctr.sessions>=10},
+ {id:'sessions30', t:'g', series:'sessions', goal:30, en:'A Lasting Routine', zh:'练习成习惯', ce:'Finish daily practice on 30 different days', cz:'在 30 个不同的日子完成今日练习', test:S=>S.ctr.sessions>=30},
+ {id:'test_first', t:'b', series:'tests', goal:1, en:'First Test', zh:'初次自测', ce:'Finish every selected line in a test. Hints and retries are welcome.', cz:'完成一次测试中的所有已选变例，可以使用提示或重试。', test:S=>S.testDays.length>=1},
+ {id:'test_days5', t:'s', series:'tests', goal:5, en:'Check Your Progress', zh:'检验所学', ce:'Finish a test on 5 different days. Complete every selected line.', cz:'在 5 个不同的日子完成测试，每次走完所有已选变例。', test:S=>S.testDays.length>=5},
+ {id:'test_days20', t:'g', series:'tests', goal:20, en:'Confidence Checks', zh:'常测常新', ce:'Finish a test on 20 different days. Complete every selected line.', cz:'在 20 个不同的日子完成测试，每次走完所有已选变例。', test:S=>S.testDays.length>=20},
+ {id:'practice_both', t:'b', en:'Ready for Either Colour', zh:'黑白皆可', ce:'Finish a drill or test line as White and as Black', cz:'执白与执黑各完成一条操练或测试变例', test:S=>S.practiceSides.length===2},
  {id:'reviewed_line', t:'s', en:'Backed by Practice', zh:'熟能生巧', ce:'Recall one line without help on 3 scheduled reviews', cz:'同一条变例在 3 次到期复习中无需帮助、全对完成', test:S=>S.lines.some(x=>x.reviewSuccess>=3)},
 ]);
 const ALL_MEDALS=[...HISTORIC_MEDALS,...MEDALS.filter(m=>!HISTORIC_MEDALS.some(old=>old.id===m.id))];
@@ -2516,6 +2786,8 @@ const ach={
   count(){ const unlocked=this.load().unlocked; return MEDALS.filter(m=>unlocked[m.id]).length; }
 };
 const MEDAL_METRICS={
+  recall:snapshot=>(snapshot||medalSnapshot()).recalled.length,
+  tests:snapshot=>(snapshot||medalSnapshot()).testDays.length,
   reviews:()=>ach.load().ctr.reviews,
   sessions:()=>ach.load().ctr.sessions,
   streak: ()=>activity.streak(),
@@ -2540,7 +2812,7 @@ function achCheck(ev,d={}){
     c.moves+=countValue(d.playerMoves);
   }
   if(ev==='session'&&d.completed&&c.lastSessionDay!==today){ c.sessions++; c.lastSessionDay=today; }
-  const snapshot=medalSnapshot();
+  const snapshot=medalSnapshot(A);
   const S={ev,d,ctr:c,...snapshot,totalDays:Object.keys(activity.load()).length};
   MEDALS.forEach(m=>{
     if(!A.unlocked[m.id]&&m.test(S)){ A.unlocked[m.id]=today; A.pending.push(m.id); }
@@ -2565,6 +2837,7 @@ function medalToast(m){
 }
 /* Icons share a 24px drawing grid; numbered tiers make each milestone identifiable. */
 const MEDAL_ICONS={
+  test:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9zM8 11l2 2 5-4M9 17h6"/>',
   sprout:'<path d="M12 21v-9M12 15C5 15 3 11 3 6c6 0 9 3 9 9ZM12 11c0-5 3-8 9-8 0 5-3 8-9 8Z"/>',
   check:'<circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/>',
   rook:'<path d="M5 21h14M6 17h12l-1-9 2-2V3h-4v3h-2V3h-2v3H9V3H5v3l2 2-1 9ZM8 17v4m8-4v4"/>',
@@ -2600,10 +2873,10 @@ const MEDAL_ICONS={
   mystery:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/><path d="M10.5 10a1.5 1.5 0 1 1 2 1.4l-.5.6m0 2h.01"/>'
 };
 const MEDAL_GROUPS=[
-  ['learning','achLearning'],['practice','achPractice'],['consistency','achConsistency'],
-  ['exploration','achExploration'],['play','achPlay'],['discoveries','achDiscoveries']
+  ['learning','achLearning'],['practice','achPractice'],['testing','navTest'],['consistency','achConsistency']
 ];
 const MEDAL_FAMILIES={
+  recall:['learning','book','achRecallLines'], tests:['testing','test','achTestDays'],
   reviews:['practice','repeat','achReviews'], sessions:['consistency','calendar','achSessions'], practice_both:['learning','sides'], reviewed_line:['practice','check'],
   first_steps:['learning','sprout'], clean_sheet:['practice','check'], first_rook:['learning','rook'], queens:['learning','crown','achQueens'], gap:['consistency','hourglass','achGap'],
   opening_read:['learning','book'], opening_bishops:['learning','bishop'], opening_crowned:['learning','crownedBook'], half_board:['learning','half'], whole_book:['learning','library'],
@@ -2623,26 +2896,28 @@ function medalDate(day){
   const date=new Date(String(day)+'T12:00:00');
   return /^\d{4}-\d{2}-\d{2}$/.test(day)&&Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{day:'numeric',month:'short',year:'numeric'}).format(date) : '';
 }
-function medalSnapshot(){
+function medalSnapshot(A=ach.load()){
   const lines=[];
   DATA.openings.forEach((op,oi)=>op.lines.forEach((l,li)=>['w','b'].forEach(side=>{
     const st=store.get(oi,li,side);
-    lines.push({oi,li,side,r:lineRank(oi,li,side),reviewSuccess:countValue(st.reviewSuccess)});
+    lines.push({oi,li,side,key:l.id+':'+side,r:lineRank(oi,li,side),perfect:countValue(st.perfect),reviewSuccess:countValue(st.reviewSuccess)});
   })));
-  return {lines,byOp:DATA.openings.map((_,oi)=>lines.filter(x=>x.oi===oi))};
+  const tests=testMilestoneStats(),recalled=[...new Set([...lines.filter(x=>x.perfect>0).map(x=>x.key),...tests.recalled])];
+  const practiceSides=[...new Set([...A.ctr.sides,...tests.completed.map(k=>k.slice(-1))])];
+  return {lines,byOp:DATA.openings.map((_,oi)=>lines.filter(x=>x.oi===oi)),recalled,practiceSides,testDays:tests.days,testCompleted:tests.completed};
 }
 
 function medalProgress(m,A,snapshot){
   const metric=(cur,goal,label='achProgress',wait=false)=>({cur:Math.max(0,Math.min(Number(cur)||0,goal)),goal,label,wait});
-  if(m.series) return metric(MEDAL_METRICS[m.series](),m.goal,{reviews:'achReviewCount',sessions:'achSessionCount',gap:'achRestDays',streak:'achCurrentStreak',days:'achTrainingDays',reps:'achDrills',moves:'achRecallMoves',roll:'achPerfectDrills',queens:'achQueenLines'}[m.series],m.series==='gap');
+  if(m.series) return metric(MEDAL_METRICS[m.series](snapshot),m.goal,{recall:'achRecallCount',tests:'achTestDayCount',reviews:'achReviewCount',sessions:'achSessionCount',gap:'achRestDays',streak:'achCurrentStreak',days:'achTrainingDays',reps:'achDrills',moves:'achRecallMoves',roll:'achPerfectDrills',queens:'achQueenLines'}[m.series],m.series==='gap');
   const {lines,byOp}=snapshot;
-  if(m.id==='practice_both') return metric(A.ctr.sides.length,2,'achPracticeColors');
+  if(m.id==='practice_both') return metric(snapshot.practiceSides.length,2,'achPracticeColors');
   if(m.id==='reviewed_line') return metric(Math.max(0,...lines.map(x=>x.reviewSuccess)),3,'achSuccessfulReviews');
   const best=(groups,rank)=>groups.map(group=>({cur:group.filter(x=>x.r>=rank).length,goal:group.length})).filter(p=>p.goal).sort((a,b)=>b.cur/b.goal-a.cur/a.goal)[0];
   const ranked={opening_read:1,opening_bishops:3,opening_crowned:5};
   if(ranked[m.id]){ const p=best(byOp,ranked[m.id]); return metric(p.cur,p.goal,'achBestOpening'); }
   if(m.id==='half_board'){ const p=best(['w','b'].map(side=>lines.filter(x=>x.side===side)),1); return metric(p.cur,p.goal,'achOneColor'); }
-  if(m.id==='first_steps') return metric(lines.filter(x=>x.r>=1).length,1,'achLines');
+  if(m.id==='first_steps') return metric(lines.filter(x=>x.r>=1).length+snapshot.testCompleted.length,1,'achLines');
   if(m.id==='first_rook') return metric(lines.filter(x=>x.r>=4).length,1,'achRookLines');
   if(m.id==='whole_book') return metric(lines.filter(x=>x.r>=1).length,lines.length,'achLines');
   if(m.id==='grand_tour') return metric(byOp.filter(a=>a.some(x=>x.r>=1)).length,8,'achOpenings');
@@ -2651,7 +2926,7 @@ function medalProgress(m,A,snapshot){
   return null; // event achievements show their exact requirement, not invented percentages
 }
 function medalRows(A){
-  const rows=[], seen=new Set(), snapshot=medalSnapshot();
+  const rows=[], seen=new Set(), snapshot=medalSnapshot(A);
   MEDALS.forEach(m=>{
     const key=m.series||m.id; if(seen.has(key)) return; seen.add(key);
     const chain=m.series?MEDALS.filter(x=>x.series===m.series).sort((a,b)=>a.goal-b.goal):[m];
@@ -2679,7 +2954,7 @@ function medalCardHTML(row,A,earnedMedal=null){
     ${complete?`<p class="ach-earned-date">${t('achEarnedOn',{date:medalText(medalDate(A.unlocked[m.id]))})}</p>`:medalProgressHTML(row.progress)}${tiers}</article>`;
 }
 function medalNextRows(rows){
-  const order=['first_steps','sessions','reps','days','reviews','practice_both','reviewed_line'];
+  const order=['first_steps','recall','sessions','tests','days','reviews','practice_both','reviewed_line'];
   return rows.filter(r=>r.next&&!r.secret&&r.progress&&!r.progress.wait)
     .sort((a,b)=>(b.progress.cur/b.progress.goal)-(a.progress.cur/a.progress.goal)||order.indexOf(a.key)-order.indexOf(b.key));
 }
@@ -2707,7 +2982,7 @@ function medalBoardHTML(A){
   }
   const filters=[['all','achAll'],['next','achNextGoals'],['earned','achEarned']]
     .map(([key,label])=>`<button class="ach-filter" data-filter="${key}" aria-pressed="${medalUI.filter===key}" onclick="setMedalFilter('${key}')">${t(label)}</button>`).join('');
-  return `<div class="ach-overview ach-overview-simple">${medalSymbol('trophy')}<div><h3>${t('achEarnedCount',{n:earned.length})}</h3><p>${t('achFocusNote')}</p></div></div><div class="ach-filters" role="group" aria-label="${t('achFilters')}">${filters}</div><p class="ach-results-count" role="status">${t('achShowing',{n:visible})}</p>${sections}<p class="ach-footnote">${t('achFootnote')}</p>`;
+  return `<div class="ach-overview ach-overview-simple">${medalSymbol('trophy')}<div><h3>${t('achEarnedCount',{n:earned.length})}</h3></div></div><div class="ach-filters" role="group" aria-label="${t('achFilters')}">${filters}</div><p class="ach-results-count" role="status">${t('achShowing',{n:visible})}</p>${sections}<details class="ach-counting"><summary>${t('achCounting')}</summary><p class="ach-footnote">${t('achFootnote')}</p></details>`;
 }
 
 
@@ -2819,7 +3094,11 @@ function recallGrade({mistakes=0,hints=0,revealed=false}){
 
 /* ================= ACTIVITY LOG (streak + heatmap) ================= */
 const activity = {
-  load(){ return Object.fromEntries(Object.entries(readStoredRecord('otActivity')).filter(([k,v])=>/^\d{4}-\d{2}-\d{2}$/.test(k) && countValue(v)>0)); },
+  load(){
+    const days=Object.fromEntries(Object.entries(readStoredRecord('otActivity')).filter(([k,v])=>/^\d{4}-\d{2}-\d{2}$/.test(k) && countValue(v)>0));
+    for(const day of testMilestoneStats().practiceDays)days[day]=Math.max(countValue(days[day]),1);
+    return days;
+  },
   save(o){ localStorage.setItem('otActivity', JSON.stringify(o)); },
   key(d){ const x=d||new Date(); return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); },
   log(){ const a=this.load(); const k=this.key(); a[k]=(a[k]||0)+1; this.save(a); },
@@ -2832,10 +3111,11 @@ const activity = {
 };
 
 /* ================= TODAY SESSION =================
-   A small persisted plan: at most five due reviews and one new learning step.
+   Suggest at most five due reviews and one new step; let the user choose up to
+   six saved lines in the preview. Persist only after confirmation.
    Returning to the menu or reloading pauses it; completion never chains into
    the whole catalogue. Each daily session can award practice once per day. */
-let sessionActive=false, sessionItem=null;
+let sessionActive=false, sessionItem=null, dailyPreview=null;
 const daily={
   load(){
     const d=readStoredRecord('otSession');
@@ -2858,6 +3138,28 @@ const daily={
     if(fresh) items.push({id:fresh.id,side:fresh.side,mode:store.get(fresh.oi,fresh.li,fresh.side).learned?'drill':'learn'});
     return {day:activity.key(),items,done:[],completed:false};
   },
+  preview(){
+    const base=this.load(); if(base?.completed) return null;
+    const plan=base||this.plan(), done=new Set(plan.done), saved=new Map(plan.items.map(x=>[itemKey(x),x]));
+    const items=repertoire.entries().filter(x=>!done.has(itemKey(x))).map(x=>{
+      const st=store.get(x.oi,x.li,x.side);
+      return saved.get(itemKey(x))||{id:x.id,side:x.side,mode:st.learned||st.runs?'drill':'learn'};
+    });
+    return {day:activity.key(),base,items,selected:plan.items.filter(x=>!done.has(itemKey(x))).map(itemKey),done:plan.done};
+  },
+  choose(keys,preview){
+    if(!preview||preview.day!==activity.key()||JSON.stringify(this.load())!==JSON.stringify(preview.base)) throw new Error('daily-choice-changed');
+    const current=this.preview(); if(!current) throw new Error('daily-choice-changed');
+    const byKey=new Map(current.items.map(x=>[itemKey(x),x])), shown=new Map(preview.items.map(x=>[itemKey(x),x]));
+    if(!Array.isArray(keys)||!keys.length||new Set(keys).size!==keys.length||keys.length+current.done.length>6) throw new Error('daily-choice-invalid');
+    const chosen=keys.map(k=>{
+      const item=byKey.get(k); if(!item||item.mode!==shown.get(k)?.mode) throw new Error('daily-choice-changed');
+      return item;
+    });
+    const completed=(current.base?.items||[]).filter(x=>current.done.includes(itemKey(x)));
+    const plan={day:current.day,items:[...completed,...chosen],done:current.done,completed:false};
+    this.save(plan); return plan;
+  },
   selectionChanged(){
     sessionActive=false; sessionItem=null;
     if(!this.load()?.completed) localStorage.removeItem('otSession');
@@ -2878,9 +3180,60 @@ function syncSessionContext(nextMode,oi,li,side){
 }
 function startDailySession(){
   if(!repertoire.entries().length){ showMenu('practice'); return; }
-  let d=daily.load();
-  if(!d){ d=daily.plan(); if(!d.items.length){showMenu('practice');return;} daily.save(d); }
-  if(d.completed){showMenu('practice');return;}
+  const preview=daily.preview();
+  if(!preview||!preview.items.length){document.getElementById('dailyPreviewDialog').close();showMenu('practice');return;}
+  dailyPreview={...preview,chosen:new Set(preview.selected)};
+  renderDailyPreview();
+  const dialog=document.getElementById('dailyPreviewDialog');
+  if(!dialog.open) dialog.showModal();
+}
+function dailyChoiceHTML(item){
+  const key=itemKey(item),x=resolveLesson(item.id),op=DATA.openings[x.oi],line=op.lines[x.li];
+  const due=srs.get(x.oi,x.li,item.side)?.due<=Date.now();
+  const action=t(item.mode==='learn'?'learn':due?'dueTag':'drill');
+  return `<li class="daily-choice"><input id="daily-${key}" type="checkbox" data-daily-key="${key}" ${dailyPreview.chosen.has(key)?'checked':''} onchange="toggleDailyChoice(this)"><label for="daily-${key}"><b>${medalText(opName(op))}</b><span>${medalText(lnName(line))}</span><span class="daily-choice-meta">${t(item.side==='w'?'white':'black')} · ${action}</span></label></li>`;
+}
+function renderDailyPreview(){
+  const draft=dailyPreview, suggested=new Set(draft.selected);
+  const byKey=new Map(draft.items.map(x=>[itemKey(x),x]));
+  const first=draft.selected.map(k=>byKey.get(k)).filter(Boolean),other=draft.items.filter(x=>!suggested.has(itemKey(x)));
+  document.getElementById('dailyPreviewDialog').innerHTML=`<div class="daily-preview-head"><div><h2 id="dailyPreviewTitle" tabindex="-1" autofocus>${t('dailyPreviewTitle')}</h2><p id="dailyPreviewHint">${t('dailyPreviewHint')}</p>${draft.done.length?`<p>${t('dailyAlreadyDone',{n:draft.done.length})}</p>`:''}</div><button class="daily-preview-close" type="button" aria-label="${t('closeWord')}" onclick="document.getElementById('dailyPreviewDialog').close()">×</button></div><div class="daily-preview-body">${first.length?`<section><h3>${t(draft.base?'dailyRemaining':'dailySuggested')}</h3><ul class="daily-choices">${first.map(dailyChoiceHTML).join('')}</ul></section>`:''}${other.length?`<details class="daily-other" ${first.length?'':'open'}><summary>${t('dailyOtherLines')}</summary><label class="sr-only" for="dailyPreviewSearch">${t('quickAddSearch')}</label><input id="dailyPreviewSearch" class="daily-preview-search" type="search" placeholder="${t('quickAddPlaceholder')}" oninput="filterDailyChoices(this.value)"><ul id="dailyOtherChoices" class="daily-choices">${other.map(dailyChoiceHTML).join('')}</ul><p id="dailyNoMatches" class="home-note" hidden>${t('dailyNoMatches')}</p></details>`:''}</div><div class="daily-preview-foot"><span id="dailyPreviewCount" class="daily-preview-count" role="status" aria-live="polite"></span><button id="dailyConfirmBtn" class="act primary" onclick="confirmDailySession()">${t(draft.base?'dailyContinue':'dailyStart')}</button><p id="dailyPreviewError" class="daily-preview-error" role="alert" hidden></p></div>`;
+  updateDailySelection();
+}
+function filterDailyChoices(query){
+  const normalized=s=>String(s).normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
+  const q=normalized(query);let visible=0;
+  document.querySelectorAll('#dailyOtherChoices .daily-choice').forEach(row=>{
+    const key=row.querySelector('input').dataset.dailyKey,item=dailyPreview.items.find(x=>itemKey(x)===key),x=resolveLesson(item.id),op=DATA.openings[x.oi],line=op.lines[x.li];
+    row.hidden=![op.name,line.name,op.nameZh,line.nameZh].some(name=>normalized(name||'').includes(q));
+    if(!row.hidden)visible++;
+  });
+  document.getElementById('dailyNoMatches').hidden=visible>0;
+}
+function toggleDailyChoice(input){
+  if(!dailyPreview)return;
+  const key=input.dataset.dailyKey;
+  if(input.checked&&dailyPreview.chosen.size<6-dailyPreview.done.length)dailyPreview.chosen.add(key);
+  else{dailyPreview.chosen.delete(key);input.checked=false;}
+  updateDailySelection();
+}
+function updateDailySelection(){
+  const max=6-dailyPreview.done.length,n=dailyPreview.chosen.size;
+  document.getElementById('dailyPreviewCount').textContent=t('dailySelectionCount',{n,max});
+  document.getElementById('dailyConfirmBtn').disabled=!n;
+  document.querySelectorAll('#dailyPreviewDialog input[type="checkbox"]').forEach(input=>{input.disabled=!input.checked&&n>=max;});
+}
+function confirmDailySession(){
+  if(!dailyPreview)return;
+  try{daily.choose([...dailyPreview.chosen],dailyPreview);}
+  catch(error){
+    const changed=['daily-choice-changed','daily-choice-invalid'].includes(error.message);
+    if(changed)startDailySession();
+    const notice=document.getElementById('dailyPreviewError');
+    if(notice){notice.textContent=t(changed?'dailyChoicesChanged':'dailySaveFailed');notice.hidden=false;}
+    return;
+  }
+  document.getElementById('dailyPreviewDialog').close();
   sessionActive=true; nextSessionItem();
 }
 function nextSessionItem(){
@@ -2952,13 +3305,47 @@ function cleanTestRun(run,active=false){
   if(!issues||run.phase!=='playing'&&issues.length)return null;
   return {...run,name:run.name.slice(0,60),items:run.items.map((x,i)=>({...items[i],signature:x.signature})),results,issues};
 }
+// Durable sets survive the 20-report history limit. Unioning evidence is
+// idempotent: repeats, reloads and imports never multiply a line or a day.
+function validTestMilestones(m){
+  if(!isRecord(m))return false;
+  const unique=(xs,max,valid)=>Array.isArray(xs)&&xs.length<=max&&new Set(xs).size===xs.length&&xs.every(valid);
+  const day=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x+'T12:00:00Z'))&&new Date(x+'T12:00:00Z').toISOString().slice(0,10)===x;
+  const key=x=>typeof x==='string'&&/^[a-z0-9-]+:[wb]$/.test(x)&&x.length<=180;
+  return unique(m.days,50000,day)&&unique(m.practiceDays,50000,day)&&unique(m.completed,1000,key)&&unique(m.recalled,1000,key)&&m.days.every(d=>m.practiceDays.includes(d))&&m.recalled.every(k=>m.completed.includes(k));
+}
+function mergeTestMilestones(base,run,at=run.finishedAt,latestOnly=false){
+  const days=new Set(base.days),practiceDays=new Set(base.practiceDays),completed=new Set(base.completed),recalled=new Set(base.recalled);
+  const finished=run.results.map((r,i)=>{
+    const item=run.items[i],moves=item.signature.split(' '),issues=r.issues||[];
+    const total=moves.filter((_,p)=>testOwnPly(item,p)).length;
+    if(!moves.every(u=>/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(u))||!['recalled','recovered','assisted'].includes(r.outcome)||r.stopPly!==moves.length||r.total!==total||(r.attempted??r.correct)!==total||r.correct!==total-issues.length)return false;
+    if(issues.some(x=>x.ply>=moves.length||!testOwnPly(item,x.ply))||r.outcome==='recalled'&&issues.length||r.outcome==='recovered'&&(!issues.length||issues.some(x=>x.assisted))||r.outcome==='assisted'&&!issues.some(x=>x.assisted))return false;
+    completed.add(itemKey(item));if(r.outcome==='recalled')recalled.add(itemKey(item));
+    return true;
+  });
+  if(Number.isSafeInteger(at)&&at>=0&&at<=8640000000000000){
+    const day=activity.key(new Date(at));
+    if(latestOnly?finished.at(-1):finished.some(Boolean))practiceDays.add(day);
+    if(run.phase==='complete'&&finished.length===run.items.length&&finished.every(Boolean)){days.add(day);practiceDays.add(day);}
+  }
+  return {days:[...days],practiceDays:[...practiceDays],completed:[...completed],recalled:[...recalled]};
+}
+function testMilestoneStats(raw=readStoredRecord('otTests')){
+  if(validTestMilestones(raw.milestones))return raw.milestones;
+  let stats={days:[],practiceDays:[],completed:[],recalled:[]};
+  for(const value of (Array.isArray(raw.history)?raw.history:[]).slice(0,20)){
+    const run=cleanTestRun(value);if(run?.phase==='complete')stats=mergeTestMilestones(stats,run);
+  }
+  return stats;
+}
 const testStore={
   load(){
     const raw=readStoredRecord('otTests');
     const pools=(Array.isArray(raw.pools)?raw.pools:[]).filter(p=>isRecord(p)&&/^test-[a-z0-9-]+$/.test(p.id||'')&&typeof p.name==='string').slice(0,20).map(p=>({id:p.id,name:p.name.slice(0,60),items:normalizeRepItems(p.items)})).filter(p=>p.items.length);
     const history=(Array.isArray(raw.history)?raw.history:[]).map(r=>cleanTestRun(r)).filter(r=>r&&r.phase==='complete').slice(0,20);
     const active=cleanTestRun(raw.active,true);
-    return {v:2,pools,history,active:active?.phase!=='complete'?active:null};
+    return {v:3,pools,history,active:active?.phase!=='complete'?active:null,milestones:testMilestoneStats(raw)};
   },
   save(d){localStorage.setItem('otTests',JSON.stringify(d));},
   start(name,items,random=Math.random){
@@ -2976,6 +3363,7 @@ const testStore={
     if(run.phase==='complete'){
       run.finishedAt=Date.now();d.history=[run,...d.history.filter(r=>r.id!==run.id)].slice(0,20);d.active=null;
     }
+    d.milestones=mergeTestMilestones(d.milestones,run,Date.now(),true);
     return run;
   },
   issue(run,playedSan,assisted=false){
@@ -3017,11 +3405,49 @@ const testStore={
   removePool(id){const d=this.load();d.pools=d.pools.filter(p=>p.id!==id);this.save(d);}
 };
 
+
+/* G45: coaching uses recorded recall evidence, never an inferred chess rating. */
+function testCoachFacts(run,history=[]){
+  const finished=r=>['recalled','recovered','assisted'].includes(r.outcome)&&r.attempted===r.total&&typeof r.signature==='string'&&r.stopPly===r.signature.split(' ').length;
+  const older=[...new Map(history.filter(h=>h.id!==run.id&&h.finishedAt<run.finishedAt).map(h=>[h.id,h])).values()].sort((a,b)=>b.finishedAt-a.finishedAt);
+  const rows=run.results.map((r,i)=>{
+    const result={...r,signature:r.signature||run.items[i].signature},current=testSignature(result)===result.signature;
+    const previous=older.map(h=>h.results.find(p=>itemKey(p)===itemKey(result)&&p.signature===result.signature)).filter(Boolean).slice(0,3);
+    const issues=result.issues.map(issue=>{
+      const repeats=previous.filter(p=>p.issues.some(x=>x.ply===issue.ply&&x.expectedSan===issue.expectedSan)).length;
+      return {...issue,repeats,priority:repeats*4+(issue.assisted?3:issue.ply>=result.stopPly?2:1)};
+    }).sort((a,b)=>b.priority-a.priority||a.ply-b.ply);
+    return {...result,current,finished:finished(result),issues,priority:issues[0]?.priority||0};
+  });
+  const sum=f=>rows.reduce((n,r)=>n+f(r),0),correct=sum(r=>r.correct),attempted=sum(r=>r.attempted),total=sum(r=>r.total);
+  const recovered=sum(r=>r.issues.filter(x=>x.ply<r.stopPly&&!x.assisted).length),assisted=sum(r=>r.issues.filter(x=>x.assisted).length);
+  const review=rows.filter(r=>r.issues.length).sort((a,b)=>b.priority-a.priority||b.issues.length-a.issues.length);
+  const focus=review.find(r=>r.current&&testMoves(r)[r.issues[0].ply]?.san===r.issues[0].expectedSan)||null;
+  const clean=rows.filter(r=>r.finished&&r.outcome==='recalled'&&!r.issues.length),completed=rows.filter(r=>r.finished).length;
+  // Compare only complete tests with exactly the same line, colour and move versions.
+  const pool=rs=>rs.map(r=>itemKey(r)+'|'+r.signature).sort().join('\n');
+  const previous=completed===rows.length?older.find(h=>h.results.every(finished)&&pool(h.results)===pool(rows)):null;
+  const rate=attempted?Math.round(100*correct/attempted):null;
+  const trend=previous?{before:Math.round(100*previous.results.reduce((n,r)=>n+r.correct,0)/previous.results.reduce((n,r)=>n+r.attempted,0)),now:rate}:null;
+  return {rows,correct,attempted,total,rate,recovered,assisted,unresolved:Math.max(0,attempted-correct-recovered-assisted),unseen:total-attempted,
+    completed,clean,review,focus,unfinished:rows.filter(r=>!r.finished),trend};
+}
+function testCoachPayload(run,history=[]){
+  const f=testCoachFacts(run,history),label=r=>{const x=resolveLesson(r.id);return {opening:opName(DATA.openings[x.oi]),line:lnName(DATA.openings[x.oi].lines[x.li]),side:r.side};};
+  return {language:zhOn()?'zh':'en',summary:{correct:f.correct,attempted:f.attempted,total:f.total,completed:f.completed,lines:f.rows.length,
+    recalled:f.clean.length,recovered:f.recovered,assisted:f.assisted,unresolved:f.unresolved,unseen:f.unseen},trend:f.trend,
+    strengths:f.clean.slice(0,3).map(label),
+    focus:f.review.filter(r=>r.current&&r.issues.every(x=>testMoves(r)[x.ply]?.san===x.expectedSan)).slice(0,3).map(r=>({...label(r),correct:r.correct,total:r.total,
+      issues:r.issues.slice(0,3).map(x=>({move:Math.floor(x.ply/2)+1+(r.side==='w'?'.':'…')+x.expectedSan,played:x.playedSan,
+        assisted:x.assisted,recovered:x.ply<r.stopPly&&!x.assisted,repeats:x.repeats,
+        context:testMoves(r).slice(0,x.ply+1).map(m=>m.san).join(' '),explanation:mvC(testMoves(r)[x.ply]).replace(/<[^>]*>/g,'')}))}))};
+}
+
 /* ================= PROGRESS BACKUP (export / import file) =================
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G42';
+const BUILD='G45';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -3043,7 +3469,7 @@ function validTestBackup(value){
     if(r.phase!=='playing'&&(r.ply!==0||r.issues?.length)||r.phase==='between'&&!r.results.length||!issues(r.issues,r.items[r.results.length]?.side,r.ply))return false;
     return r.phase==='complete'?r.results.length===r.items.length&&time(r.finishedAt):r.results.length<r.items.length&&r.finishedAt===null;
   };
-  return isRecord(value)&&[1,2].includes(value.v)&&Array.isArray(value.pools)&&value.pools.length<=20&&value.pools.every(p=>isRecord(p)&&id(p.id)&&typeof p.name==='string'&&p.name.length<=60&&items(p.items))&&Array.isArray(value.history)&&value.history.length<=20&&value.history.every(r=>run(r)&&r.phase==='complete')&&(value.active===null||run(value.active)&&value.active.phase!=='complete');
+  return isRecord(value)&&[1,2,3].includes(value.v)&&(value.milestones===undefined?value.v!==3:validTestMilestones(value.milestones))&&Array.isArray(value.pools)&&value.pools.length<=20&&value.pools.every(p=>isRecord(p)&&id(p.id)&&typeof p.name==='string'&&p.name.length<=60&&items(p.items))&&Array.isArray(value.history)&&value.history.length<=20&&value.history.every(r=>run(r)&&r.phase==='complete')&&(value.active===null||run(value.active)&&value.active.phase!=='complete');
 }
 
 function validateProgressBackup(o){
@@ -3677,6 +4103,7 @@ function renderAnnotBtn(){
   const b=document.getElementById('annotBtn'); if(b){ b.textContent=t(showAnnots?'arrowsOn':'arrowsOff'); b.setAttribute('aria-pressed',String(showAnnots)); }
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
+let learnReviewOnly=false;
 let learnCredited=false;  // one ♟/streak credit per learn run, guarded against Back/Next refires
 let learnBadgeEarned=false; // keeps the badge note visible across Back/Next refires within the run
 let hintsThisRun=0, revealedThisRun=false, recalledThisRun=0, drillWasDue=false;   // medal-integrity trackers
@@ -3837,7 +4264,7 @@ function skipTestLine(){
   try{testBoardMessage=null;acceptTestRun(testStore.skip());}catch(e){testSaveError();}
 }
 function nextTestLine(){
-  if(testBoardRun?.phase==='complete'){testReportId=testBoardRun.id;showMenu('test');document.getElementById('testResultHeading')?.focus();return;}
+  if(testBoardRun?.phase==='complete'){testReportId=testBoardRun.id;menuScrollY=0;showMenu('test');document.getElementById('testResultHeading')?.focus({preventScroll:true});window.scrollTo(0,0);return;}
   try{if(testStore.next())resumeRecallTest();}catch(e){testSaveError();}
 }
 
@@ -3902,14 +4329,69 @@ function startRecallTest(){
   try{testStore.start(testDraftName(),testDraft.items);testNotice='';testReportId=null;resumeRecallTest();}
   catch(e){testNotice=e.message==='active-test'?'testResumeFirst':'testStorageError';renderTestPage();}
 }
-function endRecallTest(){try{const run=testStore.end();if(run)testReportId=run.id;showMenu('test');}catch(e){testNotice='testStorageError';renderTestPage();}}
+function endRecallTest(){try{const run=testStore.end();if(run){testReportId=run.id;menuScrollY=0;}showMenu('test');}catch(e){testNotice='testStorageError';renderTestPage();}}
 function testDate(stamp){return new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{dateStyle:'medium',timeStyle:'short'}).format(stamp);}
-function showTestReport(id){testReportId=id;renderTestPage();document.getElementById('testResultHeading')?.focus();}
+function showTestReport(id){testReportId=id;menuScrollY=0;renderTestPage();document.getElementById('testResultHeading')?.focus({preventScroll:true});window.scrollTo(0,0);}
+
+function testCoachMove(r){const x=r.issues[0];return Math.floor(x.ply/2)+1+(r.side==='w'?'.':'…')+x.expectedSan;}
+function testCoachLabel(r){const x=resolveLesson(r.id);return lnName(DATA.openings[x.oi].lines[x.li])+' · '+t(r.side==='w'?'white':'black');}
 function testReportHTML(run){
-  const recalled=run.results.filter(r=>r.outcome==='recalled').length,completed=run.results.filter(r=>['recalled','recovered','assisted'].includes(r.outcome)).length;
-  const correct=run.results.reduce((n,r)=>n+r.correct,0),attempted=run.results.reduce((n,r)=>n+r.attempted,0),review=run.results.filter(r=>r.outcome!=='recalled');
-  const untested=run.results.filter(r=>r.outcome==='untested').length;
-  return `<section class="test-report" aria-labelledby="testResultHeading"><div class="home-heading"><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)} · ${t('testReportEncourage')}</p></div><div class="test-score-grid"><div><strong>${completed}/${run.items.length}</strong><span>${t('testCompletedCount',{n:completed,total:run.items.length})}</span><span>${t('testFullyRecalledCount',{n:recalled})}</span></div><div><strong>${attempted?Math.round(100*correct/attempted)+'%':'—'}</strong><span>${t('testMovesAccurate',{correct,total:attempted})}</span></div><div><strong>${review.length}</strong><span>${t('testToRevisit')}</span></div></div><p class="home-note">${t('testScoreRule')}${untested?' '+t('testUntestedCount',{n:untested}):''}</p><div class="home-actions"><button class="act primary" onclick="retryTestReport(false)">${t('testRepeatPool')}</button>${review.length?`<button class="act" onclick="retryTestReport(true)">${t('testRetestMissed')}</button>`:''}<button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div><div class="test-result-lines">${run.results.map(r=>{
+ const f=testCoachFacts(run,testStore.load().history),focus=f.focus,issue=focus?.issues[0];
+ const mood=!f.attempted?'Untested':f.unfinished.length?'Partial':f.clean.length===f.rows.length?'Perfect':f.rate>=80?'Strong':f.correct||f.recovered?'Building':'Starting';
+ const strength=f.clean.length?t('coachStrengthClean',{lines:f.clean.slice(0,2).map(testCoachLabel).join(zhOn()?'；':'; ')}):f.recovered?t('coachStrengthRecovered',{n:f.recovered}):f.correct?t('coachStrengthMoves',{n:f.correct}):t('coachStrengthStart');
+ const next=focus?t('coachFocusMoves',{move:testCoachMove(focus)}):f.review.length?t('coachFocusChanged'):f.unfinished.length?t('coachFocusUnfinished',{n:f.unfinished.length}):t('coachFocusClean');
+ const segments=[['first',f.correct,'coachLegendClean'],['recovered',f.recovered,'coachLegendRecovered'],['assisted',f.assisted,'coachLegendAssisted'],['unresolved',f.unresolved,'coachLegendUnresolved'],['unseen',f.unseen,'coachLegendUnseen']].filter(x=>x[1]);
+ const trend=f.trend?`<p class="coach-trend">${t(f.trend.now>f.trend.before?'coachTrendUp':f.trend.now<f.trend.before?'coachTrendDown':'coachTrendSame',{n:Math.abs(f.trend.now-f.trend.before)})}</p>`:'';
+ return `<section class="test-report" aria-labelledby="testResultHeading"><div class="coach-report-heading"><div><span class="eyebrow">${t('testResults')}</span><h2 id="testResultHeading" tabindex="-1">${medalText(run.name)}</h2><p>${testDate(run.finishedAt)}</p></div><button class="linklike" onclick="testReportId=null;renderTestPage()">${t('testBackSetup')}</button></div>
+ <div class="coach-hero ${mood==='Perfect'?'is-perfect':''}"><div class="coach-message"><span class="coach-emblem" aria-hidden="true">${testIcon(mood==='Perfect'?'correct':f.attempted?'recovered':'ready')}</span><h3>${t('coach'+mood)}</h3><p>${t('coach'+mood+'Body')}</p>${trend}</div><div class="coach-score"><strong>${f.rate===null?'—':f.rate+'%'}</strong><span>${t('coachFirstTry')}</span><p>${t('coachTestedMoves',{correct:f.correct,total:f.attempted})}</p><p>${t('coachCompleted',{n:f.completed,total:f.rows.length})} · ${t('coachClean',{n:f.clean.length})}</p></div></div>
+ <div class="coach-breakdown"><div class="coach-meter" aria-hidden="true">${segments.map(([kind,n])=>`<span class="${kind}" style="width:${100*n/f.total}%"></span>`).join('')}</div><ul aria-label="${t('coachBreakdown')}">${segments.map(([kind,n,key])=>`<li><i class="${kind}" aria-hidden="true"></i>${t(key,{n})}</li>`).join('')}</ul></div>
+ <div class="coach-insights"><article><h3>${t('coachStrength')}</h3><p>${medalText(strength)}</p></article><article><h3>${t('coachFocus')}</h3><p>${medalText(next)}</p></article></div>
+ ${focus?testCoachFocusHTML(focus):''}
+ <div class="home-actions coach-actions">${f.review.length?`<button class="act primary" title="${t('coachFocusPool')}" onclick="retryTestReport('focus')">${t('coachRetestFocus')}</button>`:''}${f.unfinished.length?`<button class="act ${!f.review.length?'primary':''}" onclick="retryTestReport('unfinished')">${t('coachFinishPool')}</button>`:''}<button class="act ${!f.review.length&&!f.unfinished.length?'primary':''}" onclick="retryTestReport(false)">${t('testRepeatPool')}</button></div>
+ ${testCoachAIEnabled()&&f.attempted?`<details class="coach-ai"><summary>${t('coachAI')}</summary><div id="testCoachAI" aria-live="polite" aria-atomic="false"></div></details>`:''}
+ <details class="coach-line-review"><summary>${t('coachAllLines',{n:f.rows.length})}</summary><div class="test-result-lines">${testResultLinesHTML(run)}</div></details>
+ <details class="coach-score-help"><summary>${t('coachScoreHelp')}</summary><p>${t('testScoreRule')}</p><p>${t('testRankNote')}</p></details></section>`;
+}
+function testCoachFocusHTML(r){
+ const issue=r.issues[0],x=resolveLesson(r.id),line=DATA.openings[x.oi].lines[x.li];
+ return `<article class="coach-focus"><div class="coach-focus-top"><div><span class="eyebrow">${t('coachPriority')}</span><h3>${medalText(testCoachLabel(r))}</h3><p>${medalText(opName(DATA.openings[x.oi]))}</p></div><strong class="coach-key-move">${medalText(testCoachMove(r))}</strong></div><p class="coach-evidence">${t(issue.repeats?'coachRepeatMove':issue.assisted?'coachHelpMove':issue.ply<r.stopPly?'coachRecoverMove':'coachOpenMove',{n:issue.repeats+1})}</p><div class="test-explanation coach-idea"><h4>${t('coachWhy')}</h4><p>${mvC(line.moves[issue.ply])}</p></div><div class="home-actions"><button class="act" onclick="reviewTestPosition('${r.id}','${r.side}',${issue.ply})">${t('coachLearnMove')}</button><button class="linklike" onclick="startDrill(${x.oi},${x.li},'${r.side}')">${t('coachDrillLine')}</button></div></article>`;
+}
+function reviewTestPosition(id,side,ply){
+ const run=testStore.load().history.find(r=>r.id===testReportId),r=run?.results.find(r=>r.id===id&&r.side===side);
+ if(!r||testSignature(r)!==r.signature||!r.issues.some(x=>x.ply===ply))return;
+ const x=resolveLesson(id);startLearn(x.oi,x.li,side);
+ // Viewing a position grants no completion: the normal learning boundary still applies.
+ learnReviewOnly=true;learnPly=ply+1;board=initBoard();
+ for(let p=0;p<learnPly;p++)applyMove(lineMoves()[p].u);
+ learnShowStep();render(lineMoves()[ply].u);
+}
+// An optional same-origin server enables AI; static reports work without it.
+const testCoachCache=new Map();
+function testCoachAIEnabled(){return document.querySelector('meta[name="debut-test-coach"]')?.content==='./api/test-coach';}
+function testCoachCacheKey(run){return JSON.stringify(testCoachPayload(run,testStore.load().history));}
+function validTestCoachResponse(x){return isRecord(x)&&['encouragement','strength','focus','plan'].every(k=>typeof x[k]==='string'&&x[k].trim().length>0&&x[k].length<=700);}
+function renderTestCoachAI(){
+ const el=document.getElementById('testCoachAI'),run=testStore.load().history.find(r=>r.id===testReportId);if(!el||!run)return;
+ const entry=testCoachCache.get(testCoachCacheKey(run));el.setAttribute('aria-busy',entry?.loading?'true':'false');
+ if(entry?.data){el.innerHTML=`<p class="coach-ai-note">${t('coachAINote')}</p><p class="coach-ai-intro">${medalText(entry.data.encouragement)}</p><div class="coach-insights">${[['strength','coachStrength'],['focus','coachFocus']].map(([k,label])=>`<article><h3>${t(label)}</h3><p>${medalText(entry.data[k])}</p></article>`).join('')}</div><h4>${t('coachAIPlan')}</h4><p>${medalText(entry.data.plan)}</p>`;el.querySelectorAll('p').forEach(highlightExplanation);return;}
+ el.innerHTML=`<p>${t('coachAIConsent')}</p><button class="act" onclick="requestTestCoachAI()"${entry?.loading?' disabled':''}>${t(entry?.loading?'coachAILoading':entry?.error?'coachAIRefresh':'coachAIGet')}</button><p role="status" aria-live="polite">${entry?.loading?t('coachAILoading'):entry?.error?t(entry.error):''}</p>`;
+}
+async function requestTestCoachAI(){
+ const run=testStore.load().history.find(r=>r.id===testReportId);if(!run||!testCoachAIEnabled())return;
+ const payload=testCoachPayload(run,testStore.load().history),key=JSON.stringify(payload);
+ if(testCoachCache.get(key)?.loading||testCoachCache.get(key)?.data)return;
+ if(testCoachCache.size>=40)testCoachCache.delete(testCoachCache.keys().next().value);
+ testCoachCache.set(key,{loading:true});renderTestCoachAI();
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+ try{
+  const response=await fetch('./api/test-coach',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',cache:'no-store',signal:controller.signal,body:JSON.stringify(payload)});
+  if(!response.ok)throw new Error(response.status===429?'coachAILimit':'coachAIError');
+  const data=await response.json();if(!validTestCoachResponse(data))throw new Error('coachAIError');testCoachCache.set(key,{data});
+ }catch(error){testCoachCache.set(key,{error:error.message==='coachAILimit'?'coachAILimit':'coachAIError'});}
+ finally{clearTimeout(timer);renderTestCoachAI();}
+}
+
+function testResultLinesHTML(run){return run.results.map(r=>{
     const x=resolveLesson(r.id),op=DATA.openings[x.oi],line=op.lines[x.li],clean=r.outcome==='recalled';
     const recovered=r.issues.filter(x=>x.ply<r.stopPly&&!x.assisted).length,assisted=r.issues.filter(x=>x.assisted).length;
     const kind={recalled:'correct',recovered:'recovered',assisted:'assisted',missed:'mismatch',skipped:'skipped',untested:'ready'}[r.outcome];
@@ -3917,16 +4399,16 @@ function testReportHTML(run){
       const num=Math.floor(issue.ply/2)+1+(r.side==='w'?'.':'…'),same=line.moves[issue.ply]?.san===issue.expectedSan&&testSignature(r)===r.signature;
       return `<li><h4>${t('testIssueHeading',{n:Math.floor(issue.ply/2)+1,move:medalText(issue.expectedSan)})}</h4>${issue.playedSan?`<p>${t('testPlayed',{move:medalText(num+issue.playedSan)})}</p>`:''}<p>${t('testExpected',{move:medalText(num+issue.expectedSan)})}</p><p>${t(issue.assisted?'testIssueAssisted':issue.ply<r.stopPly?'testIssueRecovered':'testIssueUnfinished')}${issue.attempts>1?' '+t('testIssueTries',{n:issue.attempts}):''}</p>${same?`<details class="test-explanation"><summary>${t('testReviewAnswer')}</summary><p>${mvC(line.moves[issue.ply])}</p></details>`:''}</li>`;
     }).join('')}</ol>`:''}</article>`;
-  }).join('')}</div></section>`;
-}
+  }).join('');}
 function retryTestReport(missedOnly){
   const run=testStore.load().history.find(r=>r.id===testReportId);if(!run)return;
-  testDraft={id:null,name:run.name,items:run.results.filter(r=>!missedOnly||r.outcome!=='recalled').map(({id,side})=>({id,side}))};
+  const f=testCoachFacts(run,testStore.load().history),rows=missedOnly==='focus'?f.review.slice(0,3):missedOnly==='unfinished'?f.unfinished:missedOnly?f.rows.filter(r=>r.outcome!=='recalled'):f.rows;
+  testDraft={id:null,name:run.name,items:rows.map(({id,side})=>({id,side}))};
   testSource='selected';testColour='all';testQuery='';testReportId=null;testNotice='';renderTestPage();document.getElementById('testStartBtn').focus();
 }
 function renderTestPage(){
   ensureTestDraft();const el=document.getElementById('testPanel'),d=testStore.load(),report=d.history.find(r=>r.id===testReportId);
-  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);return;}
+  if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();return;}
   testReportId=null;
   const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
   el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p><div class="test-setup-layout"><section class="test-builder" aria-labelledby="testPoolHeading"><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="newTestPool()">${t('testNewPool')}</button></div><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><div class="test-pool-tools"><button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button><button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section><aside class="test-ready"><h3>${t('testHowItWorks')}</h3><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><div class="test-start-actions"><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div><p class="home-note">${t(d.active?'testResumeFirst':'testRankNote')}</p></aside></div><section class="test-saved"><h3>${t('testSavedPools')}</h3>${d.pools.length?`<div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div>`:`<p class="home-note">${t('testNoPools')}</p>`}</section><section class="test-history"><h3>${t('testHistory')}</h3><p class="home-note">${t('testHistoryNote')}</p>${d.history.length?d.history.map(r=>`<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></article>`).join(''):`<p class="home-note">${t('testNoHistory')}</p>`}</section>`;
@@ -4113,12 +4595,8 @@ function renderTodayBar(){
   const nextDate=future.length?new Intl.DateTimeFormat(zhOn()?'zh-CN':'en-GB',{month:'short',day:'numeric'}).format(Math.min(...future)):'';
   const title=finished?t('sessionFinished'):plan.items.length?t('todayReady'):t('allCaughtUp');
   const body=finished?t('sessionFinishedBody'):plan.items.length?[reviews?t(reviews===1?'todayOneDrill':'todayDrills',{n:reviews}):'',lessons?t('todayOneLesson'):''].filter(Boolean).join(t('planJoin'))+'. '+t('fromRepertoire'):nextDate?t('nextReviewDate',{date:nextDate}):t('freePracticeBody');
-  const list=(finished?[]:plan.items).map((it,i)=>{
-    const x=resolveLesson(it.id), line=DATA.openings[x.oi].lines[x.li], done=plan.done.includes(itemKey(it));
-    return `<li class="today-item${done?' complete':''}"><span class="today-index" aria-hidden="true">${done?'✓':i+1}</span><div><b>${lnName(line)}</b><span>${opName(DATA.openings[x.oi])} · ${t(it.side==='w'?'white':'black')} · ${t(it.mode==='learn'?'learn':'drill')}${done?' · '+t('completedWord'):''}</span></div></li>`;
-  }).join('');
   el.className='today-content';
-  el.innerHTML=`<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished&&plan.items.length?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="linklike" onclick="showSelectedOpenings()">${t('viewSelectedOpenings')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>${list?`<section class="session-plan"><h3>${t('inThisSession')}</h3><ol>${list}</ol></section>`:''}`;
+  el.innerHTML=`<div class="today-layout"><section class="daily-hero"><span class="eyebrow">${t('todayTitle')}</span><h2>${title}</h2><p>${body}</p><div class="home-actions">${!finished?`<button class="act primary" onclick="startDailySession()">${t(saved?'resumeSession':'startSession')}</button>`:''}<button class="linklike" onclick="showSelectedOpenings()">${t('viewSelectedOpenings')}</button></div>${saved?`<p class="home-note">${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</p>`:`<p class="home-note">${t('dailyLimit')}</p>`}${due.length>5&&!finished?`<p class="home-note">${t('backlogNote',{n:due.length-5})}</p>`:''}</section><aside class="today-aside"><div class="home-stat"><strong>${entries.length}</strong><span>${t('selectedLines')}</span></div><div class="home-stat"><strong>${days}</strong><span>${t('practiceDaysLabel')}</span></div><p>${t('habitNote')}</p><button class="linklike" onclick="setMenuView('progress')">${t('viewProgress')} →</button></aside></div>`;
 }
 function renderRepertoire(){
   const el=document.getElementById('repertoirePanel'), entries=repertoire.entries();
@@ -4152,8 +4630,9 @@ function renderPromotionOverview(){
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
   const totalRuns=trained.reduce((n,[,v])=>n+v.runs,0), reviews=trained.reduce((n,[,v])=>n+countValue(v.reviewAttempts),0);
+  const practised=new Set([...trained.map(([key])=>key.slice(3)),...testMilestoneStats().completed]).size;
   document.getElementById('progressHeading').innerHTML=`<h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p>`;
-  document.getElementById('summaryBar').innerHTML=`<div class="progress-stats"><div><b>${trained.length}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
+  document.getElementById('summaryBar').innerHTML=`<div class="progress-stats"><div><b>${practised}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
   renderPromotionOverview(); renderHeatmap();
 
 }
@@ -5254,7 +5733,7 @@ function startLearn(oi,li,side){
   side=side||preferredSide(oi,li);
   syncSessionContext('learn',oi,li,side);
   rememberLast(oi,li,'learn',side);
-  learnCredited=false; learnBadgeEarned=false; recalledThisRun=0;
+  learnReviewOnly=false; learnCredited=false; learnBadgeEarned=false; recalledThisRun=0;
   curOp=oi; curLine=li; playerSide=side; mode='learn';
   board=initBoard(); learnPly=0; selSq=null; aimSet=null; locked=false; curAnnot=null;
   showAppView('board');
@@ -5299,7 +5778,7 @@ function learnShowStep(){
     showComment(mv);
     if(learnPly===moves.length){
       setPrompt(`✓ ${mv.san} — ${t('lineComplete')}`,'good');
-      if(!learnCredited){
+      if(!learnCredited&&!learnReviewOnly){
         learnCredited=true;
         const pre=lineRank(curOp,curLine,playerSide);
         store.markLearned(curOp,curLine); activity.log();
