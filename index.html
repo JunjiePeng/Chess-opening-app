@@ -1123,6 +1123,9 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .guide-preferences { border-top:1px solid #584633; margin-top:16px; padding-top:12px; }
 .guide-preferences label { display:flex; gap:9px; align-items:center; font-size:.78rem; color:#c9b69b; cursor:pointer; min-height:28px; }
 #guideOff { width:15px; height:15px; flex-shrink:0; accent-color:var(--accent); }
+.guide-navigation.is-journey { flex-wrap:wrap; }
+.guide-navigation.is-journey #guideNext { flex:1 0 100%; width:100%; margin-top:2px; }
+#guideAppTour { font-size:.78rem; margin-top:5px; padding:5px 0; }
 #guideReplayNote { color:#bda98e; font-size:.75rem; margin:5px 0 0; }
 @media(max-width:760px){
  .header-controls { gap:7px; }
@@ -1144,8 +1147,8 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="guide-top"><span id="guidePageName"></span><span id="guideCount"></span></div>
     <div aria-live="polite" aria-atomic="true"><h2 id="guideTitle" tabindex="-1"></h2><p id="guideBody"></p></div>
     <div id="guideDots" aria-hidden="true"></div>
-    <div class="guide-navigation"><button id="guideSkip" type="button" class="linklike" onclick="closePageGuide()"></button><button id="guideBack" type="button" class="act" onclick="movePageGuide(-1)"></button><button id="guideNext" type="button" class="act primary" onclick="movePageGuide(1)"></button></div>
-    <div class="guide-preferences"><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p></div>
+    <div id="guideNavigation" class="guide-navigation"><button id="guideSkip" type="button" class="linklike" onclick="closePageGuide()"></button><button id="guideBack" type="button" class="act" onclick="movePageGuide(-1)"></button><button id="guideNext" type="button" class="act primary" onclick="movePageGuide(1)"></button></div>
+    <div class="guide-preferences"><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p><button id="guideAppTour" class="linklike" type="button" onclick="startAppJourney()"></button></div>
   </section>
 </dialog>
 
@@ -1189,7 +1192,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G53</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G54</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -2488,6 +2491,57 @@ Object.assign(I18N.zh, {
   guideEngineSetupBody:'用强度滑块调整练习难度。完整对局中，还可以选择执白或执黑开始。',
   guideEngineOpeningTitle:'从学过的开局开始',
   guideEngineOpeningBody:'在这里选择一条变例，从它的最后局面开始。记住的走法结束后，练习自己判断下一步。'
+});
+
+
+/* G54: connect page guidance into the learning journey. */
+Object.assign(I18N_EN, {
+  guideAppHeading:'HOW DEBUT WORKS',
+  guideAppTour:'Tour the app →',
+  guideJourneyReplay:'Replay this tour from ? → Tour the app.',
+  guideVisitRepertoire:'Next: My repertoire →',
+  guideVisitTest:'Next: Test your openings →',
+  guideVisitProgress:'Next: Progress →',
+  guideSeeEngine:'One optional extra →',
+  guideChooseOpening:'Choose an opening',
+  guideJourneyExploreTitle:'Choose a line, then learn it',
+  guideJourneyExploreBody:'Start in Openings. Find a line and choose Learn to understand its moves. Use + to save the lines you want to keep practising.',
+  guideJourneyPracticeTitle:'Make it part of your routine',
+  guideJourneyPracticeBody:'Your saved lines live in My repertoire. Use Drill to recall them from memory, or preview daily practice for a suggested mix of learning and reviews.',
+  guideJourneyTestTitle:'Check what you can remember',
+  guideJourneyTestBody:'When the lines feel familiar, come here to test a selection together. Results show first-try recall and the moves worth revisiting.',
+  guideJourneyProgressTitle:'See progress, then keep practising',
+  guideJourneyProgressBody:'Progress shows line ranks and milestones. Tests reveal what needs work; unaided drills and due reviews build ranks. Return to My repertoire for your next practice.',
+  guideJourneyEngineTitle:'Optional: put it into a game',
+  guideJourneyEngineBody:'Use vs Engine when you want to play beyond the opening. It is optional—your main loop is learn, practise, test, then revisit. Let’s pick your first line.',
+  guideLearnControlsTitle:'Next, try recalling this line',
+  guideLearnControlsBody:'Use Back and Next until the ideas make sense. Then Drill This Line lets you recall the moves yourself. Save it with + to find it later in My repertoire.',
+  guideHintBody:'Use Hint when you’re stuck. An unaided, correct drill earns Knight. Return to My repertoire for the due reviews that build lasting recall.',
+  guideNextPracticeBody:'Review tricky positions in Learn, then retest the lines that need work. My repertoire keeps those lines ready for your next practice and due reviews.'
+});
+Object.assign(I18N.zh, {
+  guideAppHeading:'Debut 使用流程',
+  guideAppTour:'了解整体使用流程 →',
+  guideJourneyReplay:'点击 ? → 了解整体使用流程，即可重看。',
+  guideVisitRepertoire:'下一站：我的开局库 →',
+  guideVisitTest:'下一站：开局自测 →',
+  guideVisitProgress:'下一站：进度 →',
+  guideSeeEngine:'再看看可选的对弈功能 →',
+  guideChooseOpening:'选择一个开局',
+  guideJourneyExploreTitle:'先选一条路线，再理解它',
+  guideJourneyExploreBody:'从「全部开局」开始，找到一条路线，点击「学习」理解走法。用 + 保存想长期练习的变例。',
+  guideJourneyPracticeTitle:'在这里持续练习',
+  guideJourneyPracticeBody:'保存的路线都在「我的开局库」。用「操练」凭记忆走棋，或预览每日练习，让 Debut 推荐学习和复习内容。',
+  guideJourneyTestTitle:'检验自己记住了多少',
+  guideJourneyTestBody:'熟悉路线后，来这里把多条变例放在一起自测。结果会显示首次回忆正确率，以及值得回顾的走法。',
+  guideJourneyProgressTitle:'看见积累，再继续巩固',
+  guideJourneyProgressBody:'这里展示路线等级和成就。自测帮你发现薄弱处，无提示操练和到期复习帮助晋级。下一次练习，回到「我的开局库」。',
+  guideJourneyEngineTitle:'可选：把开局用到实战中',
+  guideJourneyEngineBody:'想把开局继续下成完整对局时，可以使用「人机对弈」。核心流程是学习、练习、自测，再回顾。现在去选一条路线吧。',
+  guideLearnControlsTitle:'下一步，试着凭记忆走棋',
+  guideLearnControlsBody:'用「上一步」和「下一步」理解思路，再点「操练此线」自己回忆走法。用 + 保存后，就能在「我的开局库」继续练习。',
+  guideHintBody:'卡住时可以用提示。无提示完成全对操练可获得马级。之后回到「我的开局库」做推荐的到期复习，巩固记忆。',
+  guideNextPracticeBody:'在学习模式回顾难点，再自测需要巩固的路线。「我的开局库」集中保留这些路线，方便下一次练习和到期复习。'
 });
 
 /* Read old or damaged records without letting one field break the app. */
@@ -3906,7 +3960,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G53';
+const BUILD='G54';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4940,7 +4994,7 @@ function renderTestPage(){
 const GUIDE_PAGES=['explore','practice','learn','drill','test','testPlay','testResults','progress','play'];
 function normaliseGuidePrefs(value){
   const valid=value && typeof value==='object' && !Array.isArray(value)?value:{};
-  return {version:1,seen:[...new Set((Array.isArray(valid.seen)?valid.seen:[]).filter(key=>GUIDE_PAGES.includes(key)))],disabled:valid.disabled===true};
+  return {version:1,seen:[...new Set((Array.isArray(valid.seen)?valid.seen:[]).filter(key=>GUIDE_PAGES.includes(key)))],disabled:valid.disabled===true,journey:valid.journey===true};
 }
 function readGuidePrefs(){
   try{return normaliseGuidePrefs(JSON.parse(localStorage.getItem('otGuides')));}catch(e){return normaliseGuidePrefs(null);}
@@ -4972,7 +5026,7 @@ function pageGuideSteps(page){
     practice:guideTarget(['#todayBar .daily-hero'])?
       [step('guideDaily','#todayBar .daily-hero .home-actions'),step('guideSaved','#repertoirePanel .rep-line','#selectedOpeningsHeading'),step('guideAdd','#quickAddToggle')]:
       [step('guideRepertoire','#selectedOpeningsHeading'),step('guideStarter','#repertoirePanel .rep-choices','#repertoirePanel form','#repertoirePanel'),step('guideAdd','#quickAddToggle')],
-    learn:[step('guideBoard','#board'),step('guideIdeas','#promptBox'),step('guideLearnControls','#learnNav')],
+    learn:[step('guideBoard','#board'),step('guideIdeas','#promptBox'),step('guideLearnControls','#learnNav [data-i18n="drillThisLine"]','#learnNav')],
     drill:[step('guideSide','#sideToggle'),step('guideRecall','#board'),step('guideHint','#drillNav')],
     test:[step('guidePool','#testSelectionPreview'),step('guideChoose','[data-test-size="custom"]'),step('guideStartTest','#testStartBtn')],
     testPlay:[step('guideTestMoves','#board'),step('guideTestHelp','#testNav'),step('guideTestFeedback','#testFeedback')],
@@ -4982,6 +5036,33 @@ function pageGuideSteps(page){
   };
   return (steps[page]||[]).filter(item=>guideTarget(item.targets));
 }
+// This overview visits menu tabs only; it never starts lessons, tests or games.
+const APP_JOURNEY=[
+  {page:'explore',key:'guideJourneyExplore',targets:['[data-home="explore"]'],next:'guideVisitRepertoire'},
+  {page:'practice',key:'guideJourneyPractice',targets:['[data-home="practice"]'],next:'guideVisitTest'},
+  {page:'test',key:'guideJourneyTest',targets:['[data-home="test"]'],next:'guideVisitProgress'},
+  {page:'progress',key:'guideJourneyProgress',targets:['[data-home="progress"]'],next:'guideSeeEngine'},
+  {page:'progress',key:'guideJourneyEngine',targets:['#homeEngineBtn'],next:'guideChooseOpening'}
+];
+function startAppJourney(){
+  const dialog=document.getElementById('pageGuideDialog'),open=document.querySelector('dialog[open]');
+  if(!dialog || activeGuide?.journey || document.getElementById('appShell').classList.contains('board-view') || document.getElementById('appShell').inert || (open&&open!==dialog))return;
+  if(activeGuide)closePageGuide();
+  activeGuide={journey:true,page:'explore',steps:APP_JOURNEY,index:0,originMenu:menuView,reportId:testReportId,
+    focus:document.activeElement,scrollX:window.scrollX,scrollY:window.scrollY,overflow:document.body.style.overflow,paddingBottom:document.body.style.paddingBottom};
+  guidePrefs.journey=true;rememberGuide('explore');
+  showJourneyStep();
+  dialog.showModal();document.body.style.overflow='hidden';placePageGuide(true);
+  document.getElementById('guideTitle').focus({preventScroll:true});
+}
+function showJourneyStep(){
+  if(!activeGuide?.journey)return;
+  activeGuide.page=activeGuide.steps[activeGuide.index].page;
+  // Show the test preview during the tour, then restore any report on exit.
+  testReportId=null;
+  setMenuView(activeGuide.page);
+  renderPageGuide();
+}
 function queuePageGuide(){
   if(typeof requestAnimationFrame!=='function')return;
   cancelAnimationFrame(guideFrame);
@@ -4989,7 +5070,7 @@ function queuePageGuide(){
     guideFrame=0;
     const page=guidePage();
     if(activeGuide){
-      if(activeGuide.page===page){renderPageGuide(false);return;}
+      if(activeGuide.journey || activeGuide.page===page){renderPageGuide(false);return;}
       closePageGuide(false);
     }
     startPageGuide(false);
@@ -4997,7 +5078,9 @@ function queuePageGuide(){
 }
 function startPageGuide(manual=true){
   const dialog=document.getElementById('pageGuideDialog'),page=guidePage();
-  if(!dialog || activeGuide || (!manual&&!shouldOfferGuide(guidePrefs,page)))return;
+  if(!dialog || activeGuide)return;
+  if(!manual&&page==='explore'&&!guidePrefs.disabled&&!guidePrefs.journey){startAppJourney();return;}
+  if(!manual&&!shouldOfferGuide(guidePrefs,page))return;
   // Never stack a guide over a chooser, achievement board or other dialog.
   if(document.querySelector('dialog[open]') || document.getElementById('appShell').inert)return;
   const steps=pageGuideSteps(page);if(!steps.length)return;
@@ -5011,17 +5094,21 @@ function startPageGuide(manual=true){
 function renderPageGuide(focus=true){
   if(!activeGuide)return;
   const {page,steps,index}=activeGuide,item=steps[index];
-  document.getElementById('guidePageName').textContent=t('guidePage'+page);
+  document.getElementById('guidePageName').textContent=t(activeGuide.journey?'guideAppHeading':'guidePage'+page);
+  document.getElementById('guideNavigation').classList.toggle('is-journey',!!activeGuide.journey);
+  const appTour=document.getElementById('guideAppTour');
+  appTour.hidden=!!activeGuide.journey||document.getElementById('appShell').classList.contains('board-view');
+  appTour.textContent=t('guideAppTour');
   document.getElementById('guideCount').textContent=t('guideStep',{n:index+1,total:steps.length});
   document.getElementById('guideTitle').textContent=t(item.key+'Title');
   document.getElementById('guideBody').textContent=t(item.key+'Body');
   document.getElementById('guideBack').hidden=index===0;
   document.getElementById('guideBack').textContent=t('guideBack');
   document.getElementById('guideSkip').textContent=t('guideSkip');
-  document.getElementById('guideNext').textContent=t(index===steps.length-1?'guideDone':'guideNext');
+  document.getElementById('guideNext').textContent=t(activeGuide.journey?item.next:index===steps.length-1?'guideDone':'guideNext');
   document.getElementById('guideOffLabel').textContent=t('guideOff');
   document.getElementById('guideOff').checked=guidePrefs.disabled;
-  document.getElementById('guideReplayNote').textContent=t('guideReplay');
+  document.getElementById('guideReplayNote').textContent=t(activeGuide.journey?'guideJourneyReplay':'guideReplay');
   document.getElementById('guideDots').innerHTML=steps.map((_,i)=>`<i${i===index?' class="current"':''}></i>`).join('');
   if(document.getElementById('pageGuideDialog').open){
     placePageGuide(focus);
@@ -5031,16 +5118,23 @@ function renderPageGuide(focus=true){
 function movePageGuide(delta){
   if(!activeGuide)return;
   const next=activeGuide.index+delta;
-  if(next>=activeGuide.steps.length){closePageGuide();return;}
-  activeGuide.index=Math.max(0,next);renderPageGuide();
+  if(next>=activeGuide.steps.length){closePageGuide(true,!!activeGuide.journey);return;}
+  activeGuide.index=Math.max(0,next);
+  if(activeGuide.journey)showJourneyStep();else renderPageGuide();
 }
-function closePageGuide(restore=true){
+function closePageGuide(restore=true,finished=false){
   if(!activeGuide)return;
   const old=activeGuide;activeGuide=null;
   cancelAnimationFrame(guideLayoutFrame);
   document.getElementById('pageGuideDialog').close();
   document.body.style.overflow=old.overflow;document.body.style.paddingBottom=old.paddingBottom;
-  if(restore && old.page===guidePage()){
+  if(old.journey){
+    testReportId=old.reportId;
+    setMenuView(finished?'explore':old.originMenu);
+    cancelAnimationFrame(guideFrame);guideFrame=0;
+    if(finished){window.scrollTo(0,0);document.getElementById('searchBox')?.focus({preventScroll:true});return;}
+  }
+  if(restore && (old.journey || old.page===guidePage())){
     window.scrollTo(old.scrollX,old.scrollY);
     const target=old.focus!==document.body&&old.focus?.isConnected&&old.focus.getClientRects().length?old.focus:document.getElementById('pageGuideBtn');
     target?.focus({preventScroll:true});
@@ -5093,7 +5187,7 @@ function initPageGuides(){
     if(e.shiftKey&&(document.activeElement===first||document.activeElement.id==='guideTitle')){e.preventDefault();last.focus();}
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   });
-  dialog.addEventListener('close',()=>{if(activeGuide)closePageGuide();});
+  dialog.addEventListener('close',()=>{if(activeGuide&&!dialog.open)closePageGuide();});
   window.addEventListener('resize',scheduleGuideLayout);
   window.addEventListener('scroll',scheduleGuideLayout,{passive:true,capture:true});
   window.visualViewport?.addEventListener('resize',scheduleGuideLayout);
