@@ -1101,41 +1101,91 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  .coach-score { padding-top:16px; }
 }
 
-/* Short, optional guides use the same warm palette as the learning screens. */
+/* First moves: compact field notes, in Debut's wood and parchment palette. */
 .page-guide-btn { display:inline-flex; align-items:center; justify-content:center; flex:0 0 32px; width:32px; height:32px; padding:0; border:1px solid var(--line); border-radius:50%; background:transparent; color:var(--dim); font-family:inherit; font-weight:700; font-size:.95rem; line-height:1; cursor:pointer; }
 .page-guide-btn:hover { color:var(--text); border-color:var(--accent); background:var(--panel); }
-#pageGuideDialog { position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0; border:0; background:transparent; color:var(--text); overflow:hidden; }
+.guide-invite { display:flex; align-items:center; gap:12px; border-block:1px solid var(--line); padding:10px 0; margin:0 0 16px; }
+.guide-invite[hidden] { display:none; }
+.guide-invite .guide-invite-copy { flex:1; min-width:0; }
+.guide-invite strong { display:block; font-size:.87rem; font-weight:600; color:var(--dim); }
+.guide-invite.is-welcome { border:1px solid #786044; border-left:3px solid var(--accent); border-radius:4px 16px 16px 4px; background:linear-gradient(110deg,#423320,var(--panel)); padding:15px 16px; }
+.guide-invite.is-welcome strong { font-family:'Caprasimo',serif; font-weight:400; color:var(--text); font-size:1.2rem; }
+.guide-invite p { color:var(--dim); font-size:.85rem; margin-top:3px; }
+.guide-invite button { flex-shrink:0; }
+.guide-invite .linklike { color:var(--accent); font-size:.86rem; padding:8px 0; }
+.guide-dismiss { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; border-radius:50%; padding:0; background:transparent; color:inherit; opacity:.8; font-family:inherit; font-size:1.35rem; line-height:1; cursor:pointer; }
+.guide-dismiss:hover { opacity:1; background:#a0774020; }
+#boardGuideNudge { margin:0; padding:7px 0; gap:8px; }
+#pageGuideDialog { position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0; border:0; background:transparent; color:#322619; overflow:hidden; }
 #pageGuideDialog::backdrop { background:rgba(12,9,5,.12); }
-#guideSpotlight { position:fixed; pointer-events:none; border:2px solid #edb16e; border-radius:12px; box-shadow:0 0 0 9999px rgba(12,9,5,.64); }
-#guideCard { position:fixed; box-sizing:border-box; border:1px solid #a27e53; border-radius:20px; background:#33291e; box-shadow:0 16px 60px #0007; padding:22px; overflow-y:auto; overscroll-behavior:contain; }
-.guide-top { display:flex; justify-content:space-between; align-items:center; gap:12px; color:#edc79c; font-size:.76rem; font-weight:700; letter-spacing:.03em; }
-#guideCount { flex-shrink:0; color:#c9b69b; font-weight:500; }
-#guideTitle { font-family:inherit; font-size:1.22rem; line-height:1.3; font-weight:750; margin:14px 0 9px; outline:none; }
-#guideBody { color:#e1d1bb; font-size:.96rem; line-height:1.65; margin:0; }
-.guide-navigation { display:flex; align-items:center; gap:8px; margin-top:18px; }
+#guideSpotlight { position:fixed; pointer-events:none; border:2px solid #edb16e; border-radius:12px; box-shadow:0 0 0 9999px rgba(12,9,5,.5); }
+#pageGuideDialog.is-help::backdrop { background:rgba(12,9,5,.55); }
+#guideCard { position:fixed; box-sizing:border-box; border:1px solid #c2a37c; border-top:4px solid #b0793b; border-radius:5px 18px 18px 5px; background:#f1e3cc; color:#322619; box-shadow:0 14px 48px #0006; padding:20px; overflow-y:auto; overscroll-behavior:contain; }
+#guideCard::after { content:''; display:block; pointer-events:none; position:absolute; top:0; bottom:0; left:7px; border-left:1px solid #b0793b24; }
+.guide-top { display:flex; align-items:center; gap:9px; color:#705331; font-size:.69rem; font-weight:700; letter-spacing:.09em; }
+.guide-checker { width:18px; height:18px; flex:0 0 18px; background:conic-gradient(#a3723d 25%,transparent 0 50%,#a3723d 0 75%,transparent 0); background-size:12px 12px; }
+#guideCount { margin-left:auto; flex-shrink:0; letter-spacing:0; }
+#guideClose { margin-left:auto; margin-right:-8px; margin-top:-7px; margin-bottom:-7px; }
+#guideTitle { font-family:'Caprasimo',serif; font-size:1.65rem; line-height:1.22; font-weight:400; margin:16px 0 10px; outline:none; }
+#guideBody { color:#5e4932; font-size:.96rem; line-height:1.6; margin:0; }
+#guideCard button:focus-visible,#guideCard input:focus-visible { outline-color:#825221; }
+#guideCard .act { border-color:#bfa584; color:#50391f; background:transparent; font-size:.86rem; }
+#guideCard .act.primary { background:#3c4a32; color:#fff4e3; border-color:#3c4a32; }
+#guideCard .act.primary:hover { background:#4b5c3e; }
+#guideCard .linklike { color:#73502c; }
+.guide-navigation { display:flex; align-items:center; gap:9px; margin-top:20px; }
 .guide-navigation button { min-height:42px; }
-#guideSkip { margin-right:auto; padding:6px 0; font-size:.86rem; }
-#guideBack { padding:8px 10px; }
-#guideNext { padding:8px 17px; }
-#guideDots { display:flex; gap:5px; margin-top:16px; }
-#guideDots i { width:5px; height:5px; border-radius:50%; background:#766047; }
-#guideDots i.current { width:18px; border-radius:5px; background:var(--accent); }
-.guide-preferences { border-top:1px solid #584633; margin-top:16px; padding-top:12px; }
-.guide-preferences label { display:flex; gap:9px; align-items:center; font-size:.78rem; color:#c9b69b; cursor:pointer; min-height:28px; }
-#guideOff { width:15px; height:15px; flex-shrink:0; accent-color:var(--accent); }
-.guide-navigation.is-journey { flex-wrap:wrap; }
-.guide-navigation.is-journey #guideNext { flex:1 0 100%; width:100%; margin-top:2px; }
-#guideAppTour { font-size:.78rem; margin-top:5px; padding:5px 0; }
-#guideReplayNote { color:#bda98e; font-size:.75rem; margin:5px 0 0; }
+#guideBack { flex:0 0 auto; padding:8px 12px; }
+#guideNext { flex:0 1 auto; margin-left:auto; padding:9px 12px; }
+#guideSkip { padding:5px 0; font-size:.8rem; }
+.guide-navigation.is-finish { flex-wrap:wrap; }
+.guide-navigation.is-finish #guideNext { flex:1; }
+.guide-navigation.is-finish #guideSkip { order:3; width:100%; min-height:32px; }
+#guideRoute { display:flex; list-style:none; border-bottom:1px solid #c8af8c; gap:8px; padding:16px 0 12px; }
+#guideRoute[hidden] { display:none; }
+#guideRoute li { flex:1; }
+#guideRoute button { width:100%; text-align:left; background:none; border:0; padding:4px 0; color:#766348; font-family:inherit; font-weight:600; font-size:.75rem; line-height:1.25; cursor:pointer; }
+#guideRoute button span { display:block; font-size:.64rem; color:#877052; margin-bottom:3px; font-variant-numeric:tabular-nums; }
+#guideRoute button[aria-current="step"] { color:#34472b; }
+#guideRoute button[aria-current="step"] span { color:#34472b; }
+#guideRoute button[aria-current="step"]::after { content:''; display:block; width:20px; height:3px; border-radius:2px; background:#4b633a; margin-top:5px; margin-bottom:-8px; }
+#guideHelpChoices { display:grid; gap:10px; margin-top:18px; }
+#guideHelpChoices[hidden] { display:none; }
+#guideHelpChoices button { display:flex; align-items:center; justify-content:space-between; text-align:left; gap:12px; border:1px solid #c5ac8c; border-radius:10px; background:#fff9eb80; color:#3d2d1c; padding:13px 14px; font-family:inherit; font-weight:600; font-size:.95rem; line-height:1.4; cursor:pointer; }
+#guideHelpChoices button:hover { border-color:#937049; background:#fff9eb; }
+#guideHelpChoices button small { display:block; margin-top:2px; font-weight:400; color:#756045; font-size:.8rem; }
+.guide-preferences { border-top:1px solid #c8af8c; margin-top:18px; padding-top:12px; }
+.guide-preferences label { display:flex; gap:9px; align-items:center; font-size:.8rem; color:#6b5539; cursor:pointer; min-height:32px; }
+#guideOff { width:16px; height:16px; flex-shrink:0; accent-color:#3c4a32; }
+#guideReplayNote { color:#756045; font-size:.77rem; margin:5px 0 0; }
 @media(max-width:760px){
  .header-controls { gap:7px; }
  .page-guide-btn { flex-basis:28px; width:28px; height:28px; }
- #guideCard { padding:18px; border-radius:18px; }
- #guideTitle { font-size:1.12rem; margin-top:11px; }
- #guideBody { font-size:.9rem; line-height:1.55; }
- .guide-preferences { margin-top:12px; padding-top:9px; }
- .guide-navigation { margin-top:14px; }
- #guideDots { margin-top:12px; }
+ .guide-invite.is-welcome { flex-wrap:wrap; gap:8px; padding:12px; }
+ .guide-invite.is-welcome p { display:none; }
+ .guide-invite.is-welcome .guide-invite-copy { flex-basis:calc(100% - 45px); }
+ .guide-invite.is-welcome .guide-dismiss { order:0; }
+ .guide-invite.is-welcome .guide-invite-start { order:1; }
+ .guide-invite strong { font-size:.8rem; }
+ .guide-invite.is-welcome strong { font-size:1.1rem; }
+ #guideCard { padding:16px 18px; }
+ #guideTitle { font-size:1.4rem; margin-top:14px; }
+ #guideBody { font-size:.89rem; line-height:1.55; }
+ #guideRoute { padding:12px 0 10px; }
+ .guide-navigation { margin-top:16px; }
+}
+@media(max-height:500px){
+ #guideCard { padding:12px 16px; }
+ #guideCard .guide-top { position:sticky; top:-12px; z-index:1; background:#f1e3cc; padding-block:3px; }
+ #guideTitle { font-size:1.2rem; margin:10px 0 8px; }
+ #guideBody { font-size:.87rem; line-height:1.45; }
+ #guideRoute { padding:8px 0; }
+ .guide-navigation { margin-top:12px; }
+}
+@media(max-width:360px){ .header-controls { gap:5px; } }
+@media(prefers-reduced-motion:no-preference){
+ #pageGuideDialog[open] #guideCard { animation:guide-arrive .18s ease-out; }
+ @keyframes guide-arrive { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
 }
 
 </style>
@@ -1144,11 +1194,12 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 <dialog id="pageGuideDialog" aria-labelledby="guideTitle" aria-describedby="guideBody">
   <div id="guideSpotlight" aria-hidden="true"></div>
   <section id="guideCard">
-    <div class="guide-top"><span id="guidePageName"></span><span id="guideCount"></span></div>
+    <div class="guide-top"><span class="guide-checker" aria-hidden="true"></span><span id="guidePageName"></span><span id="guideCount"></span><button id="guideClose" type="button" class="guide-dismiss" onclick="closePageGuide()">×</button></div>
+    <ol id="guideRoute" hidden></ol>
     <div aria-live="polite" aria-atomic="true"><h2 id="guideTitle" tabindex="-1"></h2><p id="guideBody"></p></div>
-    <div id="guideDots" aria-hidden="true"></div>
-    <div id="guideNavigation" class="guide-navigation"><button id="guideSkip" type="button" class="linklike" onclick="closePageGuide()"></button><button id="guideBack" type="button" class="act" onclick="movePageGuide(-1)"></button><button id="guideNext" type="button" class="act primary" onclick="movePageGuide(1)"></button></div>
-    <div class="guide-preferences"><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p><button id="guideAppTour" class="linklike" type="button" onclick="startAppJourney()"></button></div>
+    <div id="guideNavigation" class="guide-navigation"><button id="guideSkip" type="button" class="linklike" onclick="closePageGuide(true,true)"></button><button id="guideBack" type="button" class="act" onclick="movePageGuide(-1)"></button><button id="guideNext" type="button" class="act primary" onclick="movePageGuide(1)"></button></div>
+    <div id="guideHelpChoices" hidden><button id="guideCurrentPage" type="button" onclick="startPageGuide()"></button><button id="guideAppTour" type="button" onclick="startAppJourney()"></button></div>
+    <div id="guidePreferences" class="guide-preferences" hidden><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p></div>
   </section>
 </dialog>
 
@@ -1161,7 +1212,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <p data-i18n="tagline">Your personal opening trainer</p>
   </div>
   <div class="header-controls">
-    <button id="pageGuideBtn" type="button" class="page-guide-btn" onclick="startPageGuide()" data-i18n-title="guideHelp" data-i18n-label="guideHelp">?</button>
+    <button id="pageGuideBtn" type="button" class="page-guide-btn" onclick="openGuideHelp()" data-i18n-title="guideHelp" data-i18n-label="guideHelp">?</button>
     <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
     <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
   </div>
@@ -1171,6 +1222,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   <!-- ============ MENU ============ -->
   <div id="menu">
     <div class="home-toolbar"><nav id="homeNav" class="home-nav" data-i18n-label="homeNavigation"></nav><button id="homeEngineBtn" class="home-engine" onclick="enterFreePlay()" data-i18n="vsEngine" data-i18n-title="engineMenuTip">vs Engine</button></div>
+    <aside id="menuGuideNudge" class="guide-invite" hidden></aside>
     <div id="todayBar"></div>
     <div id="repertoirePanel" hidden></div>
     <div id="testPanel" hidden></div>
@@ -1192,7 +1244,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G54</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G55</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1225,6 +1277,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <button id="testPauseBtn" class="act" onclick="showMenu('test')" data-i18n="testPause">Pause test</button>
         <p id="testHelpNote" data-i18n="testHelpNote">Showing a move marks it as assisted. You can still finish the line.</p>
       </div>
+      <aside id="boardGuideNudge" class="guide-invite" hidden></aside>
       <div class="panel-box" id="titleBox">
         <div id="lineTitle"></div>
         <div class="progressbar"><div id="progFill" style="width:0%"></div></div>
@@ -2542,6 +2595,111 @@ Object.assign(I18N.zh, {
   guideLearnControlsBody:'用「上一步」和「下一步」理解思路，再点「操练此线」自己回忆走法。用 + 保存后，就能在「我的开局库」继续练习。',
   guideHintBody:'卡住时可以用提示。无提示完成全对操练可获得马级。之后回到「我的开局库」做推荐的到期复习，巩固记忆。',
   guideNextPracticeBody:'在学习模式回顾难点，再自测需要巩固的路线。「我的开局库」集中保留这些路线，方便下一次练习和到期复习。'
+});
+
+
+/* G55: opt-in first moves and concise help. */
+Object.assign(I18N_EN, {
+  guideHelp:'Help & guides',
+  guideAppHeading:'DEBUT / FIRST MOVES',
+  guideHelpTitle:'Find your next move.',
+  guideHelpBody:'A little guidance, whenever you need it.',
+  guideCurrentPage:'Show me this page',
+  guideAppTour:'How Debut works',
+  guideTourLength:'4 short stops · about a minute',
+  guideOff:'Hide first-visit tips',
+  guideReplay:'All guides stay available here in ?',
+  guideClose:'Close guide',
+  guideWelcome:'Your first moves.',
+  guideWelcomeBody:'Pick a line. Learn the ideas. Make it yours.',
+  guideWelcomeStart:'Show me how',
+  guideShowMe:'Quick guide',
+  guideDismissInvite:'Dismiss this tip',
+  guideInviteexplore:'Choose a line to learn.',
+  guideInvitepractice:'Build your repertoire, one line at a time.',
+  guideInvitelearn:'Follow the moves, then try from memory.',
+  guideInvitedrill:'Your moves. Debut handles the replies.',
+  guideInvitetest:'Choose your lines. Check your recall.',
+  guideInvitetestPlay:'Take your time. You can retry any move.',
+  guideInvitetestResults:'Find one thing to work on next.',
+  guideInviteprogress:'See how your opening practice is growing.',
+  guideInviteplay:'Take your opening into a game.',
+  guideRouteLabel:'The learning path',
+  guideRouteLearn:'Learn',
+  guideRoutePractise:'Practise',
+  guideRouteTest:'Test',
+  guideRouteGrow:'Grow',
+  guideVisitRepertoire:'My repertoire →',
+  guideVisitTest:'Test your openings →',
+  guideVisitProgress:'Progress →',
+  guideBeginLesson:'Learn the Italian Game',
+  guideBrowse:'Or explore on my own',
+  guideJourneyExploreTitle:'Start with one good line.',
+  guideJourneyExploreBody:'A line is a short sequence of moves. Choose Learn to see the ideas on the board. Save it with + when you want to practise it again.',
+  guideJourneyPracticeTitle:'Make the moves your own.',
+  guideJourneyPracticeBody:'Saved lines live here. Use Drill to play them from memory, or open daily practice to pick from your suggested reviews.',
+  guideJourneyTestTitle:'See what stays with you.',
+  guideJourneyTestBody:'Test a few familiar lines together. Mistakes allow retries; results show the moves to revisit. Then return to your repertoire to practise.',
+  guideJourneyProgressTitle:'A little practice adds up.',
+  guideJourneyProgressBody:'Unaided drills and due reviews grow your line ranks. Keep practising in My repertoire, or try vs Engine beside the tabs for a full game.',
+  guideBoardBody:'Follow the arrow: tap a piece, then its destination. Or use Next to watch the move.',
+  guideIdeasBody:'Each move has a reason. Read it here; highlighted moves and squares mark the key idea.',
+  guideLearnControlsBody:'Review with Back and Next. Then choose Drill This Line to try the moves from memory.',
+  guideRecallBody:'Play your side from memory. Dots show legal destinations; Debut plays the other side.',
+  guideHintBody:'Stuck? Use Hint and keep going. A correct drill without hints earns Knight; due reviews help you advance.',
+  guideTestHelpBody:'Try again after a mistake, or use Show move for help. Pause saves your place; Skip leaves the rest of this line untested.',
+  guideNextPracticeBody:'Review tricky positions in Learn, then try those lines again. Your repertoire is the place to keep practising.'
+});
+Object.assign(I18N.zh, {
+  guideHelp:'帮助与指南',
+  guideAppHeading:'DEBUT / 入门手记',
+  guideHelpTitle:'找到下一步。',
+  guideHelpBody:'需要时，随时来看看。',
+  guideCurrentPage:'了解当前页面',
+  guideAppTour:'了解 Debut 使用流程',
+  guideTourLength:'4 个步骤 · 约 1 分钟',
+  guideOff:'隐藏首次使用提示',
+  guideReplay:'仍可通过 ? 随时查看所有指南。',
+  guideClose:'关闭指南',
+  guideWelcome:'从第一步开始。',
+  guideWelcomeBody:'选一条路线，理解思路，练成自己的开局。',
+  guideWelcomeStart:'带我了解',
+  guideShowMe:'查看指南',
+  guideDismissInvite:'关闭此提示',
+  guideInviteexplore:'选择一条路线，开始学习。',
+  guideInvitepractice:'一次一条，建立自己的开局库。',
+  guideInvitelearn:'先跟着走，再凭记忆试一试。',
+  guideInvitedrill:'你走自己的棋，Debut 负责应对。',
+  guideInvitetest:'选好路线，检验记忆。',
+  guideInvitetestPlay:'慢慢来，走错了可以重试。',
+  guideInvitetestResults:'找一个值得巩固的地方。',
+  guideInviteprogress:'看看开局练习的积累。',
+  guideInviteplay:'把学过的开局用到对局中。',
+  guideRouteLabel:'学习流程',
+  guideRouteLearn:'学习',
+  guideRoutePractise:'练习',
+  guideRouteTest:'自测',
+  guideRouteGrow:'巩固',
+  guideVisitRepertoire:'我的开局库 →',
+  guideVisitTest:'开局自测 →',
+  guideVisitProgress:'进度 →',
+  guideBeginLesson:'学习意大利开局',
+  guideBrowse:'或先自己看看',
+  guideJourneyExploreTitle:'从一条路线开始。',
+  guideJourneyExploreBody:'一条路线就是一组开局走法。点击「学习」，在棋盘上理解思路；用 + 保存，方便以后练习。',
+  guideJourneyPracticeTitle:'把走法练成自己的。',
+  guideJourneyPracticeBody:'保存的路线都在这里。用「操练」凭记忆走棋，也可以打开每日练习，从推荐内容中挑选。',
+  guideJourneyTestTitle:'看看记住了多少。',
+  guideJourneyTestBody:'把几条熟悉的路线放在一起自测。走错了可以重试，结果会指出值得回顾的走法，再回开局库练习。',
+  guideJourneyProgressTitle:'每次练习，都有积累。',
+  guideJourneyProgressBody:'无提示操练和到期复习帮助路线晋级。回到「我的开局库」继续巩固；想下完整对局，可以用标签旁的「人机对弈」。',
+  guideBoardBody:'跟着箭头，先点棋子再点目标格；也可以用「下一步」观看走法。',
+  guideIdeasBody:'每一步都有理由。在这里阅读解释，突出显示的走法和格子就是重点。',
+  guideLearnControlsBody:'用「上一步」和「下一步」回顾，再点「操练此线」凭记忆试一试。',
+  guideRecallBody:'凭记忆走自己一方的棋。圆点表示合法目标格，Debut 负责对方的应对。',
+  guideHintBody:'卡住了？用提示继续。无提示全对操练可获得马级，之后通过到期复习继续晋级。',
+  guideTestHelpBody:'走错后可以重试，或用「显示走法」求助。「暂停」保存进度，「跳过」则让该线剩余部分保持未测。',
+  guideNextPracticeBody:'在学习模式回顾难点，再试试这些路线。日常巩固，回到「我的开局库」即可。'
 });
 
 /* Read old or damaged records without letting one field break the app. */
@@ -3960,7 +4118,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G54';
+const BUILD='G55';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5005,8 +5163,8 @@ function rememberGuide(page){
   if(!guidePrefs.seen.includes(page))guidePrefs.seen.push(page);
   saveGuidePrefs();
 }
-function saveGuidePrefs(){try{localStorage.setItem('otGuides',JSON.stringify(guidePrefs));}catch(e){/* Remember for this visit even when storage is blocked. */}}
-function setGuideAutomatic(disabled){guidePrefs.disabled=disabled===true;saveGuidePrefs();}
+function saveGuidePrefs(){try{localStorage.setItem('otGuides',JSON.stringify(guidePrefs));}catch(e){/* Keep guidance usable when storage is blocked. */}}
+function setGuideAutomatic(disabled){guidePrefs.disabled=disabled===true;saveGuidePrefs();renderGuideInvite();}
 function guidePage(){
   if(document.getElementById('appShell').classList.contains('board-view'))return mode==='test'?'testPlay':mode;
   return menuView==='test'&&document.querySelector('#testPanel .test-report')?'testResults':menuView;
@@ -5036,141 +5194,180 @@ function pageGuideSteps(page){
   };
   return (steps[page]||[]).filter(item=>guideTarget(item.targets));
 }
-// This overview visits menu tabs only; it never starts lessons, tests or games.
+// An invitation, never an automatic modal: people can use the page immediately.
+function renderGuideInvite(){
+  const page=guidePage(),inBoard=document.getElementById('appShell').classList.contains('board-view');
+  const menu=document.getElementById('menuGuideNudge'),board=document.getElementById('boardGuideNudge');
+  if(!menu||!board)return;
+  menu.hidden=true;board.hidden=true;
+  if(activeGuide||document.getElementById('appShell').inert||document.querySelector('dialog[open]')||!shouldOfferGuide(guidePrefs,page))return;
+  const welcome=page==='explore'&&!guidePrefs.journey,el=inBoard?board:menu;
+  el.classList.toggle('is-welcome',welcome);
+  el.innerHTML=`<div class="guide-invite-copy"><strong>${t(welcome?'guideWelcome':'guideInvite'+page)}</strong>${welcome?`<p>${t('guideWelcomeBody')}</p>`:''}</div><button class="${welcome?'act':'linklike'} guide-invite-start" onclick="${welcome?'startAppJourney()':'startPageGuide()'}">${t(welcome?'guideWelcomeStart':'guideShowMe')} →</button><button class="guide-dismiss" aria-label="${t('guideDismissInvite')}" onclick="dismissGuideInvite()">×</button>`;
+  el.hidden=false;
+}
+function dismissGuideInvite(){rememberGuide(guidePage());renderGuideInvite();document.getElementById('pageGuideBtn').focus({preventScroll:true});}
 const APP_JOURNEY=[
-  {page:'explore',key:'guideJourneyExplore',targets:['[data-home="explore"]'],next:'guideVisitRepertoire'},
-  {page:'practice',key:'guideJourneyPractice',targets:['[data-home="practice"]'],next:'guideVisitTest'},
-  {page:'test',key:'guideJourneyTest',targets:['[data-home="test"]'],next:'guideVisitProgress'},
-  {page:'progress',key:'guideJourneyProgress',targets:['[data-home="progress"]'],next:'guideSeeEngine'},
-  {page:'progress',key:'guideJourneyEngine',targets:['#homeEngineBtn'],next:'guideChooseOpening'}
+  {page:'explore',key:'guideJourneyExplore',label:'guideRouteLearn',targets:['[data-home="explore"]'],next:'guideVisitRepertoire'},
+  {page:'practice',key:'guideJourneyPractice',label:'guideRoutePractise',targets:['[data-home="practice"]'],next:'guideVisitTest'},
+  {page:'test',key:'guideJourneyTest',label:'guideRouteTest',targets:['[data-home="test"]'],next:'guideVisitProgress'},
+  {page:'progress',key:'guideJourneyProgress',label:'guideRouteGrow',targets:['[data-home="progress"]'],next:'guideBeginLesson'}
 ];
-function startAppJourney(){
+function guideCanOpen(){
   const dialog=document.getElementById('pageGuideDialog'),open=document.querySelector('dialog[open]');
-  if(!dialog || activeGuide?.journey || document.getElementById('appShell').classList.contains('board-view') || document.getElementById('appShell').inert || (open&&open!==dialog))return;
-  if(activeGuide)closePageGuide();
-  activeGuide={journey:true,page:'explore',steps:APP_JOURNEY,index:0,originMenu:menuView,reportId:testReportId,
-    focus:document.activeElement,scrollX:window.scrollX,scrollY:window.scrollY,overflow:document.body.style.overflow,paddingBottom:document.body.style.paddingBottom};
-  guidePrefs.journey=true;rememberGuide('explore');
-  showJourneyStep();
-  dialog.showModal();document.body.style.overflow='hidden';placePageGuide(true);
+  return dialog&&!document.getElementById('appShell').inert&&(!open||open===dialog);
+}
+function guideOrigin(){
+  // Preserve the original trigger when switching between help and a guide.
+  if(activeGuide)return {...activeGuide.origin};
+  return {focus:document.activeElement,scrollX:window.scrollX,scrollY:window.scrollY,overflow:document.body.style.overflow,paddingBottom:document.body.style.paddingBottom};
+}
+function openGuide(){
+  renderGuideInvite();renderPageGuide(false);
+  const dialog=document.getElementById('pageGuideDialog');
+  if(!dialog.open)dialog.showModal();
+  document.body.style.overflow='hidden';placePageGuide(true);
   document.getElementById('guideTitle').focus({preventScroll:true});
+}
+function openGuideHelp(){
+  if(!guideCanOpen()||activeGuide)return;
+  activeGuide={help:true,page:guidePage(),origin:guideOrigin()};openGuide();
+}
+function startAppJourney(){
+  if(!guideCanOpen()||activeGuide?.journey||document.getElementById('appShell').classList.contains('board-view'))return;
+  const origin=guideOrigin();
+  activeGuide={journey:true,page:'explore',steps:APP_JOURNEY,index:0,originMenu:menuView,reportId:testReportId,origin};
+  guidePrefs.journey=true;rememberGuide('explore');
+  showJourneyStep();openGuide();
 }
 function showJourneyStep(){
   if(!activeGuide?.journey)return;
   activeGuide.page=activeGuide.steps[activeGuide.index].page;
-  // Show the test preview during the tour, then restore any report on exit.
-  testReportId=null;
-  setMenuView(activeGuide.page);
-  renderPageGuide();
+  // Tour only the setup view, restoring any previously open report on exit.
+  testReportId=null;setMenuView(activeGuide.page);renderPageGuide();
 }
 function queuePageGuide(){
   if(typeof requestAnimationFrame!=='function')return;
   cancelAnimationFrame(guideFrame);
   guideFrame=requestAnimationFrame(()=>{
     guideFrame=0;
-    const page=guidePage();
     if(activeGuide){
-      if(activeGuide.journey || activeGuide.page===page){renderPageGuide(false);return;}
+      if(activeGuide.journey||activeGuide.page===guidePage()){renderPageGuide(false);return;}
       closePageGuide(false);
     }
-    startPageGuide(false);
+    renderGuideInvite();
   });
 }
 function startPageGuide(manual=true){
-  const dialog=document.getElementById('pageGuideDialog'),page=guidePage();
-  if(!dialog || activeGuide)return;
-  if(!manual&&page==='explore'&&!guidePrefs.disabled&&!guidePrefs.journey){startAppJourney();return;}
-  if(!manual&&!shouldOfferGuide(guidePrefs,page))return;
-  // Never stack a guide over a chooser, achievement board or other dialog.
-  if(document.querySelector('dialog[open]') || document.getElementById('appShell').inert)return;
+  if(!manual){renderGuideInvite();return;}
+  const page=guidePage();
+  if(!guideCanOpen()||(activeGuide&&!activeGuide.help))return;
   const steps=pageGuideSteps(page);if(!steps.length)return;
-  activeGuide={page,steps,index:0,focus:document.activeElement,scrollX:window.scrollX,scrollY:window.scrollY,overflow:document.body.style.overflow,paddingBottom:document.body.style.paddingBottom};
-  rememberGuide(page);
-  renderPageGuide(false);
-  dialog.showModal();document.body.style.overflow='hidden';
-  placePageGuide(true);
-  document.getElementById('guideTitle').focus({preventScroll:true});
+  const origin=guideOrigin();activeGuide={page,steps,index:0,origin};
+  rememberGuide(page);openGuide();
 }
 function renderPageGuide(focus=true){
   if(!activeGuide)return;
-  const {page,steps,index}=activeGuide,item=steps[index];
-  document.getElementById('guidePageName').textContent=t(activeGuide.journey?'guideAppHeading':'guidePage'+page);
-  document.getElementById('guideNavigation').classList.toggle('is-journey',!!activeGuide.journey);
-  const appTour=document.getElementById('guideAppTour');
-  appTour.hidden=!!activeGuide.journey||document.getElementById('appShell').classList.contains('board-view');
-  appTour.textContent=t('guideAppTour');
-  document.getElementById('guideCount').textContent=t('guideStep',{n:index+1,total:steps.length});
-  document.getElementById('guideTitle').textContent=t(item.key+'Title');
-  document.getElementById('guideBody').textContent=t(item.key+'Body');
-  document.getElementById('guideBack').hidden=index===0;
-  document.getElementById('guideBack').textContent=t('guideBack');
-  document.getElementById('guideSkip').textContent=t('guideSkip');
-  document.getElementById('guideNext').textContent=t(activeGuide.journey?item.next:index===steps.length-1?'guideDone':'guideNext');
-  document.getElementById('guideOffLabel').textContent=t('guideOff');
-  document.getElementById('guideOff').checked=guidePrefs.disabled;
-  document.getElementById('guideReplayNote').textContent=t(activeGuide.journey?'guideJourneyReplay':'guideReplay');
-  document.getElementById('guideDots').innerHTML=steps.map((_,i)=>`<i${i===index?' class="current"':''}></i>`).join('');
-  if(document.getElementById('pageGuideDialog').open){
-    placePageGuide(focus);
-    if(focus)document.getElementById('guideTitle').focus({preventScroll:true});
-  }
+  const {page,steps,index,help,journey}=activeGuide,item=steps?.[index],last=!!steps&&index===steps.length-1;
+  const dialog=document.getElementById('pageGuideDialog');dialog.classList.toggle('is-help',!!help);
+  document.getElementById('guidePageName').textContent=t(journey||help?'guideAppHeading':'guidePage'+page);
+  const count=document.getElementById('guideCount');count.hidden=!!help||!!journey;count.textContent=help?'':t('guideStep',{n:index+1,total:steps.length});
+  document.getElementById('guideTitle').textContent=t(help?'guideHelpTitle':item.key+'Title');
+  document.getElementById('guideBody').textContent=t(help?'guideHelpBody':item.key+'Body');
+  document.getElementById('guideClose').setAttribute('aria-label',t('guideClose'));
+  const route=document.getElementById('guideRoute');route.hidden=!journey;
+  route.setAttribute('aria-label',t('guideRouteLabel'));
+  if(journey)route.innerHTML=APP_JOURNEY.map((step,i)=>`<li><button type="button" onclick="jumpGuideStep(${i})"${i===index?' aria-current="step"':''}><span aria-hidden="true">0${i+1}</span>${t(step.label)}</button></li>`).join('');
+  const nav=document.getElementById('guideNavigation');nav.hidden=!!help;nav.classList.toggle('is-finish',!!journey&&last);
+  document.getElementById('guideBack').hidden=index===0;document.getElementById('guideBack').textContent=t('guideBack');
+  document.getElementById('guideSkip').hidden=!journey||!last;document.getElementById('guideSkip').textContent=t('guideBrowse');
+  document.getElementById('guideNext').textContent=help?'':t(journey?item.next:last?'guideDone':'guideNext');
+  document.getElementById('guideHelpChoices').hidden=!help;
+  document.getElementById('guideCurrentPage').innerHTML=`<span>${t('guideCurrentPage')}<small>${t('guidePage'+page)}</small></span><span aria-hidden="true">→</span>`;
+  document.getElementById('guideCurrentPage').hidden=!help||!pageGuideSteps(page).length;
+  const appTour=document.getElementById('guideAppTour');appTour.hidden=!help||document.getElementById('appShell').classList.contains('board-view');
+  appTour.innerHTML=`<span>${t('guideAppTour')}<small>${t('guideTourLength')}</small></span><span aria-hidden="true">→</span>`;
+  document.getElementById('guidePreferences').hidden=!help;
+  document.getElementById('guideOffLabel').textContent=t('guideOff');document.getElementById('guideOff').checked=guidePrefs.disabled;
+  document.getElementById('guideReplayNote').textContent=t('guideReplay');
+  if(dialog.open){placePageGuide(focus);if(focus)document.getElementById('guideTitle').focus({preventScroll:true});}
+}
+function jumpGuideStep(index){
+  if(!activeGuide?.journey||!Number.isInteger(index)||index<0||index>=APP_JOURNEY.length)return;
+  activeGuide.index=index;showJourneyStep();
 }
 function movePageGuide(delta){
-  if(!activeGuide)return;
+  if(!activeGuide||activeGuide.help)return;
   const next=activeGuide.index+delta;
-  if(next>=activeGuide.steps.length){closePageGuide(true,!!activeGuide.journey);return;}
+  if(next>=activeGuide.steps.length){
+    if(activeGuide.journey){
+      const lesson=resolveLesson('italian-game-1');closePageGuide(true,true);
+      if(lesson)startLearn(lesson.oi,lesson.li,'w');
+    }else closePageGuide();
+    return;
+  }
   activeGuide.index=Math.max(0,next);
   if(activeGuide.journey)showJourneyStep();else renderPageGuide();
 }
 function closePageGuide(restore=true,finished=false){
   if(!activeGuide)return;
-  const old=activeGuide;activeGuide=null;
-  cancelAnimationFrame(guideLayoutFrame);
+  const old=activeGuide;activeGuide=null;cancelAnimationFrame(guideLayoutFrame);
   document.getElementById('pageGuideDialog').close();
-  document.body.style.overflow=old.overflow;document.body.style.paddingBottom=old.paddingBottom;
+  document.body.style.overflow=old.origin.overflow;document.body.style.paddingBottom=old.origin.paddingBottom;
   if(old.journey){
-    testReportId=old.reportId;
-    setMenuView(finished?'explore':old.originMenu);
+    testReportId=old.reportId;setMenuView(finished?'explore':old.originMenu);
     cancelAnimationFrame(guideFrame);guideFrame=0;
-    if(finished){window.scrollTo(0,0);document.getElementById('searchBox')?.focus({preventScroll:true});return;}
   }
-  if(restore && (old.journey || old.page===guidePage())){
-    window.scrollTo(old.scrollX,old.scrollY);
-    const target=old.focus!==document.body&&old.focus?.isConnected&&old.focus.getClientRects().length?old.focus:document.getElementById('pageGuideBtn');
+  renderGuideInvite();
+  if(finished){window.scrollTo(0,0);document.getElementById('searchBox')?.focus({preventScroll:true});return;}
+  if(restore&&(old.journey||old.page===guidePage())){
+    window.scrollTo(old.origin.scrollX,old.origin.scrollY);
+    const f=old.origin.focus,target=f!==document.body&&f?.isConnected&&f.getClientRects().length?f:document.getElementById('pageGuideBtn');
     target?.focus({preventScroll:true});
   }
 }
 function placePageGuide(scroll=false){
   if(!activeGuide)return;
-  const target=guideTarget(activeGuide.steps[activeGuide.index].targets),card=document.getElementById('guideCard'),ring=document.getElementById('guideSpotlight');
-  const viewport=window.visualViewport,w=viewport?.width||document.documentElement.clientWidth,h=viewport?.height||window.innerHeight;
-  const ox=viewport?.offsetLeft||0,oy=viewport?.offsetTop||0,gap=16,pad=12;
-  card.style.maxHeight=Math.max(100,h-pad*2)+'px';
-  card.style.width=Math.min(350,w-pad*2)+'px';
+  const target=activeGuide.help?null:guideTarget(activeGuide.steps[activeGuide.index].targets),card=document.getElementById('guideCard'),ring=document.getElementById('guideSpotlight');
+  const viewport=window.visualViewport,dialog=document.getElementById('pageGuideDialog');
+  const ox=viewport?.offsetLeft||0,oy=viewport?.offsetTop||0;
+  // The stable scrollbar gutter also reduces the native dialog's usable width.
+  const w=Math.min(viewport?.width||window.innerWidth,dialog.clientWidth-ox),h=Math.min(viewport?.height||window.innerHeight,dialog.clientHeight-oy);
+  const wide=w>=640,pad=w>=760?24:12,gap=16;
+  let r=target?.getBoundingClientRect();
+  const fixed=target&&getComputedStyle(target).position==='fixed';
+  const maxHeight=fixed&&r.top-oy>140?Math.min(h-pad*2,r.top-oy-gap-pad):h-pad*2;
+  card.style.maxHeight=Math.max(100,maxHeight)+'px';card.style.width=Math.min(activeGuide.help?370:360,w-pad*2)+'px';
   const ch=card.offsetHeight,cw=card.offsetWidth;
-  document.body.style.paddingBottom=(ch+32)+'px';
-  if(scroll && target)target.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'});
-  let r=target?.getBoundingClientRect(),left=ox+(w-cw)/2,top=oy+h-ch-pad;
-  const sideRoom=r && (ox+w-r.right>=cw+gap+pad || r.left-ox>=cw+gap+pad);
-  if(r && sideRoom && w>=640){
-    left=ox+w-r.right>=cw+gap+pad?r.right+gap:r.left-cw-gap;
-    top=Math.min(oy+h-ch-pad,Math.max(oy+pad,r.top));
-  }else if(r && getComputedStyle(target).position==='fixed'){
-    top=Math.max(oy+pad,r.top-ch-gap);
-  }else if(r && w>=760 && r.bottom+gap+ch<oy+h-pad){
-    left=Math.min(ox+w-cw-pad,Math.max(ox+pad,r.left));top=r.bottom+gap;
-  }else if(r && scroll){
-    // Leave room above the phone sheet for the highlighted control.
-    const available=Math.max(40,h-ch-pad-gap-pad),desired=oy+pad+Math.max(0,(available-Math.min(r.height,available))/2);
-    window.scrollBy(0,r.top-desired);r=target.getBoundingClientRect();
+  let left=ox+(w-cw)/2,top=oy+h-ch-pad;
+  if(activeGuide.help)top=oy+(h-ch)/2;
+  else if(wide){
+    // The overview stays in one place; page tips sit alongside their target when possible.
+    const shell=document.getElementById('appShell').getBoundingClientRect();
+    const start=Math.max(ox+pad,shell.left+pad),end=Math.min(ox+w-pad,shell.right-pad);
+    left=Math.max(start,end-cw);
+    if(activeGuide.journey&&h>=600)top=Math.min(top,oy+160);
+    if((!activeGuide.journey||h<500)&&r&&r.left-start>=cw+gap)left=start;
+  }
+  if(r){
+    if(fixed)top=Math.max(oy+pad,r.top-ch-gap);
+    else if(scroll){
+      const overlaps=r.right>left-gap&&r.left<left+cw+gap;
+      const bottom=overlaps?top-gap:oy+h-pad,available=Math.max(40,bottom-oy-pad);
+      // Move only as much as needed, never centre every target or jump on a redraw.
+      const dy=r.top<oy+pad?r.top-oy-pad:r.bottom>bottom?Math.min(r.top-oy-pad,r.bottom-bottom):0;
+      if(Math.abs(dy)>1){
+        document.body.style.paddingBottom=(ch+32)+'px';window.scrollBy(0,dy);r=target.getBoundingClientRect();
+      }
+      // A board can be larger than the space above a phone sheet; keep its top visible.
+      if(overlaps&&r.height>available&&r.top<oy+pad){window.scrollBy(0,r.top-oy-pad);r=target.getBoundingClientRect();}
+    }
   }
   card.style.left=Math.max(ox+pad,left)+'px';card.style.top=Math.max(oy+pad,top)+'px';
   ring.hidden=!r;
   if(r){
     const x=Math.max(ox+5,r.left-5),y=Math.max(oy+5,r.top-5);
-    ring.style.left=x+'px';ring.style.top=y+'px';
-    ring.style.width=Math.max(0,Math.min(ox+w-5,r.right+5)-x)+'px';
-    ring.style.height=Math.max(0,Math.min(oy+h-5,r.bottom+5)-y)+'px';
+    ring.style.left=x+'px';ring.style.top=y+'px';ring.style.width=Math.max(0,Math.min(ox+w-5,r.right+5)-x)+'px';ring.style.height=Math.max(0,Math.min(oy+h-5,r.bottom+5)-y)+'px';
   }
 }
 function scheduleGuideLayout(event){
@@ -5188,10 +5385,8 @@ function initPageGuides(){
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   });
   dialog.addEventListener('close',()=>{if(activeGuide&&!dialog.open)closePageGuide();});
-  window.addEventListener('resize',scheduleGuideLayout);
-  window.addEventListener('scroll',scheduleGuideLayout,{passive:true,capture:true});
-  window.visualViewport?.addEventListener('resize',scheduleGuideLayout);
-  window.visualViewport?.addEventListener('scroll',scheduleGuideLayout);
+  window.addEventListener('resize',scheduleGuideLayout);window.addEventListener('scroll',scheduleGuideLayout,{passive:true,capture:true});
+  window.visualViewport?.addEventListener('resize',scheduleGuideLayout);window.visualViewport?.addEventListener('scroll',scheduleGuideLayout);
 }
 
 /* ================= MENU ================= */
