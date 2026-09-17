@@ -25,6 +25,7 @@
   --bad: #ffac96; --light-sq: #e8d3ae; --dark-sq: #9a6b43;
   --hl: rgba(224,164,84,.55); --hl-last: rgba(224,164,84,.35);
   --panelw: 360px;      /* side panel width */
+  --eval-slot: 2.75rem; /* room for signed scores without shrinking their text */
   --reserveh: 118px;    /* header + paddings above/below the board */
   --page-gutter: 24px;  /* shared by the header and main content */
   --page-max-width: 1600px; /* keep the whole section central on large screens */
@@ -124,7 +125,7 @@ header p { color:var(--dim); font-size:.9rem; }
 /* ---- drill ---- */
 #drill { display:none; }
 #boardCol { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; --bsize:min(92vw, calc(100dvh - var(--reserveh)), max(520px, calc(min(100vw, var(--page-max-width)) - var(--panelw) - 128px)), 2000px); }
-#drill.play { --reserveh:162px; --board-extra:28px; }   /* capture trays and evaluation bar */
+#drill.play { --reserveh:162px; --board-extra:calc(var(--eval-slot) + 8px); }   /* capture trays and evaluation bar */
 #boardStack { display:flex; flex-direction:column; align-items:center; gap:6px; }
 .board-wrap { position:relative; }
 #promoPicker { position:absolute; top:0; display:none; flex-direction:column; z-index:12;
@@ -135,12 +136,14 @@ header p { color:var(--dim); font-size:.9rem; }
 .promo-cancel { height:calc(var(--bsize)/14); background:var(--panel2); border:none; color:var(--dim);
   cursor:pointer; font-size:.8rem; }
 .promo-cancel:hover { color:var(--text); }
-#evalBarWrap { display:none; width:20px; height:var(--bsize); position:relative; flex:0 0 auto;
+#evalBarWrap { display:none; width:var(--eval-slot); height:var(--bsize); position:relative; flex:0 0 auto; }
+#evalTrack { position:absolute; top:0; bottom:0; width:20px; left:50%; transform:translateX(-50%);
   background:#171006; border:2px solid rgba(0,0,0,.45); border-radius:6px; overflow:hidden; }
 #evalFill { position:absolute; left:0; right:0; bottom:0; height:50%; background:#f0e9da; transition:height .65s cubic-bezier(.22,.8,.36,1); }
-#evalBarWrap::after { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(198,113,57,.7); }
-#evalNum { position:absolute; left:0; right:0; top:3px; text-align:center; font-size:.52rem; font-weight:800;
-  color:#f0e5d3; text-shadow:0 0 3px rgba(0,0,0,.75), 0 0 3px rgba(0,0,0,.75); z-index:2; }
+#evalTrack::after { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(198,113,57,.7); }
+#evalNum { position:absolute; left:0; right:0; top:3px; padding:3px 0; text-align:center;
+  font-size:.6875rem; line-height:1.2; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap;
+  color:#fff4e3; background:#35281c; border:1px solid #765b3e; border-radius:5px; z-index:2; }
 .cap-tray { width:var(--bsize); min-height:22px; display:none; align-items:center; flex-wrap:wrap; }
 .cap-tray .cap { display:inline-flex; align-items:center; font-size:23px; line-height:1; margin-right:-1px; }
 .cap-tray .bp svg { filter:drop-shadow(0 0 2px rgba(255,246,230,.85)) drop-shadow(0 0 5px rgba(255,246,230,.35)); }  /* halo so dark pieces show on the wood panel */
@@ -458,6 +461,10 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .line-controls #lineSel { flex-basis:100%; }
 .board-options { display:flex; gap:8px; flex-basis:100%; }
 .board-options .mini { flex:1 1 0; min-width:0; min-height:44px; white-space:normal; border-radius:12px; padding:7px 6px; }
+.board-options .mini[aria-pressed="true"] { background:#405035; border-color:#7b9065; color:#f4f1df; }
+.board-options-help { flex-basis:100%; color:var(--dim); font-size:.8125rem; }
+.board-options-help summary { cursor:pointer; }
+.board-options-help p { margin-top:6px; color:var(--text); line-height:1.6; }
 #donePlan { text-align:left; color:var(--text); font-size:1rem; line-height:1.7; margin:14px 0 12px; }
 #donePlan b { color:#e0a878; }
 #langBar { display:inline-flex; gap:4px; }
@@ -477,7 +484,7 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 
 /* ---- phone layout: full explanations flow naturally with the page ---- */
 @media (max-width:760px){
-  :root { --page-gutter:8px; }
+  :root { --page-gutter:8px; --eval-slot:20px; }
   .page-shell { container-type:inline-size; }
   .page-shell.board-view { width:100%; }
   header { padding-block:max(14px, calc(env(safe-area-inset-top, 0px) + 8px)) 6px; gap:8px; }
@@ -493,9 +500,12 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
   /* Hidden evaluation takes no phone space; when shown, balance its left slot. */
   #drill.play { --board-extra:0px; }
   #drill.play #evalBarWrap { display:none !important; }
-  #drill.play.eval-visible { --board-extra:56px; }
+  #drill.play.eval-visible { --board-extra:calc(2 * var(--eval-slot) + 16px); }
   #drill.play.eval-visible #evalBarWrap { display:block !important; }
-  #drill.play.eval-visible #boardCol::after { content:''; width:20px; flex:0 0 20px; }
+  /* On phones the score sits above the slim rail, keeping the board full-sized. */
+  #drill.play #evalNum { min-width:2.75rem; width:max-content; left:0; right:auto; top:-24px !important; bottom:auto !important; padding:3px 4px; }
+  #drill.play.eval-visible #capTop { padding-left:24px; }
+  #drill.play.eval-visible #boardCol::after { content:''; width:var(--eval-slot); flex:0 0 var(--eval-slot); }
   #board { border-radius:12px; }
   .side-panel { width:100%; max-width:100%; gap:8px; display:flex; flex-direction:column; padding:0 10px; box-sizing:border-box; }
   .panel-box { padding:10px 14px; }
@@ -1300,7 +1310,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G57</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G58</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1312,7 +1322,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   <!-- ============ DRILL ============ -->
   <div id="drill" class="layout" style="padding:0;">
     <div id="boardCol">
-      <div id="evalBarWrap"><div id="evalFill"></div><span id="evalNum"></span></div>
+      <div id="evalBarWrap" data-i18n-title="tipEval"><div id="evalTrack"><div id="evalFill"></div></div><span id="evalNum"></span></div>
       <div id="boardStack">
 
         <div id="capTop" class="cap-tray"></div>
@@ -1343,10 +1353,11 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <div class="line-controls">
           <select id="lineSel" data-i18n-label="pickOpening" onchange="onLineSel(this.value)"></select>
           <div class="board-options" role="group" data-i18n-label="boardOptions">
-          <button class="mini" id="annotBtn" onclick="toggleAnnots()" data-i18n-title="tipArrows" title="Show or hide arrows and key-square markers"></button>
+          <button class="mini" id="annotBtn" onclick="toggleAnnots()" data-i18n-title="tipLearnArrows" title="Show the next lesson move and position diagrams"></button>
           <button class="mini" id="aimBtn" onclick="toggleAims()" data-i18n-title="tipDots" title="Show or hide legal-move dots when you select a piece"></button>
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" aria-pressed="false" hidden></button>
           </div>
+          <details class="board-options-help" id="boardOptionsHelp"><summary data-i18n="boardOptionsHelp">About board aids</summary><p id="boardOptionsNote"></p></details>
         </div>
         <button id="boardRepBtn" class="rep-toggle" hidden></button>
         <div id="strengthRow" style="display:none;margin-top:10px">
@@ -2819,6 +2830,34 @@ Object.assign(I18N.zh, {
   playResultClose:'关闭结果，查看最后局面'
 });
 
+/* G58: board aids describe what they actually display. */
+Object.assign(I18N_EN, {
+  arrowsOn:'Lesson arrows: On',
+  arrowsOff:'Lesson arrows: Off',
+  dotsOn:'Legal moves: On',
+  dotsOff:'Legal moves: Off',
+  tipLearnArrows:'Show the next lesson move and position diagrams',
+  tipDrillArrows:'Show available diagrams for moves already played; use Hint for the next move',
+  tipDots:'Select a piece to see legal destinations: dots for empty squares, rings for captures',
+  boardOptionsHelp:'About board aids',
+  boardAidsLearn:'Green arrows show the next lesson move. Amber arrows and circles explain the position. Legal moves shows destinations after you select a piece; rings mark captures.',
+  boardAidsDrill:'Lesson arrows show diagrams where provided, after a move is played. Use Hint for the next move. Legal moves shows destinations after you select a piece; rings mark captures.',
+  boardAidsPlay:'Select a piece to see legal moves; rings mark captures. Evaluation: + favours you, − favours the engine. M means mate in that many moves.'
+});
+Object.assign(I18N.zh, {
+  arrowsOn:'教学箭头：开',
+  arrowsOff:'教学箭头：关',
+  dotsOn:'走法提示：开',
+  dotsOff:'走法提示：关',
+  tipLearnArrows:'显示下一步教学走法和局面示意',
+  tipDrillArrows:'显示已走着法附带的局面示意；需要下一步帮助时请用「提示」',
+  tipDots:'选中棋子后显示合法落点：圆点表示空格，圆环表示可吃的棋子',
+  boardOptionsHelp:'棋盘辅助说明',
+  boardAidsLearn:'绿色箭头指向下一步教学走法，金色箭头和圆圈解释局面。开启走法提示后，选中棋子即可看到合法落点；圆环表示可以吃子。',
+  boardAidsDrill:'教学箭头解释已经走过的着法，部分着法没有示意图。需要下一步帮助时请用「提示」。开启走法提示后，选中棋子即可看到合法落点；圆环表示可以吃子。',
+  boardAidsPlay:'选中棋子可查看合法落点，圆环表示可以吃子。评估中，+ 表示你占优，− 表示引擎占优；M 后的数字表示距离将杀的步数。'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -3168,7 +3207,7 @@ let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
 const BOARD_OPTION_DEFAULTS={learn:{arrows:true,dots:false},drill:{arrows:false,dots:true},play:{arrows:false,dots:false},test:{arrows:false,dots:false}};
 function boardOptionKey(kind,view){return (kind==='arrows'?'otArrows':'otAims')+view[0].toUpperCase()+view.slice(1);}
 function readBoardOption(kind,view){
-  if(view==='test')return false;
+  if(view==='test'||(view==='play'&&kind==='arrows'))return false;
   try{
     const value=localStorage.getItem(boardOptionKey(kind,view));
     if(value==='0'||value==='1')return value==='1';
@@ -3198,7 +3237,7 @@ function toggleAims(){
   if(curOp!==null || mode==='play') render(curLastU());
 }
 function renderAimBtn(){
-  const b=document.getElementById('aimBtn'); if(b){ b.textContent=t(showAims?'dotsOn':'dotsOff'); b.setAttribute('aria-pressed',String(showAims)); }
+  const b=document.getElementById('aimBtn'); if(b){ b.hidden=mode==='test'; b.textContent=t(showAims?'dotsOn':'dotsOff'); b.setAttribute('aria-pressed',String(showAims)); }
 }
 
 /* Favorites: starred openings, keyed by (stable) English opening name. */
@@ -4235,7 +4274,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G57';
+const BUILD='G58';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4871,12 +4910,21 @@ function render(lastU){
 /* ---- annotation overlay (arrows + key squares) ---- */
 let showAnnots = readBoardOption('arrows',mode);
 function toggleAnnots(){
-  if(mode==='test')return;
+  if(mode!=='learn'&&mode!=='drill')return;
   showAnnots=!showAnnots; saveBoardOption('arrows',showAnnots);
   renderAnnotBtn(); drawAnnots();
 }
 function renderAnnotBtn(){
-  const b=document.getElementById('annotBtn'); if(b){ b.textContent=t(showAnnots?'arrowsOn':'arrowsOff'); b.setAttribute('aria-pressed',String(showAnnots)); }
+  const b=document.getElementById('annotBtn');
+  if(b){
+    b.hidden=mode!=='learn'&&mode!=='drill';
+    b.textContent=t(showAnnots?'arrowsOn':'arrowsOff');b.setAttribute('aria-pressed',String(showAnnots));
+    const tip=mode==='learn'?'tipLearnArrows':'tipDrillArrows';
+    b.setAttribute('data-i18n-title',tip);b.title=t(tip);
+  }
+  const help=document.getElementById('boardOptionsHelp'),note=document.getElementById('boardOptionsNote');
+  if(help)help.hidden=mode==='test';
+  if(note)note.textContent=t(mode==='learn'?'boardAidsLearn':mode==='drill'?'boardAidsDrill':'boardAidsPlay');
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
 let learnReviewOnly=false;
