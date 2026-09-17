@@ -1188,6 +1188,51 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  @keyframes guide-arrive { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
 }
 
+/* A finished engine game gets a clear result, with the final position kept intact. */
+#playResultDialog { width:min(420px,calc(100% - 24px)); max-height:calc(100dvh - 24px); margin:auto; padding:26px; box-sizing:border-box; overflow-y:auto; overscroll-behavior:contain; color:var(--text); background:var(--panel); border:1px solid #8e704d; border-top:4px solid var(--result-accent,var(--accent)); border-radius:6px 22px 22px 6px; box-shadow:0 20px 80px #0009; text-align:center; }
+#playResultDialog::backdrop { background:rgba(15,10,5,.68); }
+[data-outcome="win"] { --result-accent:var(--accent2); }
+[data-outcome="loss"] { --result-accent:var(--accent); }
+[data-outcome="draw"] { --result-accent:#d8c6a8; }
+#playResultDialog .result-eyebrow { color:var(--dim); font-size:.74rem; font-weight:700; letter-spacing:.12em; padding:0 22px; }
+#playResultClose { position:absolute; right:9px; top:9px; }
+.result-emblem { display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; margin:16px auto 8px; color:var(--result-accent); border:1px solid currentColor; border-radius:50%; background:#211a1250; }
+.result-emblem svg { width:30px; height:30px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+#playResultTitle { font-family:'Caprasimo',serif; font-size:2rem; font-weight:400; line-height:1.2; color:var(--result-accent); outline:none; }
+.play-result-score { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; margin:12px 0; }
+#playResultScore { font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; }
+#playResultReason { font-size:.85rem; padding-left:12px; border-left:1px solid var(--line); color:var(--dim); }
+#playResultExplanation { font-size:.94rem; line-height:1.6; color:var(--dim); }
+.play-result-actions { display:flex; flex-direction:column; gap:8px; margin-top:22px; }
+.play-result-actions button { min-height:44px; width:100%; }
+#playResultDialog .act.primary { background:var(--result-accent); border-color:var(--result-accent); color:var(--on-accent); }
+#playResultDialog .act.primary:hover { filter:brightness(1.08); }
+#playResultOpenings { margin-top:8px; padding:8px; font-size:.85rem; color:var(--dim); }
+.play-result-bar { width:100%; order:-1; display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--line); border-left:3px solid var(--result-accent); border-radius:4px 12px 12px 4px; background:var(--panel); color:var(--text); }
+.play-result-bar>div { min-width:0; flex:1; }
+.play-result-bar strong { display:block; font-size:1.05rem; color:var(--result-accent); line-height:1.25; }
+.play-result-bar small { display:block; color:var(--dim); font-size:.78rem; margin-top:3px; }
+.play-result-bar .mini { flex-shrink:0; padding:8px 10px; min-height:38px; }
+#drill.has-result .sq { cursor:default; }
+#drill.has-result .engine-purpose { display:none; }
+
+@media(max-width:400px){
+ #playResultDialog { padding:22px 18px 14px; }
+ #playResultTitle { font-size:1.65rem; }
+}
+@media(max-height:520px){
+ #playResultDialog { padding:16px 22px 10px; }
+ #playResultDialog .result-emblem { display:none; }
+ #playResultTitle { margin-top:12px; font-size:1.6rem; }
+ .play-result-score { margin:8px 0; }
+ .play-result-actions { flex-direction:row; margin-top:16px; }
+ .play-result-actions .act { flex:1 1 0; min-width:0; padding-inline:8px; font-size:.86rem; }
+}
+@media(prefers-reduced-motion:no-preference){
+ #playResultDialog[open] { animation:result-arrive .2s ease-out; }
+ @keyframes result-arrive { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+}
+
 </style>
 </head>
 <body>
@@ -1201,6 +1246,17 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div id="guideHelpChoices" hidden><button id="guideCurrentPage" type="button" onclick="startPageGuide()"></button><button id="guideAppTour" type="button" onclick="startAppJourney()"></button></div>
     <div id="guidePreferences" class="guide-preferences" hidden><label><input type="checkbox" id="guideOff" onchange="setGuideAutomatic(this.checked)"><span id="guideOffLabel"></span></label><p id="guideReplayNote"></p></div>
   </section>
+</dialog>
+
+<dialog id="playResultDialog" aria-labelledby="playResultTitle" aria-describedby="playResultReason playResultExplanation">
+  <button id="playResultClose" type="button" class="guide-dismiss" onclick="closePlayResult()" data-i18n-label="playResultClose">×</button>
+  <p class="result-eyebrow" data-i18n="playGameOver">GAME OVER</p>
+  <div id="playResultEmblem" class="result-emblem" aria-hidden="true"></div>
+  <h2 id="playResultTitle" tabindex="-1"></h2>
+  <p class="play-result-score"><span id="playResultScore" aria-hidden="true"></span><span id="playResultScoreLabel" class="sr-only"></span><span id="playResultReason"></span></p>
+  <p id="playResultExplanation"></p>
+  <div class="play-result-actions"><button type="button" class="act primary" onclick="restartFinishedPlay()" data-i18n="playAgain">Play again</button><button type="button" class="act" onclick="closePlayResult()" data-i18n="playViewPosition">View final position</button></div>
+  <button id="playResultOpenings" type="button" class="linklike" onclick="leaveFinishedPlay()" data-i18n="playBackOpenings">Back to openings</button>
 </dialog>
 
 <dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
@@ -1244,7 +1300,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G55</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G56</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1258,6 +1314,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div id="boardCol">
       <div id="evalBarWrap"><div id="evalFill"></div><span id="evalNum"></span></div>
       <div id="boardStack">
+
         <div id="capTop" class="cap-tray"></div>
         <div class="board-wrap"><div id="board" role="group" data-i18n-label="boardHelp"></div><svg id="overlay" viewBox="0 0 8 8"></svg></div>
         <div id="capBottom" class="cap-tray"></div>
@@ -1265,6 +1322,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
       </div>
     </div>
     <div class="side-panel">
+      <section id="playResultBar" class="play-result-bar" role="status" aria-live="polite" aria-atomic="true" hidden><div><strong id="playResultBarTitle"></strong><small id="playResultBarReason"></small></div><button id="playResultDetails" class="mini" type="button" onclick="openPlayResult()" data-i18n="playShowResult">Result →</button></section>
       <div id="sessionStrip" class="session-strip" role="status" hidden></div>
       <div id="testBoardStrip" role="status" hidden></div>
       <section id="testFeedback" aria-labelledby="testFeedbackHeading" hidden></section>
@@ -2702,6 +2760,59 @@ Object.assign(I18N.zh, {
   guideNextPracticeBody:'在学习模式回顾难点，再试试这些路线。日常巩固，回到「我的开局库」即可。'
 });
 
+
+/* G56: unmistakable engine-game outcomes. */
+Object.assign(I18N_EN, {
+  playGameOver:'GAME OVER',
+  playResultWin:'You won!',
+  playResultLoss:'The engine wins',
+  playResultDraw:'Game drawn',
+  playReasonMate:'Checkmate',
+  playReasonStalemate:'Stalemate',
+  playReasonMaterial:'Insufficient material',
+  playReasonRepetition:'Threefold repetition',
+  playReasonFifty:'50-move rule',
+  playExplainWin:'The engine’s king is in check, with no legal escape. Well played.',
+  playExplainLoss:'Your king is in check, with no legal escape. Take a look at the final position, then try again.',
+  playExplainStalemate:'The side to move has no legal move, but is not in check. Neither side wins.',
+  playExplainMaterial:'Neither side has enough material left to deliver checkmate.',
+  playExplainRepetition:'The same position, with the same side to move, has occurred three times.',
+  playExplainFifty:'Each side has made 50 moves without a pawn move or a capture.',
+  playScoreWhite:'White 1, Black 0',
+  playScoreBlack:'White 0, Black 1',
+  playScoreDraw:'White one half, Black one half',
+  playAgain:'Play again',
+  playViewPosition:'View final position',
+  playBackOpenings:'Back to openings',
+  playShowResult:'Result →',
+  playResultClose:'Close result and view final position'
+});
+Object.assign(I18N.zh, {
+  playGameOver:'对局结束',
+  playResultWin:'你赢了！',
+  playResultLoss:'引擎获胜',
+  playResultDraw:'本局和棋',
+  playReasonMate:'将杀',
+  playReasonStalemate:'逼和',
+  playReasonMaterial:'子力不足',
+  playReasonRepetition:'三次重复局面',
+  playReasonFifty:'五十回合规则',
+  playExplainWin:'引擎的王被将军，且无合法着法可以解围。下得好！',
+  playExplainLoss:'你的王被将军，且无合法着法可以解围。看看最后的局面，再试一盘。',
+  playExplainStalemate:'轮到行棋的一方没有合法着法，但王未被将军，双方和棋。',
+  playExplainMaterial:'双方剩余的子力都无法将杀对方。',
+  playExplainRepetition:'相同局面、同一方行棋，已出现三次。',
+  playExplainFifty:'双方各走了五十回合，没有走兵，也没有吃子。',
+  playScoreWhite:'白方 1，黑方 0',
+  playScoreBlack:'白方 0，黑方 1',
+  playScoreDraw:'白方半分，黑方半分',
+  playAgain:'再来一盘',
+  playViewPosition:'查看最后局面',
+  playBackOpenings:'返回全部开局',
+  playShowResult:'对局结果 →',
+  playResultClose:'关闭结果，查看最后局面'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -4118,7 +4229,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G55';
+const BUILD='G56';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5200,6 +5311,7 @@ function renderGuideInvite(){
   const menu=document.getElementById('menuGuideNudge'),board=document.getElementById('boardGuideNudge');
   if(!menu||!board)return;
   menu.hidden=true;board.hidden=true;
+  if(inBoard&&mode==='play'&&playOver)return;
   if(activeGuide||document.getElementById('appShell').inert||document.querySelector('dialog[open]')||!shouldOfferGuide(guidePrefs,page))return;
   const welcome=page==='explore'&&!guidePrefs.journey,el=inBoard?board:menu;
   el.classList.toggle('is-welcome',welcome);
@@ -5392,6 +5504,7 @@ function initPageGuides(){
 /* ================= MENU ================= */
 let menuScrollY=0;
 function showAppView(view){
+  if(view!=='board'||mode!=='play'||!playOver)clearPlayResultUI();
   const inBoard = view==='board';
   const wasBoard=document.getElementById('appShell').classList.contains('board-view');
   if(inBoard && !wasBoard) menuScrollY=window.scrollY;
@@ -6388,29 +6501,97 @@ function countBookUserMoves(){   // user plies inside the longest matching reper
   }));
   return best;
 }
+/* The outcome uses the side to move: after checkmate, that side has lost. */
+function playOutcome(status=playResult,whiteToMove=playWhite,side=playerSide){
+  if(!['checkmate','stalemate','material','repetition','fifty'].includes(status))return null;
+  const mate=status==='checkmate',win=mate&&whiteToMove!==(side==='w');
+  const outcome=mate?(win?'win':'loss'):'draw';
+  const reason=mate?'Mate':{stalemate:'Stalemate',material:'Material',repetition:'Repetition',fifty:'Fifty'}[status];
+  return {outcome,title:'playResult'+(mate?(win?'Win':'Loss'):'Draw'),reason:'playReason'+reason,
+    explanation:'playExplain'+(mate?(win?'Win':'Loss'):reason),
+    score:mate?(whiteToMove?'0–1':'1–0'):'½–½',scoreLabel:mate?(whiteToMove?'playScoreBlack':'playScoreWhite'):'playScoreDraw'};
+}
+let playResultOrigin=null;
 function finishPlay(status){
-  if(playOver) return;
-  playOver=true; locked=true; playResult=status;
-  let userLost=false;
-  if(status==='checkmate'){
-    const loserWhite=playWhite; userLost = (loserWhite===(playerSide==='w'));
-    if(userLost) SFX.mateLose(); else SFX.mateWin();
-  } else {
-    SFX.success();
-  }
-  achCheck('play', {result: status==='checkmate' ? (userLost?'loss':'win') : 'draw', reason: status,
-    elo: gameMinElo, free: freeMode, plies: playHist.length, flags: playFlags,
-    bookUserMoves: freeMode ? countBookUserMoves() : 0});
+  const result=playOutcome(status);if(playOver||mode!=='play'||!result)return;
+  playOver=true;locked=true;playResult=status;selSq=null;aimSet=null;
+  Engine.abort();
+  renderPlayResult();openPlayResult();
+  // A blocked audio device must never prevent a visible result or finish the game twice.
+  try{SFX[result.outcome==='win'?'mateWin':result.outcome==='loss'?'mateLose':'success']();}catch(e){}
+  achCheck('play',{result:result.outcome,reason:status,elo:gameMinElo,free:freeMode,plies:playHist.length,
+    flags:playFlags,bookUserMoves:freeMode?countBookUserMoves():0});
   flushMedals();
-  renderPlayResult();
 }
 function renderPlayResult(){
-  const status=playResult; if(!status) return;
-  const msg=status==='checkmate' ? t(playWhite===(playerSide==='w')?'checkmateLose':'checkmateWin')
-    : t(status==='stalemate'?'stalemate':status==='material'?'drawMaterial':status==='repetition'?'drawRepetition':'drawFifty');
-  setPrompt(status==='checkmate'?t('gameOverMate') : status==='stalemate'?t('gameOverStale') : t('gameOverDraw'), status==='checkmate'?'bad':'');
-  setComment(msg + t('restartHint'));
+  const result=playOutcome();if(mode!=='play'||!playOver||!result)return;
+  const dialog=document.getElementById('playResultDialog'),bar=document.getElementById('playResultBar');
+  dialog.dataset.outcome=result.outcome;bar.dataset.outcome=result.outcome;
+  const openingName=document.getElementById('openingName');
+  if(freeMode&&openingName)openingName.textContent=t('vsEngine')+' · '+t(playerSide==='w'?'white':'black')+' · '+t('playGameOver');
+  document.getElementById('playResultTitle').textContent=t(result.title);
+  document.getElementById('playResultReason').textContent=t(result.reason);
+  document.getElementById('playResultScore').textContent=result.score;
+  document.getElementById('playResultScoreLabel').textContent=t(result.scoreLabel);
+  document.getElementById('playResultExplanation').textContent=t(result.explanation);
+  const mark=result.outcome==='win'?MEDAL_ICONS.trophy:result.outcome==='draw'?'<path d="M5 9h14M5 15h14"/>':'<path d="M12 3v6M9 6h6M8 10h8l2 4-2 5H8l-2-5 2-4ZM7 22h10"/>';
+  document.getElementById('playResultEmblem').innerHTML=`<svg viewBox="0 0 24 24">${mark}</svg>`;
+  document.getElementById('playResultBarTitle').textContent=t(result.title);
+  document.getElementById('playResultBarReason').textContent=t('playGameOver')+' · '+t(result.reason)+' · '+result.score;
+  bar.hidden=false;
+  document.getElementById('drill').classList.add('has-result');
+  document.getElementById('boardGuideNudge').hidden=true;
+  document.getElementById('engMoveBtn').hidden=true;
+  document.getElementById('playRestartBtn').classList.add('primary');
+  document.getElementById('promptBox').style.display='none';
 }
+function openPlayResult(){
+  if(mode!=='play'||!playOver||!playOutcome())return;
+  const dialog=document.getElementById('playResultDialog');if(dialog.open)return;
+  // The game can finish while the optional guide is open. Give the result priority.
+  if(typeof activeGuide!=='undefined'&&activeGuide)closePageGuide(false);
+  if(document.querySelector('dialog[open]')||document.getElementById('appShell').inert)return;
+  renderPlayResult();
+  playResultOrigin={overflow:document.body.style.overflow};
+  dialog.showModal();document.body.style.overflow='hidden';
+  document.getElementById('playResultTitle').focus({preventScroll:true});
+}
+function closePlayResult(showPosition=true){
+  const dialog=document.getElementById('playResultDialog');
+  if(dialog?.open)dialog.close();
+  if(playResultOrigin){document.body.style.overflow=playResultOrigin.overflow;playResultOrigin=null;}
+  if(showPosition&&mode==='play'&&playOver){
+    const stack=document.getElementById('boardStack'),r=stack.getBoundingClientRect();
+    if(r.top<0||r.top>window.innerHeight/3)stack.scrollIntoView({block:'start',behavior:'instant'});
+    document.getElementById('playResultDetails').focus({preventScroll:true});
+  }
+}
+function clearPlayResultUI(){
+  closePlayResult(false);
+  document.getElementById('playResultBar').hidden=true;
+  document.getElementById('drill').classList.remove('has-result');
+  document.getElementById('engMoveBtn').hidden=false;
+  document.getElementById('playRestartBtn').classList.remove('primary');
+}
+function restartFinishedPlay(){
+  if(mode!=='play'||!playOver)return;
+  closePlayResult(false);
+  // Use the existing restart action: retain the opening, or the full-game colour preference.
+  document.getElementById('playRestartBtn').click();
+}
+function leaveFinishedPlay(){closePlayResult(false);setMenuView('explore');}
+function initPlayResults(){
+  const dialog=document.getElementById('playResultDialog');
+  dialog.addEventListener('cancel',e=>{e.preventDefault();closePlayResult();});
+  dialog.addEventListener('close',()=>{if(playResultOrigin&&!dialog.open)closePlayResult();});
+  dialog.addEventListener('keydown',e=>{
+    if(e.key!=='Tab')return;
+    const controls=[...dialog.querySelectorAll('button')].filter(el=>!el.disabled&&el.getClientRects().length),first=controls[0],last=controls.at(-1);
+    if(e.shiftKey&&(document.activeElement===first||document.activeElement.id==='playResultTitle')){e.preventDefault();last?.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}
+  });
+}
+
 function lineMoves(){ return DATA.openings[curOp].lines[curLine].moves; }
 function isPlayerTurn(){ return (ply%2===0?'w':'b')===playerSide; }
 
@@ -6946,6 +7127,7 @@ renderAimBtn();
 renderEvalBtn();
 setupSwipeBack();
 initPageGuides();
+initPlayResults();
 showMenu();
 // Offline shell: the manifest alone doesn't make a PWA work offline — the
 // service worker does. file:// and headless test stubs are skipped.
