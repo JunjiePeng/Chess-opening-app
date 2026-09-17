@@ -140,6 +140,9 @@ header p { color:var(--dim); font-size:.9rem; }
 #evalTrack { position:absolute; top:0; bottom:0; width:20px; left:50%; transform:translateX(-50%);
   background:#171006; border:2px solid rgba(0,0,0,.45); border-radius:6px; overflow:hidden; }
 #evalFill { position:absolute; left:0; right:0; bottom:0; height:50%; background:#f0e9da; transition:height .65s cubic-bezier(.22,.8,.36,1); }
+/* The filled bottom section belongs to the player at the bottom of the board. */
+#evalBarWrap[data-side="b"] #evalTrack { background:#f0e9da; }
+#evalBarWrap[data-side="b"] #evalFill { background:#171006; }
 #evalTrack::after { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(198,113,57,.7); }
 #evalNum { position:absolute; left:0; right:0; top:3px; padding:3px 0; text-align:center;
   font-size:.6875rem; line-height:1.2; font-weight:800; font-variant-numeric:tabular-nums; white-space:nowrap;
@@ -1327,7 +1330,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G59</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G60</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -4334,7 +4337,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G59';
+const BUILD='G60';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -6346,9 +6349,10 @@ function toggleEvalBar(){
 }
 // cp is from YOUR perspective (board-oriented): positive = you're better, bar fills toward you (bottom).
 function setEvalBar(cp){
-  const fill=document.getElementById('evalFill'), num=document.getElementById('evalNum');
-  if(!fill||!num) return;
-  if(cp===null){ fill.style.height='50%'; num.textContent='…'; return; }
+  const wrap=document.getElementById('evalBarWrap'), fill=document.getElementById('evalFill'), num=document.getElementById('evalNum');
+  if(!wrap||!fill||!num) return;
+  wrap.dataset.side=playerSide;
+  if(cp===null){ fill.style.height='50%'; num.textContent='…'; num.style.top='3px'; num.style.bottom='auto'; return; }
   let pct;
   if(Math.abs(cp)>=99000) pct = cp>0?100:0;
   else pct = 50 + 50*(2/(1+Math.exp(-0.00368208*cp)) - 1);   // lichess's win-probability curve
@@ -6367,6 +6371,7 @@ async function updateEvalBar(){
   wrap.style.display='block';
   wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
   if(!showEvalBar) return;
+  setEvalBar(null); // Align colours immediately; the previous position's score is no longer current.
   if(!playOver && !userTurnInPlay()) return;   // don't queue an eval ahead of the engine's reply
   const engineReady=await Engine.load();
   if(myseq!==evalSeq || mode!=='play') return;
