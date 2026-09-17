@@ -1300,7 +1300,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G56</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G57</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1417,7 +1417,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <button class="act" data-i18n="lines" onclick="backToLines()">← Lines</button>
       </div>
       <div class="btn-row" id="playNav" style="display:none">
-        <button class="act" id="engMoveBtn" data-i18n="engineMove" onclick="engineMoveNow()" data-i18n-title="tipEngMove" title="Let the engine move for you">↻ Engine move</button>
+        <button class="act" id="playUndoBtn" data-i18n="playUndo" onclick="undoPlayTurn()" data-i18n-title="tipPlayUndo" title="Take back your last move and the engine’s reply" disabled>↶ Undo</button>
         <button class="act" id="playRestartBtn" data-i18n="restartGame">↺ Restart game</button>
         <button class="act" id="playDrillBtn" data-i18n="backToDrill" onclick="startDrill(curOp,curLine,playerSide)">Back to Drill</button>
         <button class="act" data-i18n="menu" onclick="showMenu()">← Menu</button>
@@ -2763,6 +2763,9 @@ Object.assign(I18N.zh, {
 
 /* G56: unmistakable engine-game outcomes. */
 Object.assign(I18N_EN, {
+  playUndo:'↶ Undo',
+  tipPlayUndo:'Take back your last move and the engine’s reply',
+  playUndoDone:'Move undone — your turn.',
   playGameOver:'GAME OVER',
   playResultWin:'You won!',
   playResultLoss:'The engine wins',
@@ -2773,7 +2776,7 @@ Object.assign(I18N_EN, {
   playReasonRepetition:'Threefold repetition',
   playReasonFifty:'50-move rule',
   playExplainWin:'The engine’s king is in check, with no legal escape. Well played.',
-  playExplainLoss:'Your king is in check, with no legal escape. Take a look at the final position, then try again.',
+  playExplainLoss:'Your king is in check, with no legal escape. View the final position, then use Undo to try another move.',
   playExplainStalemate:'The side to move has no legal move, but is not in check. Neither side wins.',
   playExplainMaterial:'Neither side has enough material left to deliver checkmate.',
   playExplainRepetition:'The same position, with the same side to move, has occurred three times.',
@@ -2788,6 +2791,9 @@ Object.assign(I18N_EN, {
   playResultClose:'Close result and view final position'
 });
 Object.assign(I18N.zh, {
+  playUndo:'↶ 悔棋',
+  tipPlayUndo:'撤回你上一手棋及引擎的应对',
+  playUndoDone:'已悔棋，轮到你走。',
   playGameOver:'对局结束',
   playResultWin:'你赢了！',
   playResultLoss:'引擎获胜',
@@ -2798,7 +2804,7 @@ Object.assign(I18N.zh, {
   playReasonRepetition:'三次重复局面',
   playReasonFifty:'五十回合规则',
   playExplainWin:'引擎的王被将军，且无合法着法可以解围。下得好！',
-  playExplainLoss:'你的王被将军，且无合法着法可以解围。看看最后的局面，再试一盘。',
+  playExplainLoss:'你的王被将军，且无合法着法可以解围。查看最后局面，再用「悔棋」尝试其他走法。',
   playExplainStalemate:'轮到行棋的一方没有合法着法，但王未被将军，双方和棋。',
   playExplainMaterial:'双方剩余的子力都无法将杀对方。',
   playExplainRepetition:'相同局面、同一方行棋，已出现三次。',
@@ -4229,7 +4235,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G56';
+const BUILD='G57';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -6104,6 +6110,7 @@ function curLastU(){
 
 /* ================= PLAY vs ENGINE ================= */
 let playHist=[], playWhite=true, playOver=false, freeMode=false, playResult=null;
+let playUndoStack=[], playCompletionRecorded=false;
 let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo')) || 1000;
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
 if(playElo<500) playElo=500; if(playElo>2400) playElo=2400;
@@ -6119,6 +6126,7 @@ function onEloInput(v){
 }
 function playSetupUI(side){
   playResult=null; gameMinElo=playElo;
+  playUndoStack=[]; playCompletionRecorded=false; updatePlayUndo();
   showAppView('board');
   document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
@@ -6338,6 +6346,8 @@ function playUserMove(u){
   return true;
 }
 function commitUserMove(u){
+  if(mode!=='play'||playOver||!userTurnInPlay())return;
+  savePlayDecision();
   const from=u.slice(0,2), to=u.slice(2,4);
   const [r1,f1]=sqRC(from); const p=board[r1][f1];
   const [r2,f2]=sqRC(to);
@@ -6429,29 +6439,33 @@ async function engineMove(){
   locked=false;
   setPrompt(t('yourMove'),'');
 }
-function engineMoveNow(){ // "Engine move" button: play the user's move for them (full strength)
-  if(playOver || !userTurnInPlay() || locked) return;
-  (async()=>{
-    const g=runGen;
-    locked=true; setPrompt(t('engineChoosing'),'');
-    const white=playWhite; const fen=toFEN(white);
-    const engineReady=await Engine.load();
-    if(g!==runGen || mode!=='play' || playOver) return;
-    let u=engineReady ? await Engine.bestMove(fen,{skill:20,movetime:600,moves:playHist.map(h=>h.u).join(' ')}) : null;
-    if(g!==runGen || mode!=='play' || playOver) return;
-    if(u){ const legal=allLegalMoves(white);
-      if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }
-    if(!u) u=pickFallbackMove(white);
-    playFlags.assisted=true;
-    if(!u){ locked=false; setPrompt(t('yourMove'),''); return; }
-    makePlayMove(u);
-    const status=gameStatus(playWhite);
-    if(status!=='ongoing'){ finishPlay(status); return; }
-    const d=playDrawStatus();
-    if(d){ finishPlay(d); return; }
-    setPrompt(t('engineThinking'),'');
-    setTimeout(()=>{ if(g===runGen && mode==='play') engineMove(); },180);
-  })();
+// Save only decisions the user actually played: book moves and the engine's first
+// move never become undo targets. A snapshot also preserves special-move rights.
+function savePlayDecision(){
+  playUndoStack.push({board:board.map(row=>row.slice()),ep:epT?.slice()||null,rights:{...castleRights},
+    white:playWhite,plies:playHist.length,halfmove:playHalfmoveClock,positions:{...playPosCounts},flags:{...playFlags}});
+  updatePlayUndo();
+}
+function updatePlayUndo(){
+  document.getElementById('playUndoBtn').disabled=mode!=='play'||playUndoStack.length===0;
+}
+function undoPlayTurn(){
+  if(mode!=='play'||!playUndoStack.length)return;
+  // Invalidate delayed replies, in-flight searches, evaluations and promotion choices.
+  runGen++; Engine.abort();
+  const previous=playUndoStack.pop(),fallback=playFlags.engineFallback;
+  board=previous.board.map(row=>row.slice());epT=previous.ep?.slice()||null;castleRights={...previous.rights};
+  playWhite=previous.white;playHist=playHist.slice(0,previous.plies);
+  playHalfmoveClock=previous.halfmove;playPosCounts={...previous.positions};
+  playFlags={...previous.flags,assisted:true};if(fallback)playFlags.engineFallback=true;
+  playOver=false;playResult=null;locked=false;selSq=null;aimSet=null;curAnnot=null;
+  pendingAnim=null;userShapes=[];rcFrom=null;promoPending=null;
+  if(drag){drag=null;endGhost();}
+  const picker=document.getElementById('promoPicker');if(picker)picker.style.display='none';
+  clearPlayResultUI();
+  document.getElementById('promptBox').style.display='block';
+  render(curLastU());updatePlayList();updateEval();updateOpeningName();updateEvalBar();
+  setPrompt(t('playUndoDone'),'');
 }
 function updatePlayList(){
   let html='';
@@ -6519,9 +6533,13 @@ function finishPlay(status){
   renderPlayResult();openPlayResult();
   // A blocked audio device must never prevent a visible result or finish the game twice.
   try{SFX[result.outcome==='win'?'mateWin':result.outcome==='loss'?'mateLose':'success']();}catch(e){}
-  achCheck('play',{result:result.outcome,reason:status,elo:gameMinElo,free:freeMode,plies:playHist.length,
-    flags:playFlags,bookUserMoves:freeMode?countBookUserMoves():0});
-  flushMedals();
+  // Replaying a finished position is practice within the same game, not a second completion.
+  if(!playCompletionRecorded){
+    playCompletionRecorded=true;
+    achCheck('play',{result:result.outcome,reason:status,elo:gameMinElo,free:freeMode,plies:playHist.length,
+      flags:playFlags,bookUserMoves:freeMode?countBookUserMoves():0});
+    flushMedals();
+  }
 }
 function renderPlayResult(){
   const result=playOutcome();if(mode!=='play'||!playOver||!result)return;
@@ -6541,7 +6559,7 @@ function renderPlayResult(){
   bar.hidden=false;
   document.getElementById('drill').classList.add('has-result');
   document.getElementById('boardGuideNudge').hidden=true;
-  document.getElementById('engMoveBtn').hidden=true;
+  updatePlayUndo();
   document.getElementById('playRestartBtn').classList.add('primary');
   document.getElementById('promptBox').style.display='none';
 }
@@ -6570,7 +6588,7 @@ function clearPlayResultUI(){
   closePlayResult(false);
   document.getElementById('playResultBar').hidden=true;
   document.getElementById('drill').classList.remove('has-result');
-  document.getElementById('engMoveBtn').hidden=false;
+  updatePlayUndo();
   document.getElementById('playRestartBtn').classList.remove('primary');
 }
 function restartFinishedPlay(){
