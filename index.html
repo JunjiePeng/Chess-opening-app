@@ -204,6 +204,23 @@ button:disabled { opacity:.45; cursor:default; }
 #movelist .mv { color:var(--text); margin-right:2px; }
 #movelist .num { color:var(--dim); margin:0 4px 0 8px; }
 #movelist .cur { background:#4d3a20; border-radius:999px; padding:1px 7px; color:#f2cf9a; font-weight:700; }
+#playHistoryStatus { display:block; color:var(--text); font-size:.875rem; font-weight:650; margin-bottom:8px; }
+.play-history-nav { display:flex; gap:6px; }
+.play-history-nav .mini { min-width:42px; min-height:42px; padding:5px 8px; }
+.play-history-nav .mini svg { display:block; width:18px; height:18px; margin:auto; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.play-history-nav .history-latest { flex:1; }
+.play-history-nav .history-latest[aria-pressed="true"] { color:#e4dfcb; background:#405035; border-color:#7b9065; }
+#playHistoryControls[data-reviewing="true"] #playHistoryStatus { color:#f2cf9a; }
+#playMovesDisclosure > summary,.play-move-columns { display:none; }
+#drill.play #moveBox { order:-1; padding:12px 14px; }
+#drill.play #playMovesDisclosure > summary { display:list-item; margin-top:8px; width:fit-content; color:var(--dim); cursor:pointer; font-size:.8125rem; }
+#drill.play .play-move-columns { display:grid; grid-template-columns:2rem 1fr 1fr; gap:4px; margin-top:8px; color:var(--dim); font-size:.75rem; }
+#drill.play #movelist { display:grid; grid-template-columns:2rem 1fr 1fr; align-items:center; gap:4px; margin-top:4px; max-height:160px; line-height:1.4; }
+#drill.play #movelist .num { margin:0; font-size:.8125rem; }
+#drill.play #movelist button { background:transparent; border:1px solid transparent; border-radius:8px; padding:7px 8px; margin:0; min-height:36px; font:inherit; font-size:.9375rem; text-align:left; cursor:pointer; }
+#drill.play #movelist button:hover { border-color:var(--line); }
+#drill.play #movelist button.cur { background:#4d3a20; border-color:#8f693e; color:#f2cf9a; font-weight:700; }
+#drill.play.reviewing #promptBox { display:none !important; }
 .progressbar { height:6px; background:#453623; border-radius:999px; overflow:hidden; margin-top:10px; }
 .progressbar div { height:100%; background:var(--accent); transition:width .25s; }
 .btn-row { display:flex; gap:8px; flex-wrap:wrap; }
@@ -1310,7 +1327,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G58</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G59</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1418,7 +1435,20 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <div id="readyRail"></div>
       </div>
       <div class="panel-box" id="moveBox">
-        <div id="movelist">&nbsp;</div>
+        <div id="playHistoryControls" hidden>
+          <span id="playHistoryStatus" role="status" aria-live="polite" aria-atomic="true"></span>
+          <div class="play-history-nav" role="group" data-i18n-label="playHistoryNav" onkeydown="playHistoryKey(event)">
+            <button class="mini" id="playHistoryFirst" onclick="reviewPlayPosition(0)" data-i18n-label="playHistoryFirst" data-i18n-title="playHistoryFirst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14m12-14-7 7 7 7"/></svg></button>
+            <button class="mini" id="playHistoryBack" onclick="stepPlayHistory(-1)" data-i18n-label="playHistoryBack" data-i18n-title="playHistoryBack"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+            <button class="mini" id="playHistoryNext" onclick="stepPlayHistory(1)" data-i18n-label="playHistoryNext" data-i18n-title="playHistoryNext"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+            <button class="mini history-latest" id="playHistoryLatest" onclick="reviewPlayPosition(playHist.length)" data-i18n="playHistoryLatest" aria-pressed="true">Latest</button>
+          </div>
+        </div>
+        <details id="playMovesDisclosure" open ontoggle="if(this.open&&typeof scrollPlayHistorySelection==='function')scrollPlayHistorySelection()">
+          <summary data-i18n="playMoveList">Move list</summary>
+          <div class="play-move-columns" aria-hidden="true"><span></span><span data-i18n="white">White</span><span data-i18n="black">Black</span></div>
+          <div id="movelist">&nbsp;</div>
+        </details>
       </div>
       <div class="btn-row" id="learnNav" style="display:none">
         <button class="act primary" id="learnSessionNext" hidden onclick="nextSessionItem()"></button>
@@ -2858,6 +2888,36 @@ Object.assign(I18N.zh, {
   boardAidsPlay:'选中棋子可查看合法落点，圆环表示可以吃子。评估中，+ 表示你占优，− 表示引擎占优；M 后的数字表示距离将杀的步数。'
 });
 
+/* G59: inspect either colour without changing the live game. */
+Object.assign(I18N_EN, {
+  playHistoryNav:'Review moves',
+  playHistoryFirst:'Starting position',
+  playHistoryBack:'Previous move',
+  playHistoryNext:'Next move',
+  playHistoryLatest:'Latest',
+  playReturnLive:'Return to game',
+  playReviewFinal:'Final position',
+  playHistoryCurrent:'Latest · {move}',
+  playHistoryReview:'Review · {move}',
+  playHistoryMove:'{side}: {number}{move}',
+  playHistorySelect:'View {side}’s move {number}: {move}',
+  playMoveList:'Move list'
+});
+Object.assign(I18N.zh, {
+  playHistoryNav:'回顾着法',
+  playHistoryFirst:'初始局面',
+  playHistoryBack:'上一手',
+  playHistoryNext:'下一手',
+  playHistoryLatest:'最新局面',
+  playReturnLive:'返回对局',
+  playReviewFinal:'最后局面',
+  playHistoryCurrent:'最新 · {move}',
+  playHistoryReview:'回顾 · {move}',
+  playHistoryMove:'{side}：{number}{move}',
+  playHistorySelect:'查看{side}第 {number} 手：{move}',
+  playMoveList:'着法列表'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -4274,7 +4334,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G58';
+const BUILD='G59';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4876,6 +4936,8 @@ function animMove(u){
 }
 let keyboardSq='e2';
 function render(lastU){
+  const displayBoard=mode==='play'?playViewPosition().board:board;
+  if(reviewingPlay()){lastU=curLastU();pendingAnim=null;}
   const restoreFocus=!!document.activeElement?.closest('#board .sq');
   boardEl.innerHTML='';
   const flip = playerSide==='b';
@@ -4887,7 +4949,7 @@ function render(lastU){
     const name = String.fromCharCode(97+f)+(r+1);
     sq.className = 'sq ' + (((r+f)%2===0)?'dark':'light');
     sq.dataset.sq = name;
-    const p = board[r][f];
+    const p = displayBoard[r][f];
     const pieceName={P:'piecePawn',N:'pieceKnight',B:'pieceBishop',R:'pieceRook',Q:'pieceQueen',K:'pieceKing'};
     const label=p ? t(p===p.toUpperCase()?'white':'black')+' '+t(pieceName[p.toUpperCase()]) : t('emptySquare');
     sq.setAttribute('role','button'); sq.setAttribute('aria-label',t('boardSquare',{sq:name,piece:label}));
@@ -4897,7 +4959,7 @@ function render(lastU){
     if(vr===7) sq.innerHTML += `<span class="coord file">${String.fromCharCode(97+f)}</span>`;
     if(lastU && (name===lastU.slice(0,2)||name===lastU.slice(2,4))) sq.classList.add('last');
     if(selSq===name) sq.classList.add('sel');
-    if(aimSet && aimSet.has(name)) sq.classList.add(board[r][f] ? 'cp' : 'mv');
+    if(aimSet && aimSet.has(name)) sq.classList.add(displayBoard[r][f] ? 'cp' : 'mv');
     boardEl.appendChild(sq);
   }
   if(restoreFocus) boardEl.querySelector('[data-sq="'+keyboardSq+'"]')?.focus({preventScroll:true});
@@ -5560,6 +5622,12 @@ let menuScrollY=0;
 function showAppView(view){
   if(view!=='board'||mode!=='play'||!playOver)clearPlayResultUI();
   const inBoard = view==='board';
+  document.getElementById('playHistoryControls').hidden=!inBoard||mode!=='play';
+  if(mode!=='play'){
+    document.getElementById('moveBox').hidden=false;
+    document.getElementById('playMovesDisclosure').open=true;
+    document.getElementById('drill').classList.remove('reviewing');
+  }
   const wasBoard=document.getElementById('appShell').classList.contains('board-view');
   if(inBoard && !wasBoard) menuScrollY=window.scrollY;
   document.getElementById('appShell').classList.toggle('board-view', inBoard);
@@ -6151,7 +6219,7 @@ function syncLineSel(){
   const sel=document.getElementById('lineSel'); if(sel){sel.value=curOp+':'+curLine;fitSelectText(sel);}
 }
 function curLastU(){
-  if(mode==='play') return playHist.length?playHist[playHist.length-1].u:null;
+  if(mode==='play') return playHist[playViewPly()-1]?.u||null;
   if(mode==='learn') return learnPly>0?lineMoves()[learnPly-1].u:null;
   return plyLastU();
 }
@@ -6159,6 +6227,7 @@ function curLastU(){
 /* ================= PLAY vs ENGINE ================= */
 let playHist=[], playWhite=true, playOver=false, freeMode=false, playResult=null;
 let playUndoStack=[], playCompletionRecorded=false;
+let playPositions=[], playReviewPly=null;
 let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo')) || 1000;
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
 if(playElo<500) playElo=500; if(playElo>2400) playElo=2400;
@@ -6174,7 +6243,8 @@ function onEloInput(v){
 }
 function playSetupUI(side){
   playResult=null; gameMinElo=playElo;
-  playUndoStack=[]; playCompletionRecorded=false; updatePlayUndo();
+  playUndoStack=[]; playCompletionRecorded=false; resetPlayHistory();updatePlayUndo();
+  document.getElementById('playMovesDisclosure').open=false;
   showAppView('board');
   document.getElementById('drill').classList.toggle('play', mode==='play');
   document.getElementById('doneBox').style.display='none';
@@ -6209,7 +6279,7 @@ function startPlay(oi,li,side){
   const op=DATA.openings[oi], line=op.lines[li];
   document.getElementById('lineTitle').innerHTML=`${uiChessIcon(op.icon)} ${opName(op)}<small id="openingName">${lnName(line)} — ${side==='w'?t('white'):t('black')}</small>`;
   // play the book line to reach the opening position
-  for(const mv of line.moves){ applyMove(mv.u); playHist.push({u:mv.u,san:mv.san}); playWhite=!playWhite; }
+  for(const mv of line.moves){ applyMove(mv.u); playHist.push({u:mv.u,san:mv.san}); playWhite=!playWhite;rememberPlayPosition(); }
   resetDrawTracking();
   syncLineSel(); updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
@@ -6253,12 +6323,12 @@ function startFreePlay(side){
 }
 function updateOpeningName(){
   const el=document.getElementById('openingName'); if(!el) return;
-  const name=recognizeOpening(playHist.map(h=>h.san));
+  const name=recognizeOpening(playHist.slice(0,playViewPly()).map(h=>h.san));
   if(freeMode){
     el.textContent = name ? ''+name : t('makeMove',{side: playerSide==='w'?t('white'):t('black')});
-  } else if(name){
+  } else {
     const base=lnName(DATA.openings[curOp].lines[curLine]);
-    el.textContent = base+' · '+name;
+    el.textContent = name?base+' · '+name:base;
   }
 }
 /* ---- evaluation bar (optional, engine-driven) ---- */
@@ -6298,10 +6368,12 @@ async function updateEvalBar(){
   wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
   if(!showEvalBar) return;
   if(!playOver && !userTurnInPlay()) return;   // don't queue an eval ahead of the engine's reply
-  if(!(await Engine.load())){ setEvalBar(null); return; }
+  const engineReady=await Engine.load();
   if(myseq!==evalSeq || mode!=='play') return;
-  const g=runGen, pw=playWhite, ps=playerSide;   // snapshot the perspective this analysis belongs to
-  const fen=toFEN(pw);
+  if(!engineReady){ setEvalBar(null); return; }
+  const position=playViewPosition();
+  const g=runGen, pw=position.white, ps=playerSide;   // snapshot the displayed position, not just the live turn
+  const fen=position.fen;
   const toYour = (cp,mateN)=>{   // engine POV (side to move) → board-oriented, per the SNAPSHOTTED game
     const c = (mateN!==null && mateN!==undefined) ? (mateN>0?100000-mateN:-100000-mateN) : cp;
     const whiteCp = pw ? c : -c;
@@ -6373,7 +6445,7 @@ function makePlayMove(u){
   const [rf,ff]=sqRC(u.slice(0,2));
   const pawnMove = board[rf][ff] && board[rf][ff].toUpperCase()==='P';
   applyMove(u);
-  playHist.push({u,san}); playWhite=!playWhite;
+  playHist.push({u,san}); playWhite=!playWhite;rememberPlayPosition();
   playHalfmoveClock = (cap||pawnMove) ? 0 : playHalfmoveClock+1;
   const k=posKey(playWhite); playPosCounts[k]=(playPosCounts[k]||0)+1;
   playMoveSound({san,u},cap);
@@ -6381,6 +6453,7 @@ function makePlayMove(u){
   render(u); updatePlayList(); updateEval(); updateOpeningName(); updateEvalBar();
 }
 function playUserMove(u){
+  if(reviewingPlay())return false;
   const from=u.slice(0,2), to=u.slice(2,4);
   if(!legalTargetNames(from).includes(to)){ // illegal — ignore quietly, reselect handled by caller
     return false;
@@ -6394,7 +6467,7 @@ function playUserMove(u){
   return true;
 }
 function commitUserMove(u){
-  if(mode!=='play'||playOver||!userTurnInPlay())return;
+  if(mode!=='play'||playOver||reviewingPlay()||!userTurnInPlay())return;
   savePlayDecision();
   const from=u.slice(0,2), to=u.slice(2,4);
   const [r1,f1]=sqRC(from); const p=board[r1][f1];
@@ -6495,15 +6568,16 @@ function savePlayDecision(){
   updatePlayUndo();
 }
 function updatePlayUndo(){
-  document.getElementById('playUndoBtn').disabled=mode!=='play'||playUndoStack.length===0;
+  document.getElementById('playUndoBtn').disabled=mode!=='play'||reviewingPlay()||playUndoStack.length===0;
 }
 function undoPlayTurn(){
-  if(mode!=='play'||!playUndoStack.length)return;
+  if(mode!=='play'||reviewingPlay()||!playUndoStack.length)return;
   // Invalidate delayed replies, in-flight searches, evaluations and promotion choices.
   runGen++; Engine.abort();
   const previous=playUndoStack.pop(),fallback=playFlags.engineFallback;
   board=previous.board.map(row=>row.slice());epT=previous.ep?.slice()||null;castleRights={...previous.rights};
   playWhite=previous.white;playHist=playHist.slice(0,previous.plies);
+  playPositions=playPositions.slice(0,previous.plies+1);playReviewPly=null;
   playHalfmoveClock=previous.halfmove;playPosCounts={...previous.positions};
   playFlags={...previous.flags,assisted:true};if(fallback)playFlags.engineFallback=true;
   playOver=false;playResult=null;locked=false;selSq=null;aimSet=null;curAnnot=null;
@@ -6515,14 +6589,73 @@ function undoPlayTurn(){
   render(curLastU());updatePlayList();updateEval();updateOpeningName();updateEvalBar();
   setPrompt(t('playUndoDone'),'');
 }
+// Historical boards are display-only snapshots. The engine always reads the live board.
+function reviewingPlay(){return mode==='play'&&playReviewPly!==null;}
+function playViewPly(){return reviewingPlay()?playReviewPly:playHist.length;}
+function playViewPosition(){return reviewingPlay()?playPositions[playReviewPly]:{board,white:playWhite,fen:toFEN(playWhite)};}
+function rememberPlayPosition(){playPositions.push({board:board.map(row=>row.slice()),white:playWhite,fen:toFEN(playWhite)});}
+function resetPlayHistory(){playReviewPly=null;playPositions=[];rememberPlayPosition();}
+function playHistoryMoveLabel(ply){
+  if(!ply)return t('playHistoryFirst');
+  const i=ply-1;
+  return t('playHistoryMove',{side:t(i%2===0?'white':'black'),number:Math.floor(i/2)+1+(i%2===0?'.':'…'),move:playHist[i].san});
+}
+function reviewPlayPosition(ply){
+  if(mode!=='play'||!Number.isInteger(ply)||ply<0||ply>playHist.length||!playPositions[ply])return;
+  if(promoPending)cancelPromoPicker();
+  playReviewPly=ply===playHist.length?null:ply;
+  selSq=null;aimSet=null;pendingAnim=null;userShapes=[];rcFrom=null;
+  if(drag){drag=null;endGhost();}
+  setEvalBar(null); // Never display a score belonging to a different position.
+  render(curLastU());updatePlayList();updateEval();updateOpeningName();updateEvalBar();
+  if(playOver)renderPlayResult();
+  // A move chosen below a phone board should reveal the position being inspected.
+  const bounds=document.getElementById('board').getBoundingClientRect();
+  if(bounds.top<0||bounds.bottom>window.innerHeight)window.scrollBy(0,bounds.top-8);
+}
+function stepPlayHistory(direction){reviewPlayPosition(Math.max(0,Math.min(playHist.length,playViewPly()+direction)));}
+function playHistoryKey(event){
+  if(mode!=='play'||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  if(event.key==='Home')reviewPlayPosition(0);
+  else if(event.key==='End')reviewPlayPosition(playHist.length);
+  else stepPlayHistory(event.key==='ArrowLeft'?-1:1);
+}
+function renderPlayHistory(){
+  const reviewing=reviewingPlay(),ply=playViewPly();
+  document.getElementById('playHistoryControls').hidden=mode!=='play';
+  document.getElementById('drill').classList.toggle('reviewing',reviewing);
+  document.getElementById('playHistoryControls').dataset.reviewing=String(reviewing);
+  document.getElementById('playHistoryStatus').textContent=t(reviewing?'playHistoryReview':'playHistoryCurrent',{move:playHistoryMoveLabel(ply)});
+  document.getElementById('playHistoryFirst').disabled=ply===0;
+  document.getElementById('playHistoryBack').disabled=ply===0;
+  document.getElementById('playHistoryNext').disabled=ply===playHist.length;
+  const latest=document.getElementById('playHistoryLatest');
+  latest.setAttribute('aria-pressed',String(!reviewing));
+  latest.textContent=t(reviewing?(playOver?'playReviewFinal':'playReturnLive'):'playHistoryLatest');
+  document.getElementById('moveBox').hidden=playHist.length===0;
+  updatePlayUndo();
+}
+function scrollPlayHistorySelection(){
+  if(mode!=='play')return;
+  const ml=document.getElementById('movelist'),selected=ml.querySelector?.('[aria-current]');
+  if(!playViewPly()){ml.scrollTop=0;return;}
+  if(!selected||!ml.clientHeight)return;
+  const row=selected.getBoundingClientRect(),box=ml.getBoundingClientRect();
+  if(row.top<box.top)ml.scrollTop-=box.top-row.top;
+  else if(row.bottom>box.bottom)ml.scrollTop+=row.bottom-box.bottom;
+}
 function updatePlayList(){
-  let html='';
+  const ml=document.getElementById('movelist'),scroll=ml.scrollTop,focused=document.activeElement?.dataset?.playPly;
+  const ply=playViewPly();let html='';
   for(let i=0;i<playHist.length;i++){
-    if(i%2===0) html+=`<span class="num">${i/2+1}.</span>`;
-    html+=`<span class="mv ${i===playHist.length-1?'cur':''}">${playHist[i].san}</span> `;
+    if(i%2===0)html+=`<span class="num">${i/2+1}.</span>`;
+    const label=t('playHistorySelect',{side:t(i%2===0?'white':'black'),number:Math.floor(i/2)+1,move:playHist[i].san});
+    html+=`<button type="button" class="mv ${i===ply-1?'cur':''}" data-play-ply="${i+1}" aria-label="${label}" ${i===ply-1?'aria-current="step"':''} onclick="reviewPlayPosition(${i+1})">${playHist[i].san}</button>`;
   }
-  const ml=document.getElementById('movelist');
-  ml.innerHTML=html||'&nbsp;'; ml.scrollTop=ml.scrollHeight;
+  ml.innerHTML=html||'&nbsp;';ml.scrollTop=reviewingPlay()?scroll:ml.scrollHeight;
+  if(focused)ml.querySelector(`[data-play-ply="${focused}"]`)?.focus({preventScroll:true});
+  renderPlayHistory();scrollPlayHistorySelection();
 }
 /* chess.com-style captured-piece trays: opponent's captures above the board,
    yours below, with a "+N" badge on whoever is ahead in material. */
@@ -6531,7 +6664,8 @@ function updateEval(){
   const top=document.getElementById('capTop'), bot=document.getElementById('capBottom');
   if(!top||!bot) return;
   const c={};
-  for(let r=0;r<8;r++) for(let f=0;f<8;f++){ const p=board[r][f]; if(p) c[p]=(c[p]||0)+1; }
+  const displayBoard=playViewPosition().board;
+  for(let r=0;r<8;r++) for(let f=0;f<8;f++){ const p=displayBoard[r][f]; if(p) c[p]=(c[p]||0)+1; }
   const order=['q','r','b','n','p'], val={p:1,n:3,b:3,r:5,q:9};
   const byWhite=[], byBlack=[]; let netW=0;
   for(const t of order){
@@ -6614,6 +6748,7 @@ function renderPlayResult(){
 function openPlayResult(){
   if(mode!=='play'||!playOver||!playOutcome())return;
   const dialog=document.getElementById('playResultDialog');if(dialog.open)return;
+  if(reviewingPlay())reviewPlayPosition(playHist.length);
   // The game can finish while the optional guide is open. Give the result priority.
   if(typeof activeGuide!=='undefined'&&activeGuide)closePageGuide(false);
   if(document.querySelector('dialog[open]')||document.getElementById('appShell').inert)return;
@@ -6694,6 +6829,7 @@ function tick(){
 
 /* Whose piece can be picked up right now, per mode. */
 function isMine(name){
+  if(reviewingPlay())return false;
   if(locked) return false;
   const [r,f]=sqRC(name); const p=board[r][f];
   if(!p) return false;
@@ -6706,7 +6842,7 @@ function isMine(name){
 }
 function selectSquare(sq){ selSq=sq; aimSet = (sq&&showAims&&mode!=='test') ? new Set(legalTargetNames(sq)) : null; if(sq) buzz(8); render(curLastU()); }
 function onSquare(name){
-  if(locked) return;
+  if(locked||reviewingPlay()) return;
   if(mode==='learn' && learnPly>=lineMoves().length) return;
   const mine=isMine(name);
   if(selSq===null){
