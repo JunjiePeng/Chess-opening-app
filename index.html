@@ -1045,14 +1045,19 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .rep-saved-toolbar h3 { font-size:1.08rem; display:flex; align-items:center; gap:10px; }
 .rep-saved-toolbar h3>span { color:var(--dim); font-size:.85rem; font-weight:400; }
 .rep-saved-search { width:min(100%,440px); margin:0 0 14px; padding:10px 14px; min-height:42px; font:inherit; color:var(--text); border:1px solid var(--line); border-radius:12px; background:var(--panel); }
+/* G62: saved lines follow the situations the player is preparing for. */
+.rep-situation+.rep-situation { margin-top:24px; }
+.rep-situation-title { display:flex; align-items:center; gap:12px; margin:0 0 10px; font-size:.94rem; }
+.rep-situation-title::after { content:''; flex:1; border-top:1px solid var(--line); }
+.rep-situation-title .side-tag { white-space:normal; font-size:inherit; padding:4px 11px; }
 .rep-opening { padding:16px 20px; border:1px solid var(--line); border-radius:16px; background:var(--panel); margin-bottom:10px; }
 .rep-opening>summary { cursor:pointer; padding:2px 0; color:var(--text); line-height:1.8; }
 .rep-opening>summary strong { margin:0 8px 0 3px; font-size:1rem; }
-.rep-opening>summary .side-tag { margin-right:8px; vertical-align:middle; }
+.rep-opening>summary .first-move-tag { margin-right:8px; vertical-align:middle; }
 .rep-opening>summary .rep-count { color:var(--dim); white-space:nowrap; font-size:.82rem; }
 .rep-opening .rep-line { display:flex; gap:16px; align-items:center; padding:13px 0; margin-top:6px; }
 .rep-line-info { flex:1; min-width:0; }
-.rep-opening .rep-line h4 { font-size:.94rem; overflow-wrap:anywhere; }
+.rep-opening .rep-line h5 { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:.94rem; overflow-wrap:anywhere; }
 .rep-opening .stat-row { margin:7px 0 0; gap:6px; }
 .rep-line-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 .rep-line-actions .linklike { font-size:.86rem; min-height:40px; }
@@ -1394,7 +1399,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G61</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G62</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -3010,7 +3015,7 @@ Object.assign(I18N_EN, {
   guideStarterBody:'Pick a main line, then Add & learn. It is saved here automatically. Use Add lines to find a different opening.',
   guideDailyTitle:'Your next practice, ready to go',
   guideDailyBody:'The lines you’ll practise are shown here. Start practice begins this plan; Change lines lets you choose a different mix.',
-  guideSavedBody:'Open an opening to find its lines. Learn explains the moves; Drill helps you recall them. Manage lets you remove saved lines without losing progress.'
+  guideSavedBody:'Find your White openings or Black responses, then open an opening to see its lines. Learn explains the moves; Drill helps you recall them. Manage removes saved lines without losing progress.'
 });
 Object.assign(I18N.zh, {
   repStartTitle:'先从一个开局开始。',
@@ -3036,7 +3041,7 @@ Object.assign(I18N.zh, {
   guideStarterBody:'选择一条主线，点击「添加并学习」，它会保存在这里。想找其他开局，点击「添加变例」。',
   guideDailyTitle:'下一次练习，一目了然',
   guideDailyBody:'这里显示本次要练习的变例。点击「开始练习」即可进入，也可以先用「调整变例」更改内容。',
-  guideSavedBody:'展开开局即可找到已保存的变例。「学习」讲解走法，「操练」训练回忆。「管理」可以移除变例，学习进度仍会保留。'
+  guideSavedBody:'按执白开局或执黑应对找到相应分组，展开开局即可查看变例。「学习」讲解走法，「操练」训练回忆。「管理」可以移除变例，学习进度仍会保留。'
 });
 
 /* Read old or damaged records without letting one field break the app. */
@@ -4460,7 +4465,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G61';
+const BUILD='G62';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -6072,29 +6077,45 @@ function renderTodayBar(){
   el.className='today-content';
   el.innerHTML=repertoireHeadingHTML()+`<section class="daily-hero rep-practice" aria-labelledby="repPracticeTitle"><div class="rep-practice-head"><h3 id="repPracticeTitle">${title}</h3>${saved?`<span>${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</span>`:''}</div>${items.length?`<ul class="rep-plan">${rows}</ul>`:`<p>${t(finished?'repFinishedBody':'repCaughtUpBody')}</p>`}${!finished?`<div class="home-actions">${items.length?`<button class="act primary" onclick="beginSuggestedPractice()">${t(saved?'dailyContinue':'dailyStart')} →</button>`:''}<button class="${items.length?'linklike':'act'}" onclick="startDailySession()">${t(items.length?'repChangePractice':'chooseLines')}</button></div>`:''}</section>`;
 }
+const REPERTOIRE_SITUATIONS=[
+  {id:'white',side:'w',label:'repWhite'},
+  {id:'black-e4',side:'b',label:'repBlackE4'},
+  {id:'black-d4',side:'b',label:'repBlackD4'},
+  {id:'black-other',side:'b',label:'repOther'}
+];
 function savedRepertoireGroups(){
   const normalize=value=>String(value||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
   const q=normalize(repView.query),groups=new Map();
   for(const item of repertoire.entries()){
     const op=DATA.openings[item.oi],line=op.lines[item.li];
     if(q&&![op.name,op.nameZh,line.name,line.nameZh].some(name=>normalize(name).includes(q)))continue;
-    const key=item.oi+'-'+item.side;
-    if(!groups.has(key))groups.set(key,{key,oi:item.oi,side:item.side,items:[]});
+    const first=line.moves[0]?.u;
+    const situation=item.side==='w'?'white':first==='e2e4'?'black-e4':first==='d2d4'?'black-d4':'black-other';
+    const key=situation+'-'+item.oi;
+    if(!groups.has(key))groups.set(key,{key,situation,oi:item.oi,side:item.side,items:[]});
     groups.get(key).items.push(item);
   }
-  return [...groups.values()];
+  // Group the view only: keep saved selections and daily-session order untouched.
+  return REPERTOIRE_SITUATIONS.flatMap(situation=>[...groups.values()].filter(group=>group.situation===situation.id));
+}
+function repertoireOpeningHTML(group,small){
+  const op=DATA.openings[group.oi],due=group.items.filter(x=>srs.get(x.oi,x.li,x.side)?.due<=Date.now()).length;
+  const open=!!repView.query||(repView.expanded.get(group.key)??small);
+  const firstMoves=[...new Set(group.items.map(x=>op.lines[x.li].moves[0]?.san).filter(Boolean))];
+  const showFirst=group.situation==='white'||group.situation==='black-other';
+  const moveTag=san=>san?`<span class="first-move-tag">1.${medalText(san)}</span>`:'';
+  return `<details class="rep-opening" data-rep-group="${group.key}" ${open?'open':''} ontoggle="if(this.isConnected&&!repView.query)repView.expanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong> ${showFirst&&firstMoves.length===1?moveTag(firstMoves[0]):''} <span class="rep-count">${t(group.items.length===1?'quickAddCountOne':'quickAddCount',{n:group.items.length})}${due?' · '+t(due===1?'repDueOne':'repDueMany',{n:due}):''}</span></summary>${group.items.map(x=>{
+    const line=op.lines[x.li],st=store.get(x.oi,x.li,x.side),sv=srs.get(x.oi,x.li,x.side),rank=lineRank(x.oi,x.li,x.side),learn=!st.learned&&!st.runs;
+    const action=(isLearn,primary)=>{const label=t(isLearn?'learn':'drill');return `<button class="${primary?'mini preferred':'linklike'}" aria-label="${medalText(t('repActionLabel',{action:label,line:lnName(line),side:t(x.side==='w'?'white':'black')}))}" onclick="${isLearn?'startLearn':'startDrill'}(${x.oi},${x.li},'${x.side}')">${label}</button>`;};
+    return `<article class="rep-line"><div class="rep-line-info"><h5>${medalText(lnName(line))}${showFirst&&firstMoves.length>1?moveTag(line.moves[0]?.san):''}</h5><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div></div>${repView.managing?`<button class="rep-remove" data-rep-id="${itemKey(x)}" aria-label="${medalText(t('removeRepLine',{line:lnName(line)}))}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button>`:`<div class="rep-line-actions">${action(!learn,false)}${action(learn,true)}</div>`}</article>`;
+  }).join('')}</details>`;
 }
 function renderSavedRepertoire(){
   const el=document.getElementById('repSavedList');if(!el)return;
   const groups=savedRepertoireGroups(),small=repertoire.entries().length<=6;
-  el.innerHTML=groups.map(group=>{
-    const op=DATA.openings[group.oi],due=group.items.filter(x=>srs.get(x.oi,x.li,x.side)?.due<=Date.now()).length;
-    const open=!!repView.query||(repView.expanded.get(group.key)??small);
-    return `<details class="rep-opening" data-rep-group="${group.key}" ${open?'open':''} ontoggle="if(this.isConnected&&!repView.query)repView.expanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong><span class="side-tag side-${group.side}">${t(group.side==='w'?'white':'black')}</span><span class="rep-count">${t(group.items.length===1?'quickAddCountOne':'quickAddCount',{n:group.items.length})}${due?' · '+t(due===1?'repDueOne':'repDueMany',{n:due}):''}</span></summary>${group.items.map(x=>{
-      const line=op.lines[x.li],st=store.get(x.oi,x.li,x.side),sv=srs.get(x.oi,x.li,x.side),rank=lineRank(x.oi,x.li,x.side),learn=!st.learned&&!st.runs;
-      const action=(isLearn,primary)=>{const label=t(isLearn?'learn':'drill');return `<button class="${primary?'mini preferred':'linklike'}" aria-label="${medalText(t('repActionLabel',{action:label,line:lnName(line),side:t(x.side==='w'?'white':'black')}))}" onclick="${isLearn?'startLearn':'startDrill'}(${x.oi},${x.li},'${x.side}')">${label}</button>`;};
-      return `<article class="rep-line"><div class="rep-line-info"><h4>${medalText(lnName(line))}</h4><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div></div>${repView.managing?`<button class="rep-remove" data-rep-id="${itemKey(x)}" aria-label="${medalText(t('removeRepLine',{line:lnName(line)}))}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button>`:`<div class="rep-line-actions">${action(!learn,false)}${action(learn,true)}</div>`}</article>`;
-    }).join('')}</details>`;
+  el.innerHTML=REPERTOIRE_SITUATIONS.map(situation=>{
+    const openings=groups.filter(group=>group.situation===situation.id);if(!openings.length)return '';
+    return `<section class="rep-situation" data-rep-situation="${situation.id}" aria-labelledby="repSituation-${situation.id}"><h4 class="rep-situation-title" id="repSituation-${situation.id}"><span class="side-tag side-${situation.side}">${t(situation.label)}</span></h4>${openings.map(group=>repertoireOpeningHTML(group,small)).join('')}</section>`;
   }).join('')||`<p class="home-note" role="status">${t('repSearchEmpty')}</p>`;
 }
 function filterSavedRepertoire(query){repView.query=query;renderSavedRepertoire();}
