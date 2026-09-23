@@ -232,6 +232,9 @@ button.act { background:var(--panel); color:var(--text); border:1px solid var(--
 button.act:hover { border-color:var(--accent); background:#3e3122; }
 button.act.primary { background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:700; }
 button.act.primary:hover { background:var(--accent-hover); }
+#playBestMoveBtn[aria-pressed="true"] { color:#e4dfcb; background:#405035; border-color:#7b9065; }
+#playBestMoveBtn[aria-busy="true"] { cursor:progress; }
+#playBestMoveStatus { flex:0 0 100%; margin:0; padding:2px 2px 0; color:#f2cf9a; font-size:.875rem; line-height:1.45; overflow-wrap:anywhere; }
 .streak { font-size:.875rem; color:var(--dim); }
 .streak b { color:#a9bb8a; }
 #doneBox { display:none; text-align:center; }
@@ -1395,7 +1398,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G63</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G64</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1527,9 +1530,11 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
       </div>
       <div class="btn-row" id="playNav" style="display:none">
         <button class="act" id="playUndoBtn" data-i18n="playUndo" onclick="undoPlayTurn()" data-i18n-title="tipPlayUndo" title="Take back your last move and the engine’s reply" disabled>↶ Undo</button>
+        <button class="act" id="playBestMoveBtn" data-i18n="playBestMove" onclick="togglePlayBestMove()" data-i18n-title="tipPlayBestMove" title="Show the strongest engine suggestion for the displayed position" aria-pressed="false" aria-controls="playBestMoveStatus">Best move</button>
         <button class="act" id="playRestartBtn" data-i18n="restartGame">↺ Restart game</button>
         <button class="act" id="playDrillBtn" data-i18n="backToDrill" onclick="startDrill(curOp,curLine,playerSide)">Back to Drill</button>
         <button class="act" data-i18n="menu" onclick="showMenu()">← Menu</button>
+        <p id="playBestMoveStatus" role="status" aria-live="polite" aria-atomic="true" hidden></p>
       </div>
       <div class="streak" id="streakInfo"></div>
     </div>
@@ -2908,6 +2913,30 @@ Object.assign(I18N.zh, {
   playBackOpenings:'返回全部开局',
   playShowResult:'对局结果 →',
   playResultClose:'关闭结果，查看最后局面'
+});
+
+/* G64: optional full-strength suggestions in engine games. */
+Object.assign(I18N_EN, {
+  playBestMove:'Best move',
+  playBestMoveHide:'Hide move',
+  playBestMoveLoading:'Finding move…',
+  tipPlayBestMove:'Show the strongest engine suggestion for the displayed position',
+  playBestMoveFound:'{side}: {move}',
+  playBestMoveFailed:'Couldn’t analyse this position. Try again.',
+  playBestMoveUnavailable:'Best move is unavailable right now.',
+  playBestMoveWait:'Available after the engine replies',
+  playBestMoveEnded:'No move available in this position'
+});
+Object.assign(I18N.zh, {
+  playBestMove:'最佳走法',
+  playBestMoveHide:'隐藏走法',
+  playBestMoveLoading:'正在分析…',
+  tipPlayBestMove:'查看当前显示局面的最强引擎建议',
+  playBestMoveFound:'{side}：{move}',
+  playBestMoveFailed:'未能分析此局面，请重试。',
+  playBestMoveUnavailable:'最佳走法暂时不可用。',
+  playBestMoveWait:'引擎走棋后可用',
+  playBestMoveEnded:'此局面无可用走法'
 });
 
 /* G58: board aids describe what they actually display. */
@@ -4443,7 +4472,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G63';
+const BUILD='G64';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5108,7 +5137,8 @@ function drawAnnots(){
   const ov=document.getElementById('overlay'); if(!ov) return;
   if(mode==='test'){ov.innerHTML='';return;}
   const guide = (mode==='learn' && showAnnots) ? learnGuide : null;
-  if((!curAnnot || !showAnnots) && !guide && !userShapes.length){ ov.innerHTML=''; return; }
+  const best=mode==='play'&&typeof visiblePlayBestMove==='function'?visiblePlayBestMove():null;
+  if((!curAnnot || !showAnnots) && !guide && !best && !userShapes.length){ ov.innerHTML=''; return; }
   const flip = playerSide==='b';
   const ctr = n=>{
     const f=n.charCodeAt(0)-97, r=parseInt(n[1])-1;
@@ -5127,6 +5157,7 @@ function drawAnnots(){
     (curAnnot.a||[]).forEach(ar=>{ s+=arrow(ar,'','ah'); });
   }
   if(guide) s+=arrow(guide,'guide','ahg');
+  if(best) s+=arrow(best,'guide best-move','ahg');
   userShapes.forEach(sh=>{
     if(sh.sq){ const [x,y]=ctr(sh.sq); s+=`<circle class="user" cx="${x}" cy="${y}" r="0.44"/>`; }
     else s+=arrow(sh.from+sh.to,'user','ahu');
@@ -5729,6 +5760,7 @@ function initPageGuides(){
 /* ================= MENU ================= */
 let menuScrollY=0;
 function showAppView(view){
+  if(view!=='board'||mode!=='play')clearPlayBestMove();
   if(view!=='board'||mode!=='play'||!playOver)clearPlayResultUI();
   const inBoard = view==='board';
   document.getElementById('playHistoryControls').hidden=!inBoard||mode!=='play';
@@ -6400,6 +6432,94 @@ let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
 if(playElo<500) playElo=500; if(playElo>2400) playElo=2400;
 // Strength is chosen in Elo and remembered across sessions. Default for new users: 1000.
+// Free during development. This is UI availability, not a secure paywall.
+// Paid server features will need authenticated, server-enforced entitlements.
+const featureAccess={engineBestMove:true};
+function canUseFeature(feature){return featureAccess[feature]===true;}
+const playBestMove={seq:0,phase:'idle',key:null,move:null,san:'',white:true,error:null};
+function playBestMoveKey(){
+  return mode==='play'?runGen+':'+playViewPly()+':'+playViewPosition().fen:null;
+}
+function visiblePlayBestMove(){
+  return canUseFeature('engineBestMove')&&playBestMove.phase==='ready'&&playBestMove.key===playBestMoveKey()?playBestMove.move:null;
+}
+function renderPlayBestMove(){
+  const button=document.getElementById('playBestMoveBtn'),status=document.getElementById('playBestMoveStatus');
+  if(!button||!status)return;
+  const active=mode==='play',allowed=canUseFeature('engineBestMove'),waiting=active&&!playOver&&!userTurnInPlay();
+  const ended=active&&playOver&&!reviewingPlay(),loading=playBestMove.phase==='loading',shown=!!visiblePlayBestMove();
+  button.hidden=!active;button.disabled=!active||!allowed||waiting||ended||!!promoPending||loading;
+  button.textContent=t(loading?'playBestMoveLoading':shown?'playBestMoveHide':'playBestMove');
+  button.title=t(!allowed?'playBestMoveUnavailable':waiting?'playBestMoveWait':ended?'playBestMoveEnded':'tipPlayBestMove');
+  button.setAttribute('aria-pressed',String(shown));button.setAttribute('aria-busy',String(loading));
+  status.textContent=shown?t('playBestMoveFound',{side:t(playBestMove.white?'white':'black'),move:playBestMove.san}):playBestMove.phase==='error'?t(playBestMove.error||'playBestMoveFailed'):'';
+  status.hidden=!active||!status.textContent;
+}
+function clearPlayBestMove(){
+  const pending=playBestMove.phase==='loading';
+  playBestMove.seq++;Object.assign(playBestMove,{phase:'idle',key:null,move:null,san:'',error:null});
+  // A hint starts only while no game reply is needed. Moves clear it before
+  // queuing that reply; keep the stopped worker handler until it drains.
+  if(pending)Engine.abort();
+  renderPlayBestMove();
+  if(typeof drawAnnots==='function')drawAnnots();
+}
+function playBestMovePositionInfo(position,u=null){
+  const saved={board,epT,castleRights,pendingAnim,userShapes};
+  try{
+    board=position.board.map(row=>row.slice());
+    const [, ,rights,ep]=position.fen.split(' ');
+    castleRights=Object.fromEntries([...'KQkq'].map(k=>[k,rights.includes(k)]));
+    epT=ep==='-'?null:sqRC(ep);
+    const moves=allLegalMoves(position.white);
+    return {moves,san:u&&moves.includes(u)?uciToSan(u):null};
+  }finally{
+    board=saved.board;epT=saved.epT;castleRights=saved.castleRights;pendingAnim=saved.pendingAnim;userShapes=saved.userShapes;
+  }
+}
+async function togglePlayBestMove(){
+  if(mode!=='play'||promoPending||(!playOver&&!userTurnInPlay())||(playOver&&!reviewingPlay()))return;
+  if(!canUseFeature('engineBestMove')){
+    clearPlayBestMove();playBestMove.phase='error';playBestMove.error='playBestMoveUnavailable';renderPlayBestMove();return;
+  }
+  if(playBestMove.phase==='loading')return;
+  if(visiblePlayBestMove()){clearPlayBestMove();return;}
+  clearPlayBestMove();
+  const shown=playViewPosition(),position={...shown,board:shown.board.map(row=>row.slice())};
+  if(!playBestMovePositionInfo(position).moves.length){renderPlayBestMove();return;}
+  const seq=playBestMove.seq,key=playBestMoveKey();
+  Object.assign(playBestMove,{phase:'loading',key,white:position.white});
+  const current=()=>seq===playBestMove.seq&&key===playBestMoveKey()&&canUseFeature('engineBestMove')&&(playOver||userTurnInPlay());
+  ++evalSeq;Engine.abort(); // The requested hint takes priority over optional evaluation.
+  renderPlayBestMove();
+  try{
+    if(!Engine.ready&&!Engine._loading)Engine.tried=false; // An explicit retry can recover a failed initial download.
+    if(!await Engine.load())throw new Error('engine unavailable');
+    if(!current())return;
+    // analyse always uses skill 20, independently of the opponent's level.
+    const result=await Engine.analyse(position.fen,{movetime:500});
+    if(!current())return;
+    const u=result?.bestmove;
+    if(typeof u!=='string'||!/^([a-h][1-8]){2}[qrbn]?$/.test(u))throw new Error('missing suggestion');
+    const san=playBestMovePositionInfo(position,u).san;
+    if(!san)throw new Error('illegal suggestion');
+    Object.assign(playBestMove,{phase:'ready',move:u,san});
+    if(!playOver)playFlags.assisted=true;
+    if(showEvalBar&&Number.isFinite(result.cp))setEvalBar(result.cp*(position.white?1:-1)*(playerSide==='w'?1:-1));
+  }catch(error){
+    if(current())Object.assign(playBestMove,{phase:'error',error:'playBestMoveFailed',move:null,san:''});
+  }finally{
+    if(seq===playBestMove.seq){
+      // Access/position changes must never leave a permanently loading control.
+      if(playBestMove.phase==='loading')Object.assign(playBestMove,{phase:'idle',key:null});
+      renderPlayBestMove();if(typeof drawAnnots==='function')drawAnnots();
+      if(visiblePlayBestMove()&&window.innerWidth<=900){
+        const boardNode=document.getElementById('board'),bounds=boardNode?.getBoundingClientRect();
+        if(bounds&&(bounds.top<0||bounds.bottom>window.innerHeight))boardNode.scrollIntoView({block:'center',behavior:'auto'});
+      }
+    }
+  }
+}
 function eloToSkill(elo){ return Math.max(0, Math.min(20, Math.round((elo-600)/90))); }   // 600→0 … 2400→20
 function eloToMovetime(elo){ return Math.max(120, Math.min(550, 120+eloToSkill(elo)*22)); }
 function onEloInput(v){
@@ -6407,7 +6527,7 @@ function onEloInput(v){
   gameMinElo=Math.min(gameMinElo, playElo);
   if(typeof localStorage!=='undefined') localStorage.setItem('otElo', playElo);
   const el=document.getElementById('eloLabel'); if(el) el.textContent=playElo+' Elo';
-  if(Engine.ready) Engine.setStrength(eloToSkill(playElo));
+  // Each queued move applies its level when it starts; do not weaken an active analysis.
 }
 function playSetupUI(side){
   playResult=null; gameMinElo=playElo;
@@ -6537,9 +6657,9 @@ async function updateEvalBar(){
   wrap.style.visibility = showEvalBar ? 'visible' : 'hidden';
   if(!showEvalBar) return;
   setEvalBar(null); // Align colours immediately; the previous position's score is no longer current.
-  if(!playOver && !userTurnInPlay()) return;   // don't queue an eval ahead of the engine's reply
+  if((!playOver&&!userTurnInPlay())||playBestMove.phase==='loading')return; // Replies and requested hints take priority.
   const engineReady=await Engine.load();
-  if(myseq!==evalSeq || mode!=='play') return;
+  if(myseq!==evalSeq || mode!=='play'||playBestMove.phase==='loading') return;
   if(!engineReady){ setEvalBar(null); return; }
   const position=playViewPosition();
   const g=runGen, pw=position.white, ps=playerSide;   // snapshot the displayed position, not just the live turn
@@ -6609,6 +6729,7 @@ function playDrawStatus(){
   return null;
 }
 function makePlayMove(u){
+  clearPlayBestMove();
   const san=uciToSan(u);
   const cap=isCapture(u);
   const [rf,ff]=sqRC(u.slice(0,2));
@@ -6658,7 +6779,8 @@ function commitUserMove(u){
 /* ---- promotion picker (lichess-style column over the promotion square) ---- */
 let promoPending=null;
 function openPromoPicker(from,to){
-  promoPending={from,to,g:runGen};
+  clearPlayBestMove();
+  promoPending={from,to,g:runGen};renderPlayBestMove();
   locked=true;   // board frozen until a piece is chosen or the pick is cancelled
   const wrap=document.querySelector('.board-wrap');
   let pk=document.getElementById('promoPicker');
@@ -6690,7 +6812,7 @@ function choosePromo(pc){
 function cancelPromoPicker(){
   promoPending=null;
   const pk=document.getElementById('promoPicker'); if(pk) pk.style.display='none';
-  if(mode==='play' && !playOver){ locked=false; selSq=null; aimSet=null; render(curLastU()); }
+  if(mode==='play' && !playOver){ locked=false; selSq=null; aimSet=null; render(curLastU());renderPlayBestMove(); }
 }
 function pickFallbackMove(white){ // used only if engine unavailable
   const moves=allLegalMoves(white);
@@ -6744,10 +6866,12 @@ function savePlayDecision(){
 }
 function updatePlayUndo(){
   document.getElementById('playUndoBtn').disabled=mode!=='play'||reviewingPlay()||playUndoStack.length===0;
+  renderPlayBestMove();
 }
 function undoPlayTurn(){
   if(mode!=='play'||reviewingPlay()||!playUndoStack.length)return;
   // Invalidate delayed replies, in-flight searches, evaluations and promotion choices.
+  clearPlayBestMove();
   runGen++; Engine.abort();
   const previous=playUndoStack.pop(),fallback=playFlags.engineFallback;
   board=previous.board.map(row=>row.slice());epT=previous.ep?.slice()||null;castleRights={...previous.rights};
@@ -6769,7 +6893,7 @@ function reviewingPlay(){return mode==='play'&&playReviewPly!==null;}
 function playViewPly(){return reviewingPlay()?playReviewPly:playHist.length;}
 function playViewPosition(){return reviewingPlay()?playPositions[playReviewPly]:{board,white:playWhite,fen:toFEN(playWhite)};}
 function rememberPlayPosition(){playPositions.push({board:board.map(row=>row.slice()),white:playWhite,fen:toFEN(playWhite)});}
-function resetPlayHistory(){playReviewPly=null;playPositions=[];rememberPlayPosition();}
+function resetPlayHistory(){clearPlayBestMove();playReviewPly=null;playPositions=[];rememberPlayPosition();}
 function playHistoryMoveLabel(ply){
   if(!ply)return t('playHistoryFirst');
   const i=ply-1;
@@ -6778,6 +6902,7 @@ function playHistoryMoveLabel(ply){
 function reviewPlayPosition(ply){
   if(mode!=='play'||!Number.isInteger(ply)||ply<0||ply>playHist.length||!playPositions[ply])return;
   if(promoPending)cancelPromoPicker();
+  clearPlayBestMove();
   playReviewPly=ply===playHist.length?null:ply;
   selSq=null;aimSet=null;pendingAnim=null;userShapes=[];rcFrom=null;
   if(drag){drag=null;endGhost();}
@@ -6883,6 +7008,7 @@ function playOutcome(status=playResult,whiteToMove=playWhite,side=playerSide){
 let playResultOrigin=null;
 function finishPlay(status){
   const result=playOutcome(status);if(playOver||mode!=='play'||!result)return;
+  clearPlayBestMove();
   playOver=true;locked=true;playResult=status;selSq=null;aimSet=null;
   Engine.abort();
   renderPlayResult();openPlayResult();
