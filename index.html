@@ -1298,10 +1298,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .result-emblem { display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; margin:16px auto 8px; color:var(--result-accent); border:1px solid currentColor; border-radius:50%; background:#211a1250; }
 .result-emblem svg { width:30px; height:30px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 #playResultTitle { font-family:'Caprasimo',serif; font-size:2rem; font-weight:400; line-height:1.2; color:var(--result-accent); outline:none; }
-.play-result-score { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; margin:12px 0; }
-#playResultScore { font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; }
-#playResultReason { font-size:.85rem; padding-left:12px; border-left:1px solid var(--line); color:var(--dim); }
-#playResultExplanation { font-size:.94rem; line-height:1.6; color:var(--dim); }
+#playResultReason { margin:10px 0 0; font-size:.92rem; color:var(--dim); }
 .play-result-actions { display:flex; flex-direction:column; gap:8px; margin-top:22px; }
 .play-result-actions button { min-height:44px; width:100%; }
 #playResultDialog .act.primary { background:var(--result-accent); border-color:var(--result-accent); color:var(--on-accent); }
@@ -1323,7 +1320,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  #playResultDialog { padding:16px 22px 10px; }
  #playResultDialog .result-emblem { display:none; }
  #playResultTitle { margin-top:12px; font-size:1.6rem; }
- .play-result-score { margin:8px 0; }
+ #playResultReason { margin-top:8px; }
  .play-result-actions { flex-direction:row; margin-top:16px; }
  .play-result-actions .act { flex:1 1 0; min-width:0; padding-inline:8px; font-size:.86rem; }
 }
@@ -1347,13 +1344,12 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   </section>
 </dialog>
 
-<dialog id="playResultDialog" aria-labelledby="playResultTitle" aria-describedby="playResultReason playResultExplanation">
+<dialog id="playResultDialog" aria-labelledby="playResultTitle" aria-describedby="playResultReason">
   <button id="playResultClose" type="button" class="guide-dismiss" onclick="closePlayResult()" data-i18n-label="playResultClose">×</button>
   <p class="result-eyebrow" data-i18n="playGameOver">GAME OVER</p>
   <div id="playResultEmblem" class="result-emblem" aria-hidden="true"></div>
   <h2 id="playResultTitle" tabindex="-1"></h2>
-  <p class="play-result-score"><span id="playResultScore" aria-hidden="true"></span><span id="playResultScoreLabel" class="sr-only"></span><span id="playResultReason"></span></p>
-  <p id="playResultExplanation"></p>
+  <p id="playResultReason"></p>
   <div class="play-result-actions"><button type="button" class="act primary" onclick="restartFinishedPlay()" data-i18n="playAgain">Play again</button><button type="button" class="act" onclick="closePlayResult()" data-i18n="playViewPosition">View final position</button></div>
   <button id="playResultOpenings" type="button" class="linklike" onclick="leaveFinishedPlay()" data-i18n="playBackOpenings">Back to openings</button>
 </dialog>
@@ -1399,7 +1395,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G62</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G63</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -2888,15 +2884,6 @@ Object.assign(I18N_EN, {
   playReasonMaterial:'Insufficient material',
   playReasonRepetition:'Threefold repetition',
   playReasonFifty:'50-move rule',
-  playExplainWin:'The engine’s king is in check, with no legal escape. Well played.',
-  playExplainLoss:'Your king is in check, with no legal escape. View the final position, then use Undo to try another move.',
-  playExplainStalemate:'The side to move has no legal move, but is not in check. Neither side wins.',
-  playExplainMaterial:'Neither side has enough material left to deliver checkmate.',
-  playExplainRepetition:'The same position, with the same side to move, has occurred three times.',
-  playExplainFifty:'Each side has made 50 moves without a pawn move or a capture.',
-  playScoreWhite:'White 1, Black 0',
-  playScoreBlack:'White 0, Black 1',
-  playScoreDraw:'White one half, Black one half',
   playAgain:'Play again',
   playViewPosition:'View final position',
   playBackOpenings:'Back to openings',
@@ -2916,15 +2903,6 @@ Object.assign(I18N.zh, {
   playReasonMaterial:'子力不足',
   playReasonRepetition:'三次重复局面',
   playReasonFifty:'五十回合规则',
-  playExplainWin:'引擎的王被将军，且无合法着法可以解围。下得好！',
-  playExplainLoss:'你的王被将军，且无合法着法可以解围。查看最后局面，再用「悔棋」尝试其他走法。',
-  playExplainStalemate:'轮到行棋的一方没有合法着法，但王未被将军，双方和棋。',
-  playExplainMaterial:'双方剩余的子力都无法将杀对方。',
-  playExplainRepetition:'相同局面、同一方行棋，已出现三次。',
-  playExplainFifty:'双方各走了五十回合，没有走兵，也没有吃子。',
-  playScoreWhite:'白方 1，黑方 0',
-  playScoreBlack:'白方 0，黑方 1',
-  playScoreDraw:'白方半分，黑方半分',
   playAgain:'再来一盘',
   playViewPosition:'查看最后局面',
   playBackOpenings:'返回全部开局',
@@ -4465,7 +4443,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G62';
+const BUILD='G63';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -6416,6 +6394,7 @@ function curLastU(){
 /* ================= PLAY vs ENGINE ================= */
 let playHist=[], playWhite=true, playOver=false, freeMode=false, playResult=null;
 let playUndoStack=[], playCompletionRecorded=false;
+let playEngineRequest=null;
 let playPositions=[], playReviewPly=null;
 let playElo = (typeof localStorage!=='undefined' && +localStorage.getItem('otElo')) || 1000;
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
@@ -6570,9 +6549,8 @@ async function updateEvalBar(){
     const whiteCp = pw ? c : -c;
     return (ps==='w') ? whiteCp : -whiteCp;
   };
-  // Stream depth-by-depth updates so the bar settles live like chess.com's,
-  // and search longer — latency is invisible once updates stream in.
-  const r=await Engine.analyse(fen,{movetime:1200, onInfo:(cp,mateN)=>{
+  // Keep optional analysis brief; the next engine reply takes priority.
+  const r=await Engine.analyse(fen,{movetime:350, onInfo:(cp,mateN)=>{
     if(myseq!==evalSeq || g!==runGen || mode!=='play' || !showEvalBar) return;
     setEvalBar(toYour(cp,mateN));
   }});
@@ -6674,7 +6652,7 @@ function commitUserMove(u){
   const d=playDrawStatus();
   if(d){ finishPlay(d); return; }
   setPrompt(t('engineThinking'),'');
-  { const g=runGen; setTimeout(()=>{ if(g===runGen && mode==='play') engineMove(); }, 550); }
+  engineMove(); // Search while the player’s move animates; do not add a pre-search pause.
 }
 
 /* ---- promotion picker (lichess-style column over the promotion square) ---- */
@@ -6723,33 +6701,39 @@ function pickFallbackMove(white){ // used only if engine unavailable
   return pool[Math.floor(Math.random()*pool.length)];
 }
 async function engineMove(){
-  if(playOver) return;
-  const g=runGen;
+  if(mode!=='play'||playOver||userTurnInPlay()) return;
+  const g=runGen,white=playWhite,fen=toFEN(white);
+  if(playEngineRequest?.g===g&&playEngineRequest.fen===fen)return;
+  const request={g,fen};playEngineRequest=request;
+  const stale=()=>g!==runGen||mode!=='play'||playOver||playWhite!==white||toFEN(white)!==fen;
   locked=true;
-  const white=playWhite;
-  const fen=toFEN(white);
   const t0=Date.now();
   const skill=eloToSkill(playElo), movetime=eloToMovetime(playElo);
-  let u=null;
-  const engineReady=await Engine.load();
-  if(g!==runGen || mode!=='play' || playOver) return;
-  if(engineReady) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
-  if(g!==runGen || mode!=='play' || playOver) return;   // game restarted or left
-  if(u){ const legal=allLegalMoves(white);
-    if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }   // stale/foreign answers never touch the board
-  if(!u){ playFlags.engineFallback=true; u=pickFallbackMove(white); } // graceful fallback
-  if(!u){ finishPlay(gameStatus(white)); return; }
-  // ensure a minimum visible "thinking" beat even if the engine answers instantly
-  const elapsed=Date.now()-t0, minThink=450;
-  if(elapsed<minThink) await new Promise(r=>setTimeout(r, minThink-elapsed));
-  if(g!==runGen || mode!=='play' || playOver) return;
-  makePlayMove(u);
-  const status=gameStatus(playWhite);
-  if(status!=='ongoing'){ finishPlay(status); return; }
-  const d=playDrawStatus();
-  if(d){ finishPlay(d); return; }
-  locked=false;
-  setPrompt(t('yourMove'),'');
+  try{
+    // Retire queued evaluations and stop the current one before requesting a reply.
+    // The serialized worker still consumes its final bestmove before starting ours.
+    Engine.abort();
+    let u=null;
+    const engineReady=await Engine.load();
+    if(stale())return;
+    if(engineReady) u=await Engine.bestMove(fen,{skill,movetime,moves:playHist.map(h=>h.u).join(' ')});
+    if(stale())return;
+    if(u){ const legal=allLegalMoves(white);
+      if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }
+    if(!u){ playFlags.engineFallback=true; u=pickFallbackMove(white); }
+    if(!u){ finishPlay(gameStatus(white)); return; }
+    // One short beat includes computation and overlaps the 230ms move animation.
+    const elapsed=Date.now()-t0, minThink=250;
+    if(elapsed<minThink) await new Promise(r=>setTimeout(r, minThink-elapsed));
+    if(stale())return;
+    makePlayMove(u);
+    const status=gameStatus(playWhite);
+    if(status!=='ongoing'){ finishPlay(status); return; }
+    const d=playDrawStatus();
+    if(d){ finishPlay(d); return; }
+    locked=false;
+    setPrompt(t('yourMove'),'');
+  }finally{if(playEngineRequest===request)playEngineRequest=null;}
 }
 // Save only decisions the user actually played: book moves and the engine's first
 // move never become undo targets. A snapshot also preserves special-move rights.
@@ -6894,9 +6878,7 @@ function playOutcome(status=playResult,whiteToMove=playWhite,side=playerSide){
   const mate=status==='checkmate',win=mate&&whiteToMove!==(side==='w');
   const outcome=mate?(win?'win':'loss'):'draw';
   const reason=mate?'Mate':{stalemate:'Stalemate',material:'Material',repetition:'Repetition',fifty:'Fifty'}[status];
-  return {outcome,title:'playResult'+(mate?(win?'Win':'Loss'):'Draw'),reason:'playReason'+reason,
-    explanation:'playExplain'+(mate?(win?'Win':'Loss'):reason),
-    score:mate?(whiteToMove?'0–1':'1–0'):'½–½',scoreLabel:mate?(whiteToMove?'playScoreBlack':'playScoreWhite'):'playScoreDraw'};
+  return {outcome,title:'playResult'+(mate?(win?'Win':'Loss'):'Draw'),reason:'playReason'+reason};
 }
 let playResultOrigin=null;
 function finishPlay(status){
@@ -6922,13 +6904,10 @@ function renderPlayResult(){
   if(freeMode&&openingName)openingName.textContent=t('vsEngine')+' · '+t(playerSide==='w'?'white':'black')+' · '+t('playGameOver');
   document.getElementById('playResultTitle').textContent=t(result.title);
   document.getElementById('playResultReason').textContent=t(result.reason);
-  document.getElementById('playResultScore').textContent=result.score;
-  document.getElementById('playResultScoreLabel').textContent=t(result.scoreLabel);
-  document.getElementById('playResultExplanation').textContent=t(result.explanation);
   const mark=result.outcome==='win'?MEDAL_ICONS.trophy:result.outcome==='draw'?'<path d="M5 9h14M5 15h14"/>':'<path d="M12 3v6M9 6h6M8 10h8l2 4-2 5H8l-2-5 2-4ZM7 22h10"/>';
   document.getElementById('playResultEmblem').innerHTML=`<svg viewBox="0 0 24 24">${mark}</svg>`;
   document.getElementById('playResultBarTitle').textContent=t(result.title);
-  document.getElementById('playResultBarReason').textContent=t('playGameOver')+' · '+t(result.reason)+' · '+result.score;
+  document.getElementById('playResultBarReason').textContent=t(result.reason);
   bar.hidden=false;
   document.getElementById('drill').classList.add('has-result');
   document.getElementById('boardGuideNudge').hidden=true;
