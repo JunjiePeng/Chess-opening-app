@@ -1332,6 +1332,39 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
  @keyframes result-arrive { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
 }
 
+/* G65: one compact editing view; ordinary practice stays uncluttered. */
+.rep-editor-heading { position:sticky; top:0; z-index:8; background:var(--bg); padding-block:8px; }
+.rep-editor { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:28px; padding:24px; }
+.rep-editor>div { min-width:0; }
+.rep-editor h3 { font-size:1.08rem; margin-bottom:16px; }
+.rep-editor h3>span { font:400 .82rem Figtree,sans-serif; color:var(--dim); margin-left:8px; }
+.rep-editor-saved { border-right:1px solid var(--line); padding-right:28px; }
+#repEditorSaved { max-height:540px; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding-right:4px; }
+.rep-editor-group { border-top:1px solid var(--line); padding:12px 0; }
+.rep-editor-group>summary { cursor:pointer; line-height:1.9; }
+.rep-editor-group>summary strong { font-size:.94rem; margin-right:8px; }
+.rep-editor-group>summary small { font-size:.8rem; color:var(--dim); margin-left:8px; }
+.rep-editor-group .quick-add-line { gap:12px; }
+.rep-editor-find>input { width:100%; min-height:44px; border:1px solid #72583e; background:#221a12; color:var(--text); border-radius:10px; padding:11px 12px; font:inherit; font-size:.94rem; }
+.rep-editor-find>input::placeholder { color:#bca98e; opacity:1; }
+.rep-editor-colour { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.rep-editor-colour>span { color:var(--dim); font-size:.88rem; }
+.rep-editor-colour>div { display:flex; gap:6px; }
+.rep-editor-colour button { font:inherit; font-size:.87rem; min-height:44px; padding:7px 15px; border:1px solid #735b42; border-radius:9px; cursor:pointer; }
+.rep-editor-colour button[aria-pressed="false"] { background:transparent; color:var(--dim); }
+.rep-editor-colour button[aria-pressed="true"] { outline:2px solid var(--accent); outline-offset:2px; }
+.rep-editor .quick-add-results { max-height:420px; }
+#repertoireToast { display:flex; align-items:center; gap:18px; pointer-events:auto; }
+#repertoireToast .linklike { flex-shrink:0; color:#f6d4a9; min-height:44px; padding:8px; }
+@media (max-width:760px){
+  .rep-editor { grid-template-columns:minmax(0,1fr); gap:24px; padding:18px; }
+  .rep-editor-saved { border-right:0; padding-right:0; }
+  #repEditorSaved { max-height:280px; }
+  .rep-editor .quick-add-results { max-height:400px; }
+  .rep-editor-group>summary .side-tag { font-size:.74rem; }
+  #repertoireToast { gap:10px; padding:12px 14px; }
+}
+
 </style>
 </head>
 <body>
@@ -1358,7 +1391,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 </dialog>
 
 <dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
-<div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+<div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" onmouseenter="clearTimeout(repertoireNoticeTimer)" onmouseleave="scheduleSelectionNotice()" onfocusin="clearTimeout(repertoireNoticeTimer)" onfocusout="scheduleSelectionNotice()" hidden></div>
 <div id="appShell" class="page-shell">
 <header>
   <div class="header-brand">
@@ -1398,7 +1431,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G64</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G65</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -3051,6 +3084,30 @@ Object.assign(I18N.zh, {
   guideSavedBody:'按执白开局或执黑应对找到相应分组，展开开局即可查看变例。「学习」讲解走法，「操练」训练回忆。「管理」可以移除变例，学习进度仍会保留。'
 });
 
+/* G65: one place to build and edit a repertoire. */
+Object.assign(I18N_EN, {
+  repEdit:'Edit repertoire',repBuild:'Build your repertoire',repFindLines:'Find lines',repPractiseAs:'Practise as',repRemove:'Remove line',repUndo:'Undo',
+  repEditorEmpty:'No saved lines yet. Find an opening and use + to add a line.',
+  repSaveFailed:'Couldn’t save this change. Please try again.',
+  guideAddTitle:'Shape your repertoire',guideAddBody:'Edit repertoire brings adding and removing together. Choose a practice colour, find a line and use + to add it. Use − to remove it, or Undo to bring it back.',
+  guideStarterBody:'Pick a main line, then Add & learn. It is saved here automatically. Build your repertoire lets you find a different opening.',
+  guideSavedBody:'Find your White openings or Black responses, then open an opening to see its lines. Learn explains the moves; Drill helps you recall them. Edit repertoire changes your selection without losing progress.',
+  guideEditorSavedTitle:'Your saved lines',guideEditorSavedBody:'Open an opening and use − to remove a line. Your learning history stays safe, and the confirmation offers Undo.',
+  guideEditorFindTitle:'Choose a side, then add',guideEditorFindBody:'Search an opening or variation, choose White or Black, and use + to add a line for that side. You can save the same line for both colours.',
+  guideEditorDoneTitle:'Ready to practise',guideEditorDoneBody:'Changes are saved as you make them. Done returns to your repertoire and updates your next practice.'
+});
+Object.assign(I18N.zh, {
+  repEdit:'编辑开局库',repBuild:'建立你的开局库',repFindLines:'查找变例',repPractiseAs:'练习执方',repRemove:'移除变例',repUndo:'撤销',
+  repEditorEmpty:'还没有保存变例。找到一个开局，点击 + 添加变例。',
+  repSaveFailed:'未能保存此更改，请重试。',
+  guideAddTitle:'调整你的开局库',guideAddBody:'「编辑开局库」可以添加或移除变例。选择练习执方，找到变例后点击 + 添加，点击 − 移除，也可以撤销移除。',
+  guideStarterBody:'选择一条主线，点击「添加并学习」，它会保存在这里。想找其他开局，点击「建立你的开局库」。',
+  guideSavedBody:'按执白开局或执黑应对找到相应分组，展开开局即可查看变例。「学习」讲解走法，「操练」训练回忆。「编辑开局库」可以更改选择，学习进度仍会保留。',
+  guideEditorSavedTitle:'已保存的变例',guideEditorSavedBody:'展开开局后，点击 − 移除变例。学习记录仍会保留，确认提示中也可以撤销。',
+  guideEditorFindTitle:'选择执方，再添加',guideEditorFindBody:'搜索开局或变例，选择白方或黑方，点击 + 保存该执方的变例。同一条变例也可以同时练习双方。',
+  guideEditorDoneTitle:'回到练习',guideEditorDoneBody:'更改会即时保存。点击「完成」回到开局库，下一次练习也会相应更新。'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -4472,7 +4529,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G64';
+const BUILD='G65';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5548,7 +5605,8 @@ function pageGuideSteps(page){
   const step=(key,...targets)=>({key,targets});
   const steps={
     explore:[step('guideFind','#searchBox'),step('guideLearn','#opGrid .op-card .ln-btns','#opGrid .op-card'),step('guideSave','#opGrid [data-rep-id]','#homeNav')],
-    practice:guideTarget(['#todayBar .daily-hero'])?
+    practice:quickAdd.open?
+      [step('guideEditorSaved','#repEditorSavedHeading'),step('guideEditorFind','#quickAddSearch'),step('guideEditorDone','#quickAddToggle')]:guideTarget(['#todayBar .daily-hero'])?
       [step('guideDaily','#todayBar .daily-hero .home-actions'),step('guideSaved','#repertoirePanel .rep-line','#selectedOpeningsHeading'),step('guideAdd','#quickAddToggle')]:
       [step('guideRepertoire','#selectedOpeningsHeading'),step('guideStarter','#repStarter .rep-starters','#repStarter','#repertoirePanel'),step('guideAdd','#quickAddToggle')],
     learn:[step('guideBoard','#board'),step('guideIdeas','#promptBox'),step('guideLearnControls','#learnNav [data-i18n="drillThisLine"]','#learnNav')],
@@ -5770,6 +5828,7 @@ function showAppView(view){
     document.getElementById('drill').classList.remove('reviewing');
   }
   const wasBoard=document.getElementById('appShell').classList.contains('board-view');
+  if(inBoard)quickAdd.open=false;
   if(inBoard && !wasBoard) menuScrollY=window.scrollY;
   document.getElementById('appShell').classList.toggle('board-view', inBoard);
   document.getElementById('menu').style.display=inBoard?'none':'block';
@@ -5788,6 +5847,7 @@ function showAppView(view){
 let menuView='explore';
 const expandedOpeningCards=new Set();
 function setMenuView(view){
+  if(view!=='practice')quickAdd.open=false;
   menuScrollY=0; showMenu(view); window.scrollTo(0,0);
   document.querySelector(`[data-home="${menuView}"]`)?.focus({preventScroll:true});
 }
@@ -5818,8 +5878,8 @@ function showMenu(view){
 function renderPractice(){
   const hasLines=repertoire.entries().length>0;
   const today=document.getElementById('todayBar');
-  today.hidden=!hasLines;
-  if(hasLines) renderTodayBar(); else today.innerHTML='';
+  today.hidden=!hasLines||quickAdd.open;
+  if(hasLines&&!quickAdd.open)renderTodayBar();else today.innerHTML='';
   renderRepertoire();
 }
 function showSelectedOpenings(){
@@ -5827,7 +5887,7 @@ function showSelectedOpenings(){
   if(heading){heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}
 }
 /* G46: branded filter pickers. The hidden selects retain the existing filter logic. */
-const FILTER_PICKERS=['libraryColour','libraryFirstMove','libraryStage','librarySort','quickAddSide','testSource','testColour'];
+const FILTER_PICKERS=['libraryColour','libraryFirstMove','libraryStage','librarySort','testSource','testColour'];
 let openFilterPicker=null;
 function enhanceFilterPickers(){
   for(const id of FILTER_PICKERS){
@@ -5949,10 +6009,10 @@ window.addEventListener('resize',fitAllSelects);
 if(document.fonts) document.fonts.ready.then(fitAllSelects);
 function packName(pack){return t(pack.ids.length===1?'packLineCountOne':'packLineCount',{name:zhOn()?pack.zh:pack.en,n:pack.ids.length});}
 const REPERTOIRE_STARTERS=[{id:'italian-game-1',side:'w'},{id:'london-system-1',side:'w'},{id:'caro-kann-defense-1',side:'b'}];
-const repView={starter:0,managing:false,query:'',expanded:new Map()};
+const repView={starter:0,query:'',expanded:new Map()};
 let practicePreview=null;
 function repertoireHeadingHTML(empty=false){
-  return `<div class="home-heading rep-page-heading"><div><h2 id="${empty?'selectedOpeningsHeading':'repertoireTitle'}" tabindex="-1">${t('navPractice')}</h2></div><button id="quickAddToggle" class="act" aria-expanded="${quickAdd.open}" aria-controls="quickAddPanel" onclick="toggleQuickAdd()">${t('addMoreLines')}</button></div>`;
+  return `<div class="home-heading rep-page-heading${quickAdd.open?' rep-editor-heading':''}"><div><h2 id="${empty?'selectedOpeningsHeading':'repertoireTitle'}" tabindex="-1">${t(quickAdd.open?'repEdit':'navPractice')}</h2></div><button id="quickAddToggle" class="act" aria-expanded="${quickAdd.open}" aria-controls="quickAddPanel" onclick="toggleQuickAdd()">${t(quickAdd.open?'repManageDone':empty?'repBuild':'repEdit')}</button></div>`;
 }
 function repertoireStarterHTML(){
   return `<section id="repStarter" class="rep-start" ${quickAdd.open?'hidden':''}><h3>${t('repStartTitle')}</h3><p>${t('repStartBody')}</p><div class="rep-starters" role="group" aria-label="${t('repStarterLabel')}">${REPERTOIRE_STARTERS.map((item,i)=>{
@@ -5987,61 +6047,114 @@ function beginSuggestedPractice(){
 function repertoireBookmark(){
   return '<svg class="rep-bookmark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>';
 }
-const quickAdd={open:false,query:'',side:'all',expanded:new Map()};
+const quickAdd={open:false,query:'',side:'w',expanded:new Map(),savedExpanded:new Map()};
 let repertoireNotice=null, repertoireNoticeTimer=0;
 function renderRepertoireNotice(){
-  const el=document.getElementById('repertoireToast'); if(!el||!repertoireNotice) return;
-  const {kind,added,oi,li,side,count}=repertoireNotice, op=DATA.openings[oi];
+  const el=document.getElementById('repertoireToast');if(!el||!repertoireNotice)return;
+  const {kind,added,oi,li,side,count,undo,error}=repertoireNotice,op=DATA.openings[oi];
   const favourite=kind==='favourite';
-  const title=t(favourite?(added?'favNoticeAdded':'favNoticeRemoved'):count>1?'repNoticeMany':added?'repNoticeAdded':'repNoticeRemoved',{n:count});
-  const detail=li===null?opName(op):favourite?lnName(op.lines[li])+' · '+opName(op):t('repNoticeDetail',{line:lnName(op.lines[li]),side:t(side==='w'?'white':'black')});
-  el.hidden=false; el.innerHTML=`<b>${medalText(title)}</b><span>${medalText(detail)}</span>`;
+  const title=error?t(error):t(favourite?(added?'favNoticeAdded':'favNoticeRemoved'):count>1?'repNoticeMany':added?'repNoticeAdded':'repNoticeRemoved',{n:count});
+  const detail=error?'':li===null?opName(op):favourite?lnName(op.lines[li])+' · '+opName(op):t('repNoticeDetail',{line:lnName(op.lines[li]),side:t(side==='w'?'white':'black')});
+  el.hidden=false;el.innerHTML=`<div><b>${medalText(title)}</b>${detail?`<span>${medalText(detail)}</span>`:''}</div>${undo?`<button class="linklike" id="repUndoRemoval" onclick="undoRepertoireRemoval()">${t('repUndo')}</button>`:''}`;
+}
+function scheduleSelectionNotice(){
+  clearTimeout(repertoireNoticeTimer);
+  const el=document.getElementById('repertoireToast');
+  if(!repertoireNotice||el?.contains(document.activeElement))return;
+  repertoireNoticeTimer=setTimeout(()=>{el.hidden=true;repertoireNotice=null;},repertoireNotice.undo?10000:4000);
 }
 function showSelectionNotice(notice){
-  repertoireNotice=notice; renderRepertoireNotice();
-  clearTimeout(repertoireNoticeTimer);
-  repertoireNoticeTimer=setTimeout(()=>{document.getElementById('repertoireToast').hidden=true;repertoireNotice=null;},4000);
+  repertoireNotice=notice;renderRepertoireNotice();scheduleSelectionNotice();
 }
-function showRepertoireNotice(added,oi,li,side,count=1){showSelectionNotice({added,oi,li,side,count});}
+function showRepertoireNotice(added,oi,li,side,count=1,undo=null){showSelectionNotice({added,oi,li,side,count,undo});}
+function repertoireSaveError(){showSelectionNotice({...repertoireNotice,error:'repSaveFailed'});}
+// Keep repertoire and paused-session edits together; failed writes preserve the prior selection.
+function persistRepertoireSelection(next,restoredSession=undefined){
+  const oldRep=localStorage.getItem('otRep'),oldSession=localStorage.getItem('otSession');
+  const active=sessionActive,item=sessionItem;
+  try{
+    repertoire.save(next);
+    if(restoredSession!==undefined){daily.save(restoredSession);sessionActive=false;sessionItem=null;}
+    else daily.selectionChanged();
+  }catch(error){
+    for(const [key,value] of [['otRep',oldRep],['otSession',oldSession]]){
+      try{if(localStorage.getItem(key)!==value){if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value);}}catch{}
+    }
+    sessionActive=active;sessionItem=item;throw error;
+  }
+}
+function undoRepertoireRemoval(){
+  const undo=repertoireNotice?.undo;if(!undo)return;
+  const rep=repertoire.load(),key=itemKey(undo.item);
+  if(rep.items.some(x=>itemKey(x)===key)){showRepertoireNotice(true,undo.oi,undo.li,undo.item.side);return;}
+  const before=rep.items.findIndex(x=>itemKey(x)===undo.next),after=rep.items.findIndex(x=>itemKey(x)===undo.previous);
+  const at=before>=0?before:after>=0?after+1:Math.min(undo.index,rep.items.length);
+  rep.items.splice(at,0,undo.item);rep.configured=true;
+  let restored;
+  // An explicitly changed plan, completed session or new day must never be overwritten.
+  if(undo.sessionBefore&&!undo.sessionBefore.completed&&undo.day===activity.key()&&JSON.stringify(daily.load())===JSON.stringify(undo.sessionAfter)){
+    const saved=new Set(rep.items.map(itemKey)),done=new Set(undo.sessionBefore.done);
+    if(undo.sessionBefore.items.every(x=>done.has(itemKey(x))||saved.has(itemKey(x))))restored=undo.sessionBefore;
+  }
+  try{persistRepertoireSelection(rep,restored);}catch{repertoireSaveError();return;}
+  refreshRepertoireSelection();showRepertoireNotice(true,undo.oi,undo.li,undo.item.side);
+}
 function showFavouriteNotice(added,oi,li=null){showSelectionNotice({kind:'favourite',added,oi,li});}
 function refreshRepertoireSelection(){
   const inBoard=document.getElementById('drill').style.display!=='none';
   if(inBoard){renderRepertoireButton();renderSessionStrip();if(mode==='drill'&&document.getElementById('doneBox').style.display==='block')renderDoneBox();return;}
-  const active=document.activeElement, repId=active?.dataset.repId, quickId=active?.dataset.quickId;
-  const oldTop=active?.getBoundingClientRect().top, y=window.scrollY;
-  const resultScroll=document.getElementById('quickAddResults')?.scrollTop||0;
+  const active=document.activeElement,repId=active?.dataset.repId,quickId=active?.dataset.quickId,editorId=active?.dataset.editorId;
+  const oldTop=active?.getBoundingClientRect().top,y=window.scrollY;
+  const scrolls=['quickAddResults','repEditorSaved'].map(id=>[id,document.getElementById(id)?.scrollTop||0]);
   showMenu();
-  const results=document.getElementById('quickAddResults'); if(results) results.scrollTop=resultScroll;
-  const target=quickId?document.querySelector(`[data-quick-id="${quickId}"]`):repId?document.querySelector(`${menuView==='practice'?'#repertoirePanel':'#opGrid'} [data-rep-id="${repId}"]`):null;
+  for(const [id,top] of scrolls){const el=document.getElementById(id);if(el)el.scrollTop=top;}
+  const target=quickId?document.querySelector(`[data-quick-id="${quickId}"]`):editorId?document.querySelector(`[data-editor-id="${editorId}"]`):repId?document.querySelector(`${menuView==='practice'?'#repertoirePanel':'#opGrid'} [data-rep-id="${repId}"]`):null;
   if(target){window.scrollTo(0,y+target.getBoundingClientRect().top-oldTop);target.focus({preventScroll:true});}
-  else {window.scrollTo(0,y);if(repId)document.getElementById('selectedOpeningsHeading')?.focus({preventScroll:true});}
+  else{window.scrollTo(0,y);if(editorId||active?.id==='repUndoRemoval')(document.getElementById('repEditorSavedHeading')||document.getElementById('quickAddToggle')||document.getElementById('selectedOpeningsHeading'))?.focus({preventScroll:true});else if(repId)document.getElementById('selectedOpeningsHeading')?.focus({preventScroll:true});}
 }
 function toggleRepertoireLine(oi,li,side=preferredSide(oi,li)){
-  const added=repertoire.toggle(oi,li,side); daily.selectionChanged();
-  refreshRepertoireSelection(); showRepertoireNotice(added,oi,li,side);
+  if(!DATA.openings[oi]?.lines[li]||!['w','b'].includes(side))return;
+  const rep=repertoire.load(),id=lessonId(oi,li),key=id+':'+side,index=rep.items.findIndex(x=>itemKey(x)===key),added=index<0;
+  const undo=added?null:{oi,li,item:rep.items[index],index,previous:rep.items[index-1]&&itemKey(rep.items[index-1]),next:rep.items[index+1]&&itemKey(rep.items[index+1]),day:activity.key(),sessionBefore:daily.load()};
+  if(added)rep.items.push({id,side});else rep.items.splice(index,1);
+  rep.configured=true;
+  try{persistRepertoireSelection(rep);}catch{repertoireSaveError();return;}
+  if(undo)undo.sessionAfter=daily.load();
+  refreshRepertoireSelection();showRepertoireNotice(added,oi,li,side,1,undo);
 }
 function quickAddMatches(query=quickAdd.query,side=quickAdd.side){
   const normalize=name=>(name||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
   const q=normalize(query);
   const matches=(...names)=>names.some(name=>normalize(name).includes(q));
-  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,side:preferredSide(oi,li)}))
-    .filter(x=>(side==='all'||x.side===side)&&(matches(op.name,op.nameZh)||matches(x.line.name,x.line.nameZh)))})).filter(x=>x.lines.length);
+  return DATA.openings.map((op,oi)=>({op,oi,lines:op.lines.map((line,li)=>({line,li,side:['w','b'].includes(side)?side:preferredSide(oi,li)}))
+    .filter(x=>matches(op.name,op.nameZh)||matches(x.line.name,x.line.nameZh))})).filter(x=>x.lines.length);
 }
 function quickAddHTML(){
-  return `<section id="quickAddPanel" class="quick-add" aria-labelledby="quickAddHeading"${quickAdd.open?'':' hidden'}><div class="quick-add-heading"><h3 id="quickAddHeading">${t('quickAddTitle')}</h3><button class="linklike" type="button" onclick="toggleQuickAdd(false)">${t('closeWord')}</button></div><div class="quick-add-fields"><label for="quickAddSearch"><span>${t('quickAddSearch')}</span><input id="quickAddSearch" type="search" maxlength="120" autocomplete="off" placeholder="${t('quickAddPlaceholder')}" value="${medalText(quickAdd.query)}" oninput="updateQuickAdd(this.value,quickAdd.side)" aria-describedby="quickAddHelp"></label><label for="quickAddSide"><span>${t('quickAddSide')}</span><select id="quickAddSide" onchange="updateQuickAdd(quickAdd.query,this.value)">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${quickAdd.side===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="quickAddHelp" class="quick-add-help">${t('quickAddHelp')}</p><p id="quickAddCount" class="quick-add-count" role="status" aria-live="polite" aria-atomic="true"></p><div id="quickAddResults" class="quick-add-results"></div></section>`;
+  if(!quickAdd.open)return '<div id="quickAddPanel" hidden></div>';
+  return `<section id="quickAddPanel" class="quick-add rep-editor" aria-label="${t('repEdit')}" onkeydown="if(event.key==='Escape'&&!event.defaultPrevented){event.preventDefault();toggleQuickAdd(false)}"><div class="rep-editor-saved"><h3 id="repEditorSavedHeading" tabindex="-1">${t('repSavedTitle')} <span id="repEditorSavedCount"></span></h3><div id="repEditorSaved"></div></div><div class="rep-editor-find"><h3>${t('repFindLines')}</h3><label class="sr-only" for="quickAddSearch">${t('quickAddSearch')}</label><input id="quickAddSearch" type="search" maxlength="120" autocomplete="off" placeholder="${t('quickAddSearch')}" value="${medalText(quickAdd.query)}" oninput="updateQuickAdd(this.value,quickAdd.side)"><div class="rep-editor-colour"><span id="repEditorColourLabel">${t('repPractiseAs')}</span><div role="group" aria-labelledby="repEditorColourLabel">${['w','b'].map(side=>`<button type="button" class="side-${side}" data-editor-side="${side}" aria-pressed="${quickAdd.side===side}" onclick="updateQuickAdd(quickAdd.query,'${side}')">${t(side==='w'?'white':'black')}</button>`).join('')}</div></div><p id="quickAddCount" class="quick-add-count" role="status" aria-live="polite" aria-atomic="true"></p><div id="quickAddResults" class="quick-add-results"></div></div></section>`;
 }
 function toggleQuickAdd(open=!quickAdd.open){
-  quickAdd.open=open;
-  const panel=document.getElementById('quickAddPanel'); panel.hidden=!open;
-  document.getElementById('quickAddToggle').setAttribute('aria-expanded',String(open));
-  const starter=document.getElementById('repStarter');if(starter)starter.hidden=open;
-  if(open){renderQuickAddResults();document.getElementById('quickAddSearch').focus();}
-  else document.getElementById('quickAddToggle').focus({preventScroll:true});
+  quickAdd.open=!!open;
+  if(open&& !['w','b'].includes(quickAdd.side))quickAdd.side='w';
+  renderPractice();
+  const target=document.getElementById(open?(repertoire.entries().length?'repEditorSavedHeading':'quickAddSearch'):'quickAddToggle');
+  target?.focus({preventScroll:true});
+  document.getElementById('quickAddToggle')?.scrollIntoView({block:'nearest'});
 }
 function updateQuickAdd(query,side){
-  quickAdd.query=query; quickAdd.side=side; quickAdd.expanded.clear();
+  quickAdd.query=query;quickAdd.side=['w','b'].includes(side)?side:'w';quickAdd.expanded.clear();
+  document.querySelectorAll('[data-editor-side]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.editorSide===quickAdd.side)));
   renderQuickAddResults();
-  const results=document.getElementById('quickAddResults'); if(results) results.scrollTop=0;
+  const results=document.getElementById('quickAddResults');if(results)results.scrollTop=0;
+}
+function renderEditorSavedRepertoire(){
+  const el=document.getElementById('repEditorSaved');if(!el||!quickAdd.open)return;
+  const entries=repertoire.entries(),groups=savedRepertoireGroups('');
+  document.getElementById('repEditorSavedCount').textContent=t(entries.length===1?'quickAddCountOne':'quickAddCount',{n:entries.length});
+  el.innerHTML=groups.map(group=>{
+    const op=DATA.openings[group.oi],open=quickAdd.savedExpanded.get(group.key)??entries.length<=6;
+    return `<details class="rep-editor-group" data-editor-group="${group.key}"${open?' open':''} ontoggle="if(this.isConnected)quickAdd.savedExpanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong><span class="side-tag side-${group.side}">${t(group.side==='w'?'white':'black')}</span><small>${group.items.length}</small></summary>${group.items.map(x=>`<div class="quick-add-line"><div><b>${medalText(lnName(op.lines[x.li]))}</b></div><button class="rep-remove" data-editor-id="${itemKey(x)}" aria-label="${medalText(t('removeSavedPractice',{line:lnName(op.lines[x.li]),side:t(x.side==='w'?'white':'black')}))}" title="${t('repRemove')}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button></div>`).join('')}</details>`;
+  }).join('')||`<p class="home-note">${t('repEditorEmpty')}</p>`;
 }
 function renderQuickAddResults(){
   const el=document.getElementById('quickAddResults'); if(!el||!quickAdd.open)return;
@@ -6054,7 +6167,7 @@ function renderQuickAddResults(){
     const expanded=quickAdd.expanded.get(oi)??!!quickAdd.query.trim();
     return `<details class="quick-add-group"${expanded?' open':''} ontoggle="if(this.isConnected)quickAdd.expanded.set(${oi},this.open)"><summary>${medalText(opName(op))}<span>${t(lines.length===1?'quickAddCountOne':'quickAddCount',{n:lines.length})}</span></summary><div class="quick-add-group-actions"><button class="mini" data-quick-id="group-${oi}" aria-label="${medalText(groupLabel)}" aria-disabled="${!missing}" onclick="addQuickOpening(${oi})">${!missing?repertoireBookmark()+' ':''}${t(!missing?'quickAddAllSaved':missing===1?'quickAddOne':'quickAddMany',{n:missing})}</button></div>${lines.map(({line,li,side})=>{
       const id=lessonId(oi,li)+':'+side, added=items.has(id), label=t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')});
-      return `<div class="quick-add-line"><div><b>${medalText(lnName(line))}</b><small>${t(side==='w'?'white':'black')}</small></div><button class="rep-toggle" data-quick-id="${id}" aria-pressed="${added}" aria-label="${medalText(label)}" title="${medalText(label)}" onclick="toggleRepertoireLine(${oi},${li},'${side}')"><span aria-hidden="true">${added?repertoireBookmark():'+'}</span></button></div>`;
+      return `<div class="quick-add-line"><div><b>${medalText(lnName(line))}</b><small>${t(side==='w'?'white':'black')}</small></div><button class="rep-toggle" data-quick-id="${id}" aria-pressed="${added}" aria-label="${medalText(label)}" title="${medalText(label)}" onclick="toggleRepertoireLine(${oi},${li},'${side}')"><span aria-hidden="true">${added?'−':'+'}</span></button></div>`;
     }).join('')}</details>`;
   }).join('')||`<p class="home-note">${t('quickAddEmpty')}</p>`;
 }
@@ -6063,7 +6176,8 @@ function addQuickOpening(oi){
   const rep=repertoire.load(), saved=new Set(rep.items.map(itemKey));
   const added=group.lines.filter(x=>!saved.has(lessonId(oi,x.li)+':'+x.side)); if(!added.length)return;
   rep.items.push(...added.map(x=>({id:lessonId(oi,x.li),side:x.side})));
-  rep.configured=true; repertoire.save(rep); daily.selectionChanged();
+  rep.configured=true;
+  try{persistRepertoireSelection(rep);}catch{repertoireSaveError();return;}
   refreshRepertoireSelection();
   showRepertoireNotice(true,oi,added.length===1?added[0].li:null,added[0].side,added.length);
 }
@@ -6093,9 +6207,9 @@ const REPERTOIRE_SITUATIONS=[
   {id:'black-d4',side:'b',label:'repBlackD4'},
   {id:'black-other',side:'b',label:'repOther'}
 ];
-function savedRepertoireGroups(){
+function savedRepertoireGroups(query=repView.query){
   const normalize=value=>String(value||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
-  const q=normalize(repView.query),groups=new Map();
+  const q=normalize(query),groups=new Map();
   for(const item of repertoire.entries()){
     const op=DATA.openings[item.oi],line=op.lines[item.li];
     if(q&&![op.name,op.nameZh,line.name,line.nameZh].some(name=>normalize(name).includes(q)))continue;
@@ -6117,7 +6231,7 @@ function repertoireOpeningHTML(group,small){
   return `<details class="rep-opening" data-rep-group="${group.key}" ${open?'open':''} ontoggle="if(this.isConnected&&!repView.query)repView.expanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong> ${showFirst&&firstMoves.length===1?moveTag(firstMoves[0]):''} <span class="rep-count">${t(group.items.length===1?'quickAddCountOne':'quickAddCount',{n:group.items.length})}${due?' · '+t(due===1?'repDueOne':'repDueMany',{n:due}):''}</span></summary>${group.items.map(x=>{
     const line=op.lines[x.li],st=store.get(x.oi,x.li,x.side),sv=srs.get(x.oi,x.li,x.side),rank=lineRank(x.oi,x.li,x.side),learn=!st.learned&&!st.runs;
     const action=(isLearn,primary)=>{const label=t(isLearn?'learn':'drill');return `<button class="${primary?'mini preferred':'linklike'}" aria-label="${medalText(t('repActionLabel',{action:label,line:lnName(line),side:t(x.side==='w'?'white':'black')}))}" onclick="${isLearn?'startLearn':'startDrill'}(${x.oi},${x.li},'${x.side}')">${label}</button>`;};
-    return `<article class="rep-line"><div class="rep-line-info"><h5>${medalText(lnName(line))}${showFirst&&firstMoves.length>1?moveTag(line.moves[0]?.san):''}</h5><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div></div>${repView.managing?`<button class="rep-remove" data-rep-id="${itemKey(x)}" aria-label="${medalText(t('removeRepLine',{line:lnName(line)}))}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button>`:`<div class="rep-line-actions">${action(!learn,false)}${action(learn,true)}</div>`}</article>`;
+    return `<article class="rep-line"><div class="rep-line-info"><h5>${medalText(lnName(line))}${showFirst&&firstMoves.length>1?moveTag(line.moves[0]?.san):''}</h5><div class="stat-row">${rank?rankChipHTML(rank,rankRusty(rank,sv)):`<span class="stat">${t('newWord')}</span>`}${sv&&sv.due<=Date.now()?`<span class="due-tag">${t('dueTag')}</span>`:''}</div></div><div class="rep-line-actions">${action(!learn,false)}${action(learn,true)}</div></article>`;
   }).join('')}</details>`;
 }
 function renderSavedRepertoire(){
@@ -6129,19 +6243,17 @@ function renderSavedRepertoire(){
   }).join('')||`<p class="home-note" role="status">${t('repSearchEmpty')}</p>`;
 }
 function filterSavedRepertoire(query){repView.query=query;renderSavedRepertoire();}
-function toggleRepertoireManage(){
-  repView.managing=!repView.managing;
-  const button=document.getElementById('repManage');button.textContent=t(repView.managing?'repManageDone':'repManage');button.setAttribute('aria-pressed',String(repView.managing));
-  document.getElementById('repManageNote').hidden=!repView.managing;renderSavedRepertoire();
-}
 function renderRepertoire(){
   const el=document.getElementById('repertoirePanel'),entries=repertoire.entries();
-  if(!entries.length){
-    repView.managing=false;repView.query='';repView.expanded.clear();
-    el.innerHTML=repertoireHeadingHTML(true)+quickAddHTML()+repertoireStarterHTML();renderQuickAddResults();return;
+  if(quickAdd.open){
+    el.innerHTML=repertoireHeadingHTML(!entries.length)+quickAddHTML();renderEditorSavedRepertoire();renderQuickAddResults();return;
   }
-  el.innerHTML=quickAddHTML()+`<div class="rep-saved-toolbar"><h3 id="selectedOpeningsHeading" tabindex="-1">${t('repSavedTitle')} <span>${t(entries.length===1?'quickAddCountOne':'quickAddCount',{n:entries.length})}</span></h3><button id="repManage" class="linklike" aria-pressed="${repView.managing}" onclick="toggleRepertoireManage()">${t(repView.managing?'repManageDone':'repManage')}</button></div><p id="repManageNote" class="rep-manage-note" ${repView.managing?'':'hidden'}>${t('repManageNote')}</p>${entries.length>8||repView.query?`<label class="sr-only" for="repSavedSearch">${t('repSearch')}</label><input id="repSavedSearch" class="rep-saved-search" type="search" placeholder="${t('repSearch')}" value="${medalText(repView.query)}" oninput="filterSavedRepertoire(this.value)">`:''}<div id="repSavedList"></div>`;
-  renderSavedRepertoire();renderQuickAddResults();
+  if(!entries.length){
+    repView.query='';repView.expanded.clear();
+    el.innerHTML=repertoireHeadingHTML(true)+quickAddHTML()+repertoireStarterHTML();return;
+  }
+  el.innerHTML=quickAddHTML()+`<div class="rep-saved-toolbar"><h3 id="selectedOpeningsHeading" tabindex="-1">${t('repSavedTitle')} <span>${t(entries.length===1?'quickAddCountOne':'quickAddCount',{n:entries.length})}</span></h3></div>${entries.length>8||repView.query?`<label class="sr-only" for="repSavedSearch">${t('repSearch')}</label><input id="repSavedSearch" class="rep-saved-search" type="search" placeholder="${t('repSearch')}" value="${medalText(repView.query)}" oninput="filterSavedRepertoire(this.value)">`:''}<div id="repSavedList"></div>`;
+  renderSavedRepertoire();
 }
 function renderPromotionOverview(){
   const summary=promotionSummary();
