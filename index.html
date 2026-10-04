@@ -572,6 +572,9 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .home-toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 20px; border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:24px; }
 .home-nav { display:flex; flex:1 1 auto; gap:5px; }
 .home-engine { flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; font:inherit; font-size:.88rem; color:#dac5a8; border:1px solid #695239; background:transparent; padding:9px 14px; border-radius:12px; min-height:40px; cursor:pointer; }
+/* Keep all interface knights independent of operating-system chess fonts. */
+.knight-icon { display:inline-block; width:1em; height:1em; flex:0 0 auto; vertical-align:-.12em; }
+.knight-icon svg { display:block; width:100%; height:100%; overflow:visible; }
 /* Draw UI pawns instead of depending on a platform's emoji font. */
 .pawn-icon, .home-engine::before, [data-i18n="playVsEngine"]::before {
   display:inline-block; width:.8em; height:1em; flex-shrink:0; vertical-align:-.12em;
@@ -1431,7 +1434,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G66</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G67</b> · 中文</div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -1704,7 +1707,7 @@ Object.assign(I18N_EN, {
   repStrength:'strength',
   startedWord:'lines started',
   rankBarTip:'Each line climbs Pawn → Knight → Bishop → Rook → Queen',
-  toRank2:'A perfect drill promotes it to ♞ Knight.',
+  toRank2:'A perfect drill promotes it to Knight.',
   toRank3:'Perfect on {n} more day(s) promotes it to ♝ Bishop.',
   toRank4:'Let it rest — recall it after 14+ days to promote it to ♜ Rook.',
   toRank5:'Recall it after a month away to crown it ♛ Queen.',
@@ -1838,7 +1841,7 @@ if(I18N.zh!==I18N_EN) Object.assign(I18N.zh, {
   repStrength:'强度',
   startedWord:'条线已开始',
   rankBarTip:'每条线沿 兵 → 马 → 象 → 车 → 后 升级',
-  toRank2:'一次全对操练即可升为 ♞ 马。',
+  toRank2:'一次全对操练即可升为马。',
   toRank3:'再在 {n} 个不同日子全对即可升为 ♝ 象。',
   toRank4:'让它休息——相隔 14 天以上仍全对即可升为 ♜ 车。',
   toRank5:'相隔一个月后仍能全对，即可加冕为 ♛ 后。',
@@ -2201,7 +2204,7 @@ Object.assign(I18N_EN, {
   rustyTip:'This badge is yours. A review is due or the last recall needed help.',
   rankComplete:'Keep following your review schedule. Your earned rank stays.',
   reviewRankHint:'{n} more successful scheduled review(s) to {rank}. No need to wait beyond your due date.',
-  toRank2:'A complete drill without hints or retries earns ♞ Knight.',
+  toRank2:'A complete drill without hints or retries earns Knight.',
   readyNowTitle:'Next in your repertoire',
   payoffLearn:'Learn the idea',
   learnedBadgeRest:'Lesson complete. You can now practise either colour separately.',
@@ -2528,7 +2531,7 @@ Object.assign(I18N.zh, {
   rustyTip:'等级永久保留。当前有复习到期，或上次回忆需要帮助。',
   rankComplete:'继续按计划复习，已获得的等级会一直保留。',
   reviewRankHint:'再完成 {n} 次全对的到期复习，即可达到「{rank}」。无需等到到期日之后。',
-  toRank2:'完整操练一次，无提示、无重试，即可获得 ♞ 马。',
+  toRank2:'完整操练一次，无提示、无重试，即可获得「马」等级。',
   readyNowTitle:'开局库中的下一步',
   payoffLearn:'理解思路',
   learnedBadgeRest:'本课已完成，现在可按执方分别操练。',
@@ -3424,12 +3427,7 @@ function buildPieceSet(fill, line, det){
 <path d="M31 29.5l1.5 2.5h-20l1.5-2.5"/>
 <path d="M11 14h23" fill="none" stroke="${det}" stroke-linejoin="miter"/>
 </g></svg>`,
-  N:`${S}<g fill="none" stroke="${line}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="${fill}"/>
-<path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3" fill="${fill}"/>
-<path d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0z" fill="${det}" stroke="${det}"/>
-<path d="M15 15.5a.5 1.5 0 1 1-1 0 .5 1.5 0 1 1 1 0z" transform="matrix(.866 .5 -.5 .866 9.693 -5.173)" fill="${det}" stroke="${det}"/>
-</g></svg>`,
+  N:knightSVG(fill,line,det),
   B:`${S}<g fill="${fill}" stroke="${line}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 <g stroke-linecap="butt">
 <path d="M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.354.49-2.323.47-3-.5 1.354-1.94 3-2 3-2z"/>
@@ -3610,7 +3608,17 @@ const store = {
    A record of completed work, never a timer or a prediction of playing strength.
    A successful scheduled review is the first unaided attempt on a due line/side
    that day. Voluntary repeats are welcome and never postpone a successful review. */
+// One knight drawing for the board, interface and achievement artwork.
+function knightSVG(fill,line,det){
+  return `<svg viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="${line}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21" fill="${fill}"/>
+<path d="M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3" fill="${fill}"/>
+<path d="M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0z" fill="${det}" stroke="${det}"/>
+<path d="M15 15.5a.5 1.5 0 1 1-1 0 .5 1.5 0 1 1 1 0z" transform="matrix(.866 .5 -.5 .866 9.693 -5.173)" fill="${det}" stroke="${det}"/>
+</g></svg>`;
+}
 function uiChessIcon(symbol){
+  if(symbol==='♘'||symbol==='♞')return `<span class="knight-icon" aria-hidden="true">${knightSVG('currentColor','currentColor','var(--bg)')}</span>`;
   if(symbol!=='♟' && symbol!=='♙') return symbol;
   return `<span class="pawn-icon${symbol==='♙'?' outlined':''}" aria-hidden="true"></span>`;
 }
@@ -3925,7 +3933,7 @@ const MEDAL_ICONS={
   timer:'<circle cx="12" cy="14" r="8"/><path d="M9 2h6m-3 0v4m6 1 2-2m-8 5v4l3 2"/>',
   loop:'<path d="M8 7a5 5 0 1 0 0 10l8-10a5 5 0 1 1 0 10L8 7Z"/>',
   promotion:'<circle cx="8" cy="6" r="3"/><path d="m6 9-2 8h8l-2-8M3 21h10m5-5V4m-3 3 3-3 3 3"/>',
-  knight:'<path d="M6 20h13l-2-4c4-7-1-11-7-13l-1 4-5 6 3 2 5-3-3 5-3 3ZM12 7h.01"/>',
+  knight:knightSVG('currentColor','currentColor','var(--panel)').replace('<svg ', '<svg x="1" y="1" width="22" height="22" '),
   castle:'<path d="M3 5h3v3h3V5h3v6l-2 2v5H5v-5l-2-2V5ZM3 21h10m8-6h-7m3-3-3 3 3 3"/>',
   passant:'<circle cx="7" cy="5" r="2"/><path d="m6 7-2 7h6L8 7m-5 11h8m2-2 8-8m-5 0h5v5M15 21h6"/>',
   modes:'<circle cx="12" cy="6" r="4"/><circle cx="6" cy="17" r="4"/><circle cx="18" cy="17" r="4"/>',
@@ -4538,7 +4546,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G66';
+const BUILD='G67';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
