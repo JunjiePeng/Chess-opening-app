@@ -490,10 +490,21 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .board-options-help p { margin-top:6px; color:var(--text); line-height:1.6; }
 #donePlan { text-align:left; color:var(--text); font-size:1rem; line-height:1.7; margin:14px 0 12px; }
 #donePlan b { color:#e0a878; }
-#langBar { display:inline-flex; gap:4px; }
+#langBar { display:flex; gap:8px; margin-top:10px; }
 #langBar button { background:var(--panel); color:var(--dim); border:1px solid var(--line); border-radius:999px;
-  min-height:32px; padding:7px 11px; cursor:pointer; font-size:.875rem; font-family:inherit; line-height:1; }
+  flex:1; min-width:0; min-height:44px; padding:10px 14px; cursor:pointer; font-size:.9375rem; font-family:inherit; line-height:1.3; }
 #langBar button.on { background:var(--accent); color:var(--on-accent); font-weight:700; border-color:var(--accent); }
+.settings-btn { display:grid; place-items:center; flex:0 0 40px; width:40px; height:44px; padding:8px; border:0; border-radius:12px; background:transparent; color:var(--dim); cursor:pointer; }
+.settings-btn:hover { background:var(--panel); color:var(--text); }
+.settings-btn svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+#settingsDialog { width:min(360px,calc(100% - 32px)); max-height:calc(100dvh - 32px); margin:auto; padding:22px; overflow:auto; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:20px; box-shadow:0 20px 70px #0009; }
+#settingsDialog::backdrop { background:#100b07a8; }
+.settings-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; }
+.settings-heading h2 { font-family:'Caprasimo',serif; font-size:1.4rem; font-weight:400; }
+.settings-close { flex:0 0 44px; width:44px; height:44px; border:1px solid var(--line); border-radius:50%; color:var(--dim); background:none; cursor:pointer; font:inherit; font-size:1.5rem; line-height:1; }
+.settings-close:hover { color:var(--text); border-color:var(--accent); }
+.settings-language { border:0; min-width:0; padding:0; }
+.settings-language legend { color:var(--text); font-size:.9375rem; font-weight:600; }
 #muteBtn { margin-left:0; background:none; border:none; cursor:pointer; padding:4px;
   color:var(--dim); transition:opacity .15s; line-height:1; }
 #muteBtn:hover { opacity:1; }
@@ -1394,6 +1405,10 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 </dialog>
 
 <dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
+<dialog id="settingsDialog" aria-labelledby="settingsTitle" onclose="if(!this.open)closeSettings()" onkeydown="settingsKeydown(event)">
+  <div class="settings-heading"><h2 id="settingsTitle" data-i18n="settings">Settings</h2><button type="button" class="settings-close" onclick="closeSettings()" data-i18n-label="settingsClose" aria-label="Close settings">×</button></div>
+  <fieldset class="settings-language"><legend data-i18n="settingsLanguage">Language</legend><div id="langBar"><button id="langEN" type="button" lang="en" aria-pressed="false" onclick="setLang('en')">English</button><button id="langZH" type="button" lang="zh-Hans" aria-pressed="false" onclick="setLang('zh')">简体中文</button></div></fieldset>
+</dialog>
 <div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" onmouseenter="clearTimeout(repertoireNoticeTimer)" onmouseleave="scheduleSelectionNotice()" onfocusin="clearTimeout(repertoireNoticeTimer)" onfocusout="scheduleSelectionNotice()" hidden></div>
 <div id="appShell" class="page-shell">
 <header>
@@ -1403,8 +1418,8 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   </div>
   <div class="header-controls">
     <button id="pageGuideBtn" type="button" class="page-guide-btn" onclick="openGuideHelp()" data-i18n-title="guideHelp" data-i18n-label="guideHelp">?</button>
-    <span id="langBar"><button id="langEN" onclick="setLang('en')">EN</button><button id="langZH" onclick="setLang('zh')">中文</button></span>
     <button id="muteBtn" onclick="toggleMute()" data-i18n-title="tipSound" title="Toggle sound"></button>
+    <button id="settingsBtn" type="button" class="settings-btn" onclick="openSettings()" aria-haspopup="dialog" aria-controls="settingsDialog" data-i18n-title="settings" data-i18n-label="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3h5l.6 2.4 2 1.2 2.4-.7 2.5 4.2-1.8 1.7v2.4l1.8 1.7-2.5 4.2-2.4-.7-2 1.2-.6 2.4h-5l-.6-2.4-2-1.2-2.4.7L2 15.9l1.8-1.7v-2.4L2 10.1l2.5-4.2 2.4.7 2-1.2.6-2.4Z" transform="translate(0 -1) scale(1 .95)"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 </header>
 
@@ -1434,7 +1449,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G67</b> · 中文</div>
+    <div id="buildTag">Debut · build <b>G68</b></div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -3353,11 +3368,40 @@ function lnName(l){ return zhOn()&&l.nameZh ? l.nameZh : l.name; }
 function lnIntro(l){ return zhOn()&&l.introZh ? l.introZh : l.intro; }
 function lnPlan(l){ return zhOn()&&l.planZh ? l.planZh : l.plan; }
 function mvC(mv){ return zhOn()&&mv.cZh ? mv.cZh : mv.c; }
+/* Language is a secondary preference, available from the header settings. */
+Object.assign(I18N_EN, {settings:'Settings',settingsLanguage:'Language',settingsClose:'Close settings'});
+Object.assign(I18N.zh, {settings:'设置',settingsLanguage:'语言',settingsClose:'关闭设置'});
+let settingsOrigin=null;
+function openSettings(){
+  const dialog=document.getElementById('settingsDialog');
+  if(dialog.open||document.querySelector('dialog[open]')||document.getElementById('appShell').inert)return;
+  settingsOrigin={overflow:document.body.style.overflow};
+  dialog.showModal();document.body.style.overflow='hidden';
+  document.getElementById(LANG==='zh'?'langZH':'langEN').focus({preventScroll:true});
+}
+function closeSettings(restore=true){
+  const dialog=document.getElementById('settingsDialog'),origin=settingsOrigin;
+  settingsOrigin=null;
+  if(dialog.open)dialog.close();
+  if(!origin)return;
+  document.body.style.overflow=origin.overflow;
+  if(restore)document.getElementById('settingsBtn').focus({preventScroll:true});
+  queuePageGuide();
+}
+function settingsKeydown(event){
+  if(event.key==='Escape')event.stopPropagation();
+  if(event.key!=='Tab')return;
+  const controls=[...document.getElementById('settingsDialog').querySelectorAll('button')];
+  const first=controls[0],last=controls.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+}
 function setLang(l){
   LANG=l; writePreference('otLang',l);
   applyStaticI18n();
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
+  if(eb) eb.setAttribute('aria-pressed',String(l==='en')); if(zb) zb.setAttribute('aria-pressed',String(l==='zh'));
   renderAnnotBtn(); renderAimBtn(); renderEvalBtn(); renderRepertoireNotice(); queuePageGuide();
   if(board) render(curLastU());
   buildLineSel(); renderSessionStrip(); renderRepertoireButton();
@@ -4546,7 +4590,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G67';
+const BUILD='G68';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -7187,8 +7231,9 @@ function openPlayResult(){
   if(mode!=='play'||!playOver||!playOutcome())return;
   const dialog=document.getElementById('playResultDialog');if(dialog.open)return;
   if(reviewingPlay())reviewPlayPosition(playHist.length);
-  // The game can finish while the optional guide is open. Give the result priority.
+  // The game can finish during a guide or settings. Give the result priority.
   if(typeof activeGuide!=='undefined'&&activeGuide)closePageGuide(false);
+  if(document.getElementById('settingsDialog')?.open)closeSettings(false);
   if(document.querySelector('dialog[open]')||document.getElementById('appShell').inert)return;
   renderPlayResult();
   playResultOrigin={overflow:document.body.style.overflow};
@@ -7836,6 +7881,7 @@ renderMuteBtn();
 buildLineSel();
 applyStaticI18n();
 document.getElementById(LANG==='zh'?'langZH':'langEN').classList.add('on');
+document.getElementById(LANG==='zh'?'langZH':'langEN').setAttribute('aria-pressed','true');
 renderAnnotBtn();
 renderAimBtn();
 renderEvalBtn();
