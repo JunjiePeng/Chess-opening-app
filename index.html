@@ -59,10 +59,6 @@ header p { color:var(--dim); font-size:.9rem; }
 .op-grid > .op-card { min-width:0; }
 #buildTag { text-align:center; color:var(--dim); font-size:.8125rem; margin-top:22px; }
 #buildTag b { color:var(--accent); }
-#backupRow { text-align:center; margin-top:4px; }
-#backupRow .linklike { background:none; border:none; color:var(--dim); cursor:pointer; font-size:.875rem;
-  text-decoration:underline dotted; padding:6px 8px; }
-#backupRow .linklike:hover { color:#e0a878; opacity:1; }
 /* Duolingo-style daily hero: streak front and center, actions beside it,
    engine play folded in as a compact side button. */
 .today-hero { display:flex; align-items:center; gap:18px; flex-wrap:wrap;
@@ -497,14 +493,35 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .settings-btn { display:grid; place-items:center; flex:0 0 40px; width:40px; height:44px; padding:8px; border:0; border-radius:12px; background:transparent; color:var(--dim); cursor:pointer; }
 .settings-btn:hover { background:var(--panel); color:var(--text); }
 .settings-btn svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
-#settingsDialog { width:min(360px,calc(100% - 32px)); max-height:calc(100dvh - 32px); margin:auto; padding:22px; overflow:auto; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:20px; box-shadow:0 20px 70px #0009; }
+#settingsDialog { width:min(440px,calc(100% - 24px)); max-height:calc(100dvh - 24px); margin:auto; padding:22px; overflow:auto; overscroll-behavior:contain; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:20px; box-shadow:0 20px 70px #0009; }
 #settingsDialog::backdrop { background:#100b07a8; }
-.settings-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; }
+.settings-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
 .settings-heading h2 { font-family:'Caprasimo',serif; font-size:1.4rem; font-weight:400; }
 .settings-close { flex:0 0 44px; width:44px; height:44px; border:1px solid var(--line); border-radius:50%; color:var(--dim); background:none; cursor:pointer; font:inherit; font-size:1.5rem; line-height:1; }
 .settings-close:hover { color:var(--text); border-color:var(--accent); }
-.settings-language { border:0; min-width:0; padding:0; }
+.settings-language { border:0; min-width:0; padding:0; margin-top:18px; }
 .settings-language legend { color:var(--text); font-size:.9375rem; font-weight:600; }
+.settings-row { display:flex; justify-content:space-between; align-items:center; gap:16px; min-height:56px; font-size:.9375rem; }
+.settings-row>span { min-width:0; }
+.settings-switch { position:relative; flex:0 0 48px; width:48px; height:44px; border:0; background:none; cursor:pointer; }
+.settings-switch::before { content:''; position:absolute; inset:9px 0; border:1px solid #8a7155; border-radius:99px; background:#21190f; }
+.settings-switch::after { content:''; position:absolute; top:13px; left:5px; width:18px; height:18px; border-radius:50%; background:#b8a48a; transition:transform .15s; }
+.settings-switch[aria-checked="true"]::before { background:#52633d; border-color:#92a970; }
+.settings-switch[aria-checked="true"]::after { background:#f1e6d0; transform:translateX(20px); }
+.settings-section { border-top:1px solid var(--line); padding:10px 0; }
+.settings-section>summary { width:fit-content; max-width:100%; min-height:44px; padding:10px 0; cursor:pointer; font-size:.9375rem; font-weight:600; }
+.settings-section>summary small { color:var(--dim); font-weight:400; margin-left:8px; }
+.settings-section[open]>summary { color:var(--accent); }
+.settings-mode-choices,.settings-pace-choices { display:flex; gap:6px; margin:4px 0 8px; }
+.settings-mode-choices button,.settings-pace-choices button { flex:1; min-width:0; min-height:44px; padding:9px 5px; font:inherit; font-size:.85rem; cursor:pointer; border:1px solid var(--line); border-radius:12px; color:var(--dim); background:#251c14; }
+.settings-mode-choices button[aria-pressed="true"],.settings-pace-choices button[aria-pressed="true"] { background:#4a5636; border-color:#93a575; color:#f1e6d0; font-weight:650; }
+.settings-pace-choices small { display:block; font-size:.75rem; margin-top:4px; font-weight:400; }
+.settings-note { color:var(--dim); font-size:.8rem; line-height:1.55; margin:8px 0; }
+.settings-backup-actions { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.settings-backup-actions button { flex:1 1 120px; min-height:44px; }
+#settingsError { color:#f4b295; }
+#settingsDialog button:focus-visible,#settingsDialog summary:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+@media(prefers-reduced-motion:reduce){ .settings-switch::after { transition:none; } }
 #muteBtn { margin-left:0; background:none; border:none; cursor:pointer; padding:4px;
   color:var(--dim); transition:opacity .15s; line-height:1; }
 #muteBtn:hover { opacity:1; }
@@ -1410,7 +1427,27 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 
 <dialog id="dailyPreviewDialog" class="daily-preview" aria-labelledby="dailyPreviewTitle" aria-describedby="dailyPreviewHint" onclose="dailyPreview=null"></dialog>
 <dialog id="settingsDialog" aria-labelledby="settingsTitle" onclose="if(!this.open)closeSettings()" onkeydown="settingsKeydown(event)">
-  <div class="settings-heading"><h2 id="settingsTitle" data-i18n="settings">Settings</h2><button type="button" class="settings-close" onclick="closeSettings()" data-i18n-label="settingsClose" aria-label="Close settings">×</button></div>
+  <div class="settings-heading"><h2 id="settingsTitle" data-i18n="settings">Settings</h2><button id="settingsClose" type="button" class="settings-close" onclick="closeSettings()" data-i18n-label="settingsClose" aria-label="Close settings">×</button></div>
+  <div class="settings-row"><span id="settingsSoundLabel" data-i18n="settingsSound">Sound effects</span><button id="settingsSound" type="button" class="settings-switch" role="switch" aria-checked="true" aria-labelledby="settingsSoundLabel" onclick="settingsToggleSound()"></button></div>
+  <div class="settings-row"><span id="settingsTipsLabel" data-i18n="settingsTips">First-time tips</span><button id="settingsTips" type="button" class="settings-switch" role="switch" aria-checked="true" aria-labelledby="settingsTipsLabel" onclick="settingsToggleTips()"></button></div>
+  <details class="settings-section" id="settingsBoardSection"><summary data-i18n="settingsBoard">Board guidance</summary>
+    <div class="settings-mode-choices" id="settingsBoardModes" role="group" data-i18n-label="settingsMode"><button type="button" data-settings-mode="learn" aria-pressed="true" onclick="settingsSelectMode('learn')" data-i18n="learn">Learn</button><button type="button" data-settings-mode="drill" aria-pressed="false" onclick="settingsSelectMode('drill')" data-i18n="drill">Drill</button><button type="button" data-settings-mode="play" aria-pressed="false" onclick="settingsSelectMode('play')" data-i18n="settingsEngine">vs Engine</button></div>
+    <div class="settings-row" id="settingsArrowsRow"><span id="settingsArrowsLabel" data-i18n="settingsArrows">Lesson arrows</span><button id="settingsArrows" type="button" class="settings-switch" role="switch" aria-checked="false" aria-labelledby="settingsArrowsLabel" onclick="settingsToggleBoardOption('arrows')"></button></div>
+    <div class="settings-row"><span id="settingsDotsLabel" data-i18n="settingsDots">Legal-move dots</span><button id="settingsDots" type="button" class="settings-switch" role="switch" aria-checked="false" aria-labelledby="settingsDotsLabel" onclick="settingsToggleBoardOption('dots')"></button></div>
+    <div class="settings-row" id="settingsEvalRow" hidden><span id="settingsEvalLabel" data-i18n="settingsEval">Evaluation bar</span><button id="settingsEval" type="button" class="settings-switch" role="switch" aria-checked="false" aria-labelledby="settingsEvalLabel" onclick="settingsToggleEval()"></button></div>
+    <p class="settings-note" data-i18n="settingsTestAids">Guidance stays off during tests.</p>
+  </details>
+  <details class="settings-section" id="settingsPaceSection"><summary><span data-i18n="settingsPace">Engine reply pace</span><small id="settingsPaceValue"></small></summary>
+    <div class="settings-pace-choices" role="group" data-i18n-label="settingsPace"><button type="button" data-settings-pace="quick" aria-pressed="false" onclick="settingsChangePace('quick')"><span data-i18n="settingsPaceQuick">Quick</span><small>0.25 s</small></button><button type="button" data-settings-pace="steady" aria-pressed="true" onclick="settingsChangePace('steady')"><span data-i18n="settingsPaceSteady">Steady</span><small>0.75 s</small></button><button type="button" data-settings-pace="relaxed" aria-pressed="false" onclick="settingsChangePace('relaxed')"><span data-i18n="settingsPaceRelaxed">Relaxed</span><small>1.2 s</small></button></div>
+    <p class="settings-note" data-i18n="settingsPaceNote">Minimum reply time. Engine strength stays the same.</p>
+  </details>
+  <details class="settings-section" id="settingsBackupSection"><summary data-i18n="settingsBackup">Progress backup</summary>
+    <p class="settings-note" data-i18n="settingsBackupNote">Progress is saved on this device. Export a backup to keep a copy.</p>
+    <div class="settings-backup-actions"><button type="button" class="mini" onclick="settingsBackup('export')" data-i18n="backupExport">Export progress</button><button type="button" class="mini" onclick="settingsBackup('import')" data-i18n="backupImport">Import progress</button></div>
+    <p class="settings-note" data-i18n="settingsImportNote">Import replaces this device’s saved progress.</p>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    <p id="settingsError" class="settings-note" role="alert" hidden></p>
+  </details>
   <fieldset class="settings-language"><legend data-i18n="settingsLanguage">Language</legend><div id="langBar"><button id="langEN" type="button" lang="en" aria-pressed="false" onclick="setLang('en')">English</button><button id="langZH" type="button" lang="zh-Hans" aria-pressed="false" onclick="setLang('zh')">简体中文</button></div></fieldset>
 </dialog>
 <div id="repertoireToast" role="status" aria-live="polite" aria-atomic="true" onmouseenter="clearTimeout(repertoireNoticeTimer)" onmouseleave="scheduleSelectionNotice()" onfocusin="clearTimeout(repertoireNoticeTimer)" onfocusout="scheduleSelectionNotice()" hidden></div>
@@ -1452,13 +1489,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G71</b></div>
-    <div id="backupRow">
-      <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
-      <span style="color:var(--dim);opacity:.5">·</span>
-      <button class="linklike" data-i18n="backupImport" onclick="importProgress()"></button>
-      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
-    </div>
+    <div id="buildTag">Debut · build <b>G72</b></div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -3376,15 +3407,65 @@ function lnIntro(l){ return zhOn()&&l.introZh ? l.introZh : l.intro; }
 function lnPlan(l){ return zhOn()&&l.planZh ? l.planZh : l.plan; }
 function mvC(mv){ return zhOn()&&mv.cZh ? mv.cZh : mv.c; }
 /* Language is a secondary preference, available from the header settings. */
-Object.assign(I18N_EN, {settings:'Settings',settingsLanguage:'Language',settingsClose:'Close settings'});
-Object.assign(I18N.zh, {settings:'设置',settingsLanguage:'语言',settingsClose:'关闭设置'});
+Object.assign(I18N_EN, {
+  settings:'Settings',settingsLanguage:'Language',settingsClose:'Close settings',
+  settingsSound:'Sound effects',settingsTips:'First-time tips',settingsBoard:'Board guidance',settingsMode:'Board mode',settingsEngine:'vs Engine',
+  settingsArrows:'Lesson arrows',settingsDots:'Legal-move dots',settingsEval:'Evaluation bar',settingsTestAids:'Guidance stays off during tests.',
+  settingsPace:'Engine reply pace',settingsPaceQuick:'Quick',settingsPaceSteady:'Steady',settingsPaceRelaxed:'Relaxed',settingsPaceNote:'Minimum reply time. Engine strength stays the same.',
+  settingsBackup:'Progress backup',settingsBackupNote:'Progress is saved on this device. Export a backup to keep a copy.',settingsImportNote:'Import replaces this device’s saved progress.',
+  settingsBackupFailed:'Could not open the backup action. Please try again.'
+});
+Object.assign(I18N.zh, {
+  settings:'设置',settingsLanguage:'语言',settingsClose:'关闭设置',
+  settingsSound:'音效',settingsTips:'首次使用提示',settingsBoard:'棋盘辅助',settingsMode:'棋盘模式',settingsEngine:'人机对弈',
+  settingsArrows:'讲解箭头',settingsDots:'合法着法圆点',settingsEval:'局面评估条',settingsTestAids:'自测时始终关闭辅助提示。',
+  settingsPace:'引擎应手节奏',settingsPaceQuick:'快速',settingsPaceSteady:'适中',settingsPaceRelaxed:'从容',settingsPaceNote:'最短应手时间，不改变引擎棋力。',
+  settingsBackup:'进度备份',settingsBackupNote:'进度保存在此设备上，可导出备份留存。',settingsImportNote:'导入会替换此设备已保存的进度。',
+  settingsBackupFailed:'无法打开备份操作，请重试。'
+});
 let settingsOrigin=null;
+let settingsBoardMode='learn',settingsErrorKey='';
+function renderSettings(){
+  const check=(id,value)=>document.getElementById(id).setAttribute('aria-checked',String(value));
+  check('settingsSound',!SFX.muted);check('settingsTips',!guidePrefs.disabled);
+  document.querySelectorAll('[data-settings-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.settingsMode===settingsBoardMode)));
+  document.getElementById('settingsArrowsRow').hidden=settingsBoardMode==='play';
+  document.getElementById('settingsEvalRow').hidden=settingsBoardMode!=='play';
+  check('settingsArrows',readBoardOption('arrows',settingsBoardMode));check('settingsDots',readBoardOption('dots',settingsBoardMode));check('settingsEval',showEvalBar);
+  document.querySelectorAll('[data-settings-pace]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.settingsPace===playPace)));
+  document.getElementById('settingsPaceValue').textContent=t({quick:'settingsPaceQuick',steady:'settingsPaceSteady',relaxed:'settingsPaceRelaxed'}[playPace]);
+  const error=document.getElementById('settingsError');error.hidden=!settingsErrorKey;error.textContent=settingsErrorKey?t(settingsErrorKey):'';
+}
+function settingsSelectMode(view){if(['learn','drill','play'].includes(view)){settingsBoardMode=view;renderSettings();}}
+function settingsToggleSound(){toggleMute();renderSettings();}
+function settingsToggleTips(){setGuideAutomatic(!guidePrefs.disabled);renderSettings();}
+function settingsToggleBoardOption(kind){
+  const view=settingsBoardMode;
+  if(!['arrows','dots'].includes(kind)||(view==='play'&&kind==='arrows'))return;
+  saveBoardOption(kind,!readBoardOption(kind,view),view);
+  if(mode===view){
+    syncBoardOptions();aimSet=showAims&&selSq?new Set(legalTargetNames(selSq)):null;
+    if(board)render(curLastU());
+  }
+  renderSettings();
+}
+function settingsToggleEval(){setEvalBarVisible(!showEvalBar);renderSettings();}
+function settingsChangePace(value){setPlayPace(value);renderSettings();}
+function settingsBackup(action){
+  if(!['export','import'].includes(action))return;
+  settingsErrorKey='';
+  try{if(action==='export')exportProgress();else importProgress();}
+  catch{settingsErrorKey='settingsBackupFailed';}
+  renderSettings();
+}
 function openSettings(){
   const dialog=document.getElementById('settingsDialog');
   if(dialog.open||document.querySelector('dialog[open]')||document.getElementById('appShell').inert)return;
   settingsOrigin={overflow:document.body.style.overflow};
+  if(document.getElementById('appShell').classList.contains('board-view')&&['learn','drill','play'].includes(mode))settingsBoardMode=mode;
+  settingsErrorKey='';renderSettings();
   dialog.showModal();document.body.style.overflow='hidden';
-  document.getElementById(LANG==='zh'?'langZH':'langEN').focus({preventScroll:true});
+  document.getElementById('settingsClose').focus({preventScroll:true});
 }
 function closeSettings(restore=true){
   const dialog=document.getElementById('settingsDialog'),origin=settingsOrigin;
@@ -3398,14 +3479,16 @@ function closeSettings(restore=true){
 function settingsKeydown(event){
   if(event.key==='Escape')event.stopPropagation();
   if(event.key!=='Tab')return;
-  const controls=[...document.getElementById('settingsDialog').querySelectorAll('button')];
+  const controls=[...document.getElementById('settingsDialog').querySelectorAll('button,summary')].filter(el=>!el.disabled&&!el.closest('[hidden]')&&el.getClientRects().length);
   const first=controls[0],last=controls.at(-1);
+  if(!first)return;
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 }
 function setLang(l){
   LANG=l; writePreference('otLang',l);
   applyStaticI18n();
+  if(document.getElementById('settingsDialog')?.open)renderSettings();
   const eb=document.getElementById('langEN'), zb=document.getElementById('langZH');
   if(eb) eb.classList.toggle('on', l==='en'); if(zb) zb.classList.toggle('on', l==='zh');
   if(eb) eb.setAttribute('aria-pressed',String(l==='en')); if(zb) zb.setAttribute('aria-pressed',String(l==='zh'));
@@ -3513,11 +3596,14 @@ let board, curOp=null, curLine=null, playerSide='w', ply=0, selSq=null, misses=0
 let mode='drill', learnPly=0, curAnnot=null, aimSet=null;
 /* Board aids belong to their mode: learning guidance must not inherit drill settings. */
 const BOARD_OPTION_DEFAULTS={learn:{arrows:true,dots:false},drill:{arrows:false,dots:true},play:{arrows:false,dots:false},test:{arrows:false,dots:false}};
+const boardOptionChoices={};
 function boardOptionKey(kind,view){return (kind==='arrows'?'otArrows':'otAims')+view[0].toUpperCase()+view.slice(1);}
 function readBoardOption(kind,view){
-  if(view==='test'||(view==='play'&&kind==='arrows'))return false;
+  if(!['arrows','dots'].includes(kind)||!['learn','drill','play'].includes(view)||(view==='play'&&kind==='arrows'))return false;
+  const key=boardOptionKey(kind,view);
+  if(Object.prototype.hasOwnProperty.call(boardOptionChoices,key))return boardOptionChoices[key];
   try{
-    const value=localStorage.getItem(boardOptionKey(kind,view));
+    const value=localStorage.getItem(key);
     if(value==='0'||value==='1')return value==='1';
     // Existing engine preferences remain valid; Learn and Drill get their own defaults.
     if(view==='play'){
@@ -3527,9 +3613,10 @@ function readBoardOption(kind,view){
   }catch{}
   return BOARD_OPTION_DEFAULTS[view]?.[kind]??false;
 }
-function saveBoardOption(kind,value){
-  if(mode==='test')return;
-  try{localStorage.setItem(boardOptionKey(kind,mode),value?'1':'0');}catch{}
+function saveBoardOption(kind,value,view=mode){
+  if(!['arrows','dots'].includes(kind)||!['learn','drill','play'].includes(view)||(view==='play'&&kind==='arrows'))return;
+  const key=boardOptionKey(kind,view);boardOptionChoices[key]=!!value;
+  try{localStorage.setItem(key,value?'1':'0');}catch{}
 }
 function syncBoardOptions(){
   showAnnots=readBoardOption('arrows',mode);showAims=readBoardOption('dots',mode);
@@ -4595,7 +4682,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G71';
+const BUILD='G72';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -4674,8 +4761,12 @@ function exportProgress(){
   const out=createProgressBackup();
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));
-  a.download='debut-progress-'+activity.key()+'.json'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),5000); flushMedals();
+  a.download='debut-progress-'+activity.key()+'.json'; a.hidden=true;
+  const dialog=document.getElementById('settingsDialog');
+  (dialog?.open?dialog:document.body).appendChild(a);
+  try{a.click();}
+  finally{a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);}
+  flushMedals();
 }
 function importProgress(){ const el=document.getElementById('importFile'); if(el) el.click(); }
 (function(){
@@ -4755,7 +4846,7 @@ function renderMuteBtn(){ document.getElementById('muteBtn').innerHTML = SFX.mut
 function toggleMute(){
   SFX.muted=!SFX.muted; writePreference('otMuted',SFX.muted?'1':'0');
   renderMuteBtn();
-  if(!SFX.muted) SFX.move();
+  if(!SFX.muted){try{SFX.move();}catch{}}
 }
 function isCapture(u){
   const [r1,f1]=sqRC(u.slice(0,2)), [r2,f2]=sqRC(u.slice(2,4));
@@ -6644,6 +6735,14 @@ function curLastU(){
 let playHist=[], playWhite=true, playOver=false, freeMode=false, playResult=null;
 let playUndoStack=[], playCompletionRecorded=false;
 let playEngineRequest=null;
+const PLAY_PACES=Object.freeze({quick:250,steady:750,relaxed:1200});
+let playPace=readPreference('otEnginePace','steady');
+if(typeof playPace!=='string'||!Object.prototype.hasOwnProperty.call(PLAY_PACES,playPace))playPace='steady';
+function setPlayPace(value){
+  if(typeof value!=='string'||!Object.prototype.hasOwnProperty.call(PLAY_PACES,value))return false;
+  playPace=value;writePreference('otEnginePace',value);return true;
+}
+function playReplyInterval(){return PLAY_PACES[playPace];}
 let playPositions=[], playReviewPly=null;
 let playElo = +readPreference('otElo','1000') || 1000;
 let gameMinElo = playElo;   // lowest strength faced during the current game — medals read this
@@ -6837,7 +6936,7 @@ function updateOpeningName(){
   }
 }
 /* ---- evaluation bar (optional, engine-driven) ---- */
-let showEvalBar = false;   // always starts off — the toggle lasts for the session only
+let showEvalBar = readPreference('otEvalBar','0')==='1';
 let evalSeq=0;
 function renderEvalBtn(){
   document.getElementById('drill')?.classList.toggle('eval-visible',mode==='play'&&showEvalBar);
@@ -6845,10 +6944,12 @@ function renderEvalBtn(){
   b.hidden=mode!=='play'; b.textContent=t(showEvalBar?'evalOn':'evalOff');
   b.setAttribute('aria-pressed',String(showEvalBar));
 }
-function toggleEvalBar(){
-  showEvalBar=!showEvalBar;
-  renderEvalBtn(); updateEvalBar();
+function setEvalBarVisible(value){
+  showEvalBar=!!value;writePreference('otEvalBar',showEvalBar?'1':'0');
+  renderEvalBtn();
+  if(document.getElementById('drill')?.style.display!=='none')updateEvalBar();
 }
+function toggleEvalBar(){setEvalBarVisible(!showEvalBar);}
 // cp is from YOUR perspective (board-oriented): positive = you're better, bar fills toward you (bottom).
 function setEvalBar(cp){
   const wrap=document.getElementById('evalBarWrap'), fill=document.getElementById('evalFill'), num=document.getElementById('evalNum');
@@ -7046,7 +7147,7 @@ async function engineMove(){
   const request={g,fen};playEngineRequest=request;
   const stale=()=>g!==runGen||mode!=='play'||playOver||playWhite!==white||toFEN(white)!==fen;
   locked=true;
-  const t0=Date.now();
+  const t0=Date.now(), minThink=playReplyInterval();
   const skill=eloToSkill(playElo), movetime=eloToMovetime(playElo);
   try{
     // Retire queued evaluations and stop the current one before requesting a reply.
@@ -7062,7 +7163,7 @@ async function engineMove(){
     if(!u){ playFlags.engineFallback=true; u=pickFallbackMove(white); }
     if(!u){ finishPlay(gameStatus(white)); return; }
     // Give the player a readable pause; computation counts toward this interval.
-    const elapsed=Date.now()-t0, minThink=750;
+    const elapsed=Date.now()-t0;
     if(elapsed<minThink) await new Promise(r=>setTimeout(r, minThink-elapsed));
     if(stale())return;
     makePlayMove(u);
