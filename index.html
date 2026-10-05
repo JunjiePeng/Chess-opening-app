@@ -194,6 +194,7 @@ button:disabled { opacity:.45; cursor:default; }
 #prompt.good { color:#c6daa2; } #prompt.bad { color:var(--bad); }
 #comment { color:var(--text); font-size:1rem; line-height:1.7; min-height:60px; overflow-wrap:break-word; }
 #comment b { color:#e0a878; }
+#comment:empty { display:none; }
 .move-token { display:inline; padding:.06em .22em; border-radius:4px;
   background:rgba(227,160,95,.22); color:#ffdaa8; font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;
   font-size:.94em; font-weight:700; white-space:nowrap; }
@@ -684,8 +685,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .home-footer p { color:#c7b89f; margin-right:auto; }
 #todayBar:not([hidden]) + #repertoirePanel { margin-top:32px; padding-top:32px; border-top:1px solid var(--line); }
 #selectedOpeningsHeading { scroll-margin-top:24px; }
-.engine-purpose { margin:0 0 14px; color:#d3c1a8; font-size:.9rem; line-height:1.6; }
-.engine-purpose b { display:block; color:#efcfaa; margin-bottom:4px; }
 .quick-add { margin:0 0 24px; padding:20px; border:1px solid #705239; border-radius:18px; background:var(--panel); }
 .quick-add-heading { display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .quick-add-heading h3 { font-size:1.05rem; }
@@ -750,7 +749,10 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .promotion-ranks li p { color:#dbc9b1; font-size:.9rem; line-height:1.5; margin-top:10px; }
 .promotion-piece { flex-shrink:0; font-size:1.7rem; color:#e7b47c; }
 .promotion-ranks strong { font-size:1.5rem; }
-.rank-explainer { display:grid; gap:12px; margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+.rank-help { margin-top:20px; padding-top:14px; border-top:1px solid var(--line); }
+.rank-help>summary { width:fit-content; max-width:100%; cursor:pointer; color:#e6bc89; line-height:1.6; }
+.rank-help>summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+.rank-explainer { display:grid; gap:12px; margin-top:16px; }
 .rank-explainer p { max-width:90ch; color:#d3c1a8; line-height:1.6; font-size:.92rem; }
 .rank-explainer b { color:#f1d6b3; }
 .rank-total-note { margin-top:18px; color:#c8b89f; font-size:.88rem; line-height:1.6; }
@@ -900,11 +902,9 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .test-line-summary { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
 .test-line-summary strong { flex-basis:100%; color:var(--feedback); font-size:1.08rem; }
 .test-line-summary span { font-size:.8rem; color:#efe2d0; background:#ffffff0d; border:1px solid #ffffff30; border-radius:6px; padding:5px 8px; }
-.test-feedback-next { border-top:1px solid #ffffff25; padding-top:14px; margin-top:16px; font-size:.87rem; line-height:1.5; color:#e0d2c0; }
 #testNav { order:2; gap:8px; }
 #drill.testing #moveBox { order:3; }
 #testNextBtn { flex:1 0 100%; }
-#testHelpNote { flex:1 0 100%; margin:4px 0 0; color:#d0bea5; font-size:.8rem; line-height:1.55; }
 #testMoveProgress { margin-top:10px; }
 #testMoveProgress>span { color:#d8c5ab; font-size:.8rem; }
 .test-step-track { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
@@ -945,7 +945,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
   #drill.testing { padding-bottom:160px!important; }
   #drill.testing #testNav { position:fixed; z-index:30; bottom:0; left:0; right:0; padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left)); background:#2c2219; border-top:1px solid #846a4d; box-shadow:0 -6px 22px #100b0766; justify-content:center; }
   #testNav .act { flex:1 1 auto; }
-  #testHelpNote { text-align:center; margin:0; font-size:.73rem; }
   #testFeedback { scroll-margin-top:20px; }
   #testFeedbackHeading { scroll-margin-top:24px; scroll-margin-bottom:170px; }
 }
@@ -1159,7 +1158,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .test-size-choices button:hover { border-color:#e8ba85; }
 .test-size-choices button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .test-launch-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,.48fr); gap:30px; padding-top:20px; }
-.test-preview-source { color:#c7b397; font-size:.87rem; margin-bottom:10px; line-height:1.6; }
 .test-selection-preview { max-height:330px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; }
 .test-selection-list { margin:0; padding:0; list-style:none; }
 .test-selection-list li { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid #6a543733; }
@@ -1240,14 +1238,9 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 /* First moves: compact field notes, in Debut's wood and parchment palette. */
 .page-guide-btn { display:inline-flex; align-items:center; justify-content:center; flex:0 0 32px; width:32px; height:32px; padding:0; border:1px solid var(--line); border-radius:50%; background:transparent; color:var(--dim); font-family:inherit; font-weight:700; font-size:.95rem; line-height:1; cursor:pointer; }
 .page-guide-btn:hover { color:var(--text); border-color:var(--accent); background:var(--panel); }
-.guide-invite { display:flex; align-items:center; gap:12px; border-block:1px solid var(--line); padding:10px 0; margin:0 0 16px; }
+.guide-invite { display:flex; align-items:center; gap:12px; width:fit-content; max-width:100%; padding:0; margin:0 0 14px; }
 .guide-invite[hidden] { display:none; }
-.guide-invite .guide-invite-copy { flex:1; min-width:0; }
 #menu:has([data-home="practice"][aria-current="page"]) #menuGuideNudge { border:0; padding:0; margin-bottom:12px; }
-.guide-invite strong { display:block; font-size:.87rem; font-weight:600; color:var(--dim); }
-.guide-invite.is-welcome { border:1px solid #786044; border-left:3px solid var(--accent); border-radius:4px 16px 16px 4px; background:linear-gradient(110deg,#423320,var(--panel)); padding:15px 16px; }
-.guide-invite.is-welcome strong { font-family:'Caprasimo',serif; font-weight:400; color:var(--text); font-size:1.2rem; }
-.guide-invite p { color:var(--dim); font-size:.85rem; margin-top:3px; }
 .guide-invite button { flex-shrink:0; }
 .guide-invite .linklike { color:var(--accent); font-size:.86rem; padding:8px 0; }
 .guide-dismiss { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border:0; border-radius:50%; padding:0; background:transparent; color:inherit; opacity:.8; font-family:inherit; font-size:1.35rem; line-height:1; cursor:pointer; }
@@ -1298,13 +1291,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 @media(max-width:760px){
  .header-controls { gap:7px; }
  .page-guide-btn { flex-basis:28px; width:28px; height:28px; }
- .guide-invite.is-welcome { flex-wrap:wrap; gap:8px; padding:12px; }
- .guide-invite.is-welcome p { display:none; }
- .guide-invite.is-welcome .guide-invite-copy { flex-basis:calc(100% - 45px); }
- .guide-invite.is-welcome .guide-dismiss { order:0; }
- .guide-invite.is-welcome .guide-invite-start { order:1; }
- .guide-invite strong { font-size:.8rem; }
- .guide-invite.is-welcome strong { font-size:1.1rem; }
  #guideCard { padding:16px 18px; }
  #guideTitle { font-size:1.4rem; margin-top:14px; }
  #guideBody { font-size:.89rem; line-height:1.55; }
@@ -1348,7 +1334,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .play-result-bar small { display:block; color:var(--dim); font-size:.78rem; margin-top:3px; }
 .play-result-bar .mini { flex-shrink:0; padding:8px 10px; min-height:38px; }
 #drill.has-result .sq { cursor:default; }
-#drill.has-result .engine-purpose { display:none; }
 
 @media(max-width:400px){
  #playResultDialog { padding:22px 18px 14px; }
@@ -1483,13 +1468,13 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         <button id="libraryClear" type="button" onclick="clearLibraryFilters()" data-i18n-label="libraryClear" data-i18n-title="libraryClear" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
         <details class="library-filter-help"><summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg><span class="sr-only" data-i18n="libraryHelpTitle">About these filters</span></summary><div><p id="libraryFilterHelp" data-i18n="libraryFilterHelp">Colour is the side taught in the lesson. First move is White’s opening move.</p><p id="libraryStageHelp"></p></div></details>
       </div>
-      <div class="library-meta"><p class="library-hint" data-i18n="saveLineHint">Use + to save lines to My repertoire.</p><p id="catalogueCount" role="status" aria-live="polite" aria-atomic="true"></p></div>
+      <div class="library-meta"><p id="catalogueCount" role="status" aria-live="polite" aria-atomic="true"></p></div>
     </div>
     <div class="op-grid" id="opGrid"></div>
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G72</b></div>
+    <div id="buildTag">Debut · build <b>G73</b></div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -1511,12 +1496,12 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
       <section id="testFeedback" aria-labelledby="testFeedbackHeading" hidden></section>
       <div id="testNav" class="btn-row" hidden>
         <button id="testNextBtn" class="act primary" onclick="nextTestLine()" data-i18n="testNextLine">Next line</button>
-        <button id="testRevealBtn" class="act" onclick="revealTestMove()" data-i18n="testReveal">Show move</button>
+        <button id="testRevealBtn" class="act" aria-describedby="testHelpNote" onclick="revealTestMove()" data-i18n="testReveal">Show move</button>
         <button id="testPlayShownBtn" class="act primary" onclick="playShownTestMove()" hidden></button>
         <button id="testRetrySaveBtn" class="act primary" onclick="resumeRecallTest()" data-i18n="testRetrySave" hidden>Retry saving</button>
         <button id="testSkipBtn" class="act" onclick="skipTestLine()" data-i18n="testSkipLine">Skip line</button>
         <button id="testPauseBtn" class="act" onclick="showMenu('test')" data-i18n="testPause">Pause test</button>
-        <p id="testHelpNote" data-i18n="testHelpNote">Showing a move marks it as assisted. You can still finish the line.</p>
+        <p id="testHelpNote" class="sr-only" data-i18n="testHelpNote">Showing a move marks it as assisted. You can still finish the line.</p>
       </div>
       <aside id="boardGuideNudge" class="guide-invite" hidden></aside>
       <div class="panel-box" id="titleBox">
@@ -1534,7 +1519,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
         </div>
         <button id="boardRepBtn" class="rep-toggle" hidden></button>
         <div id="strengthRow" style="display:none;margin-top:10px">
-          <p class="engine-purpose"><b data-i18n="enginePurposeTitle">Put your opening into play.</b> <span data-i18n="enginePurposeBody">Practise making your own decisions against an adjustable opponent, and see how your opening leads into the rest of the game.</span></p>
           <label style="font-size:.875rem;color:var(--dim);display:flex;justify-content:space-between">
             <span data-i18n="engineStrength">Engine strength</span><span id="eloLabel"></span>
           </label>
@@ -1982,7 +1966,6 @@ Object.assign(I18N_EN, {
   testScoreRule:'First-try recall counts each position once. A retry or revealed answer marks only that move for review; your later moves still count. Skipped and unseen moves earn no recall credit. A fully recalled line needs every move correct first try, without help.',
   testLinesRecalled:'Fully recalled lines',
   testMovesAccurate:'{correct}/{total} tested moves correct first try',
-  testBoardRule:'Follow the named variation. A mismatch stays on this position so you can try again.',
   testLineRecalled:'Line complete — fully recalled',
   testLineRecorded:'Line saved for review',
   testAnswersLater:'Your move-by-move review is available in the results.',
@@ -2007,13 +1990,10 @@ Object.assign(I18N_EN, {
   testIllegalBody:'Choose a legal move and try again. This tap does not affect your score.',
   testCorrectTitle:'{move} — correct',
   testBackOnTrack:'{move} — back on track',
-  testKeepGoing:'Keep going. Recall the next move after the reply.',
   testFirstTryCount:'{n}/{total} moves correct first try',
   testRecoveredCount:'{n} recovered',
   testAssistedCount:'{n} with help',
   testRemainingCount:'{n} unfinished',
-  testAllFinished:'That was the last line. Your results are ready when you are.',
-  testNextReady:'Take a moment, then continue to the next line.',
   testMovesFinished:'{n}/{total} of your moves completed',
   testTurnProgress:'{side} to move · Move {n} of {total}',
   testSaveFailed:'Your last saved position is safe',
@@ -2060,8 +2040,6 @@ Object.assign(I18N_EN, {
   libraryNoResults:'No lines match these filters. Try another combination or clear the filters.',
   homeNavigation:'Main navigation',
   navTest:'Test your openings',
-  testTitle:'How much can you recall?',
-  testIntro:'Choose the lines you want to know, then play them from memory. Build a custom test or use your repertoire.',
   testDefaultName:'My repertoire test',
   testChoosePool:'Choose your lines',
   testNameLabel:'Test name (optional)',
@@ -2078,7 +2056,7 @@ Object.assign(I18N_EN, {
   testSelectionCount:'{lines} · {moves} moves to recall',
   testMatches:'Matching variations: {n}',
   testEmptyRepertoire:'Your repertoire is empty. Browse Openings here to choose test lines.',
-  testHowItWorks:'How your test works',
+  testHowItWorks:'Test rules',
   testRuleOrder:'Each chosen line and colour appears once, in a shuffled order. There is no timer.',
   testStart:'Start test',
   testSavePool:'Save this pool',
@@ -2123,10 +2101,6 @@ Object.assign(I18N_EN, {
   testSkipLine:'Skip line',
   testPause:'Pause test',
   boardOptions:'Board display options',
-  enginePurposeTitle:'Put your opening into play.',
-  enginePurposeBody:'Practise making your own decisions against an adjustable opponent, and see how your opening leads into the rest of the game.',
-  playFromStart:'Play a full game from move one, or choose a line above to start where its lesson ends. The opening name updates as you play.',
-  playPosition:'The <b>{name}</b> lesson has been played out. Now try its ideas in a real game: choose your own moves and respond to the engine.',
   tipEval:'Show the engine evaluation: positive means you are better; negative means the engine is better.',
   quickAddTitle:'Find lines for your repertoire',
   quickAddSearch:'Search openings or variations',
@@ -2218,24 +2192,19 @@ Object.assign(I18N_EN, {
   fewerOpeningLines:'Show fewer lines',
   packLineCount:'{name} · {n} lines',
   packLineCountOne:'{name} · 1 line',
-  saveLineHint:'Use + to save lines to My repertoire.',
   savePracticeLine:'Add {line} to My repertoire as {side}',
   removeSavedPractice:'Remove {line} from My repertoire as {side}',
   repAdd:'+ Save for practice',
   addMoreLines:'+ Add lines',
   changeStarter:'Change starter choices',
-  sideProgressNote:'White and Black recall are tracked separately. Lesson reading is shared.',
   promotionTitle:'Your opening ranks',
   promotionTotal:'Total promotions',
-  promotionScope:'Learn a line, recall it from memory, then revisit it when it’s due.',
   promotionBreakdown:'Pawn to Queen: current counts and requirements',
   promotionBreakdownNote:'The numbers show how many lines are at each rank. White and Black can have different ranks; a shared lesson is counted once until you practise a side.',
-  promotionHow:'How is this counted?',
+  promotionHow:'How ranks work',
   promotionCounting:'Pawn is your first rank. Each step after Pawn adds one promotion: Pawn → Knight = 1, Pawn → Bishop = 2. Repeating a rank adds no extra promotions.',
   promotionEarlier:'Earlier promotions: {n}.',
   promotionEarlierNote:'These came from older combined-colour ranks and are kept separately. You can see those lines in Earlier progress below.',
-  progressTitle:'Practice that adds up.',
-  progressBody:'A record of your learning and practice. Find your next session in My repertoire.',
   practisedLines:'Lines practised by colour',
   earlierProgress:'Earlier progress · {n} lines',
   legacyProgressNote:'Earlier versions combined White and Black. Your old drills and ranks are kept here. New recall starts separately for each colour; completed lessons remain available to drill.',
@@ -2305,7 +2274,6 @@ Object.assign(I18N.zh, {
   testScoreRule:'首次正确率按本方局面计数，每个局面只计一次。重试或查看答案只影响当前这一步，之后的着法仍正常计分。跳过与未测试的着法不计回忆成绩。整条变例需本方每步首次正确、未借助提示，才算完整回忆。',
   testLinesRecalled:'完整回忆的变例',
   testMovesAccurate:'已测试着法中 {correct}/{total} 步首次正确',
-  testBoardRule:'请回忆指定变例。走偏后会保留当前局面，方便重试。',
   testLineRecalled:'本线完成 · 完整回忆',
   testLineRecorded:'本线已记录，可供复习',
   testAnswersLater:'结果页可逐步查看需要复习的着法。',
@@ -2330,13 +2298,10 @@ Object.assign(I18N.zh, {
   testIllegalBody:'请选择合法着法再试。这次点击不影响得分。',
   testCorrectTitle:'{move} · 正确',
   testBackOnTrack:'{move} · 已找回正确着法',
-  testKeepGoing:'请继续，等对方应着后回忆下一步。',
   testFirstTryCount:'{n}/{total} 步首次正确',
   testRecoveredCount:'{n} 步重试找回',
   testAssistedCount:'{n} 步借助提示',
   testRemainingCount:'{n} 步未完成',
-  testAllFinished:'这是最后一条变例。准备好后即可查看结果。',
-  testNextReady:'稍作停留，准备好后继续下一条变例。',
   testMovesFinished:'本方已完成 {n}/{total} 步',
   testTurnProgress:'轮到{side} · 第 {n}/{total} 步',
   testSaveFailed:'已保留上次成功保存的局面',
@@ -2383,8 +2348,6 @@ Object.assign(I18N.zh, {
   libraryNoResults:'没有符合当前筛选条件的变例。试试其他组合，或清除筛选。',
   homeNavigation:'主导航',
   navTest:'开局自测',
-  testTitle:'你能记住多少？',
-  testIntro:'选择想掌握的变例，再凭记忆走出来。你可以自选测试内容，也可以使用我的开局库。',
   testDefaultName:'我的开局测试',
   testChoosePool:'选择测试变例',
   testNameLabel:'测试名称（选填）',
@@ -2401,7 +2364,7 @@ Object.assign(I18N.zh, {
   testSelectionCount:'{lines} · 需回忆 {moves} 步',
   testMatches:'匹配 {n} 条变例',
   testEmptyRepertoire:'你的开局库还没有变例。可切换到全部开局，在这里选择测试内容。',
-  testHowItWorks:'测试方式',
+  testHowItWorks:'自测规则',
   testRuleOrder:'每个已选变例与执方组合出现一次，顺序随机，无时间限制。',
   testStart:'开始测试',
   testSavePool:'保存题库',
@@ -2446,10 +2409,6 @@ Object.assign(I18N.zh, {
   testSkipLine:'跳过此线',
   testPause:'暂停测试',
   boardOptions:'棋盘显示选项',
-  enginePurposeTitle:'把开局知识用到实战中。',
-  enginePurposeBody:'与可调节难度的引擎对弈，练习自主判断，看看学过的开局如何发展到中局及之后。',
-  playFromStart:'从第一步开始下完整对局，或在上方选择一条变例，从课程结束的局面继续。开局名称会随走子更新。',
-  playPosition:'<b>{name}</b> 的课程着法已走完。现在试着把其中的思路用到实战中：自主选择着法，应对引擎。',
   tipEval:'显示引擎评估：正数表示你占优，负数表示引擎占优。',
   quickAddTitle:'为开局库添加变例',
   quickAddSearch:'搜索开局或变例',
@@ -2541,24 +2500,19 @@ Object.assign(I18N.zh, {
   fewerOpeningLines:'收起更多变例',
   packLineCount:'{name} · {n} 条',
   packLineCountOne:'{name} · 1 条',
-  saveLineHint:'点击 +，将变例加入我的开局库。',
   savePracticeLine:'将「{line}」加入我的开局库（{side}）',
   removeSavedPractice:'从我的开局库移除「{line}」（{side}）',
   repAdd:'+ 加入我的开局库',
   addMoreLines:'+ 添加变例',
   changeStarter:'更改入门组合',
-  sideProgressNote:'白方与黑方的回忆进度分别记录，课文阅读进度共享。',
   promotionTitle:'你的开局等级',
   promotionTotal:'累计晋级',
-  promotionScope:'先学会一条变例，再凭记忆走出，并在到期时复习。',
   promotionBreakdown:'从兵到后：当前数量与晋级条件',
   promotionBreakdownNote:'数字表示当前处于该等级的变例数。白方和黑方可有不同等级；开始按执方练习前，共享课文只计一次。',
-  promotionHow:'如何计算？',
+  promotionHow:'等级规则',
   promotionCounting:'兵是你的第一个等级。之后每升一级计一次晋级：兵 → 马 = 1 次，兵 → 象 = 2 次。重复达到同一等级不会额外计数。',
   promotionEarlier:'早期晋级：{n} 次。',
   promotionEarlierNote:'来自旧版黑白合并的等级，单独保留。下方「早期进度」可查看对应变例。',
-  progressTitle:'每次练习，都有积累。',
-  progressBody:'记录你的学习与练习。下一次该复习什么，可在「我的开局库」中查看。',
   practisedLines:'按执方记录的已练变例',
   earlierProgress:'早期进度 · {n} 条变例',
   legacyProgressNote:'早期版本将黑白双方合并记录。旧操练与等级保存在这里。新的回忆进度按执方分别记录，已学完的课文仍可直接操练。',
@@ -2859,20 +2813,9 @@ Object.assign(I18N_EN, {
   guideOff:'Hide first-visit tips',
   guideReplay:'All guides stay available here in ?',
   guideClose:'Close guide',
-  guideWelcome:'Your first moves.',
-  guideWelcomeBody:'Pick a line. Learn the ideas. Make it yours.',
-  guideWelcomeStart:'Show me how',
+  guideWelcomeStart:'Quick tour',
   guideShowMe:'Quick guide',
   guideDismissInvite:'Dismiss this tip',
-  guideInviteexplore:'Choose a line to learn.',
-  guideInvitepractice:'Build your repertoire, one line at a time.',
-  guideInvitelearn:'Follow the moves, then try from memory.',
-  guideInvitedrill:'Your moves. Debut handles the replies.',
-  guideInvitetest:'Choose your lines. Check your recall.',
-  guideInvitetestPlay:'Take your time. You can retry any move.',
-  guideInvitetestResults:'Find one thing to work on next.',
-  guideInviteprogress:'See how your opening practice is growing.',
-  guideInviteplay:'Take your opening into a game.',
   guideRouteLabel:'The learning path',
   guideRouteLearn:'Learn',
   guideRoutePractise:'Practise',
@@ -2910,20 +2853,9 @@ Object.assign(I18N.zh, {
   guideOff:'隐藏首次使用提示',
   guideReplay:'仍可通过 ? 随时查看所有指南。',
   guideClose:'关闭指南',
-  guideWelcome:'从第一步开始。',
-  guideWelcomeBody:'选一条路线，理解思路，练成自己的开局。',
-  guideWelcomeStart:'带我了解',
+  guideWelcomeStart:'快速导览',
   guideShowMe:'查看指南',
   guideDismissInvite:'关闭此提示',
-  guideInviteexplore:'选择一条路线，开始学习。',
-  guideInvitepractice:'一次一条，建立自己的开局库。',
-  guideInvitelearn:'先跟着走，再凭记忆试一试。',
-  guideInvitedrill:'你走自己的棋，Debut 负责应对。',
-  guideInvitetest:'选好路线，检验记忆。',
-  guideInvitetestPlay:'慢慢来，走错了可以重试。',
-  guideInvitetestResults:'找一个值得巩固的地方。',
-  guideInviteprogress:'看看开局练习的积累。',
-  guideInviteplay:'把学过的开局用到对局中。',
   guideRouteLabel:'学习流程',
   guideRouteLearn:'学习',
   guideRoutePractise:'练习',
@@ -3076,8 +3008,7 @@ Object.assign(I18N.zh, {
 
 /* G61: a clearer repertoire setup and practice flow. */
 Object.assign(I18N_EN, {
-  repStartTitle:'Start with one opening.',
-  repStartBody:'Pick a main line to learn. Add more whenever you’re ready.',
+  repStartTitle:'Choose an opening',
   repStarterLabel:'Choose a first opening',
   repAddLearn:'Add & learn',
   repSaveFailed:'Couldn’t save your opening. Please try again.',
@@ -3102,8 +3033,7 @@ Object.assign(I18N_EN, {
   guideSavedBody:'Find your White openings or Black responses, then open an opening to see its lines. Learn explains the moves; Drill helps you recall them. Manage removes saved lines without losing progress.'
 });
 Object.assign(I18N.zh, {
-  repStartTitle:'先从一个开局开始。',
-  repStartBody:'选一条主线学习，准备好后再逐步扩充。',
+  repStartTitle:'选择一个开局',
   repStarterLabel:'选择第一个开局',
   repAddLearn:'添加并学习',
   repSaveFailed:'未能保存开局，请重试。',
@@ -3319,20 +3249,12 @@ Object.assign(I18N.zh, {
 
 /* G47: clearer test setup and honest score denominators. */
 Object.assign(I18N_EN, {
-  testTitle:'Put your openings to the test.',
-  testIntro:'Pick your lines. Play from memory. Find your next step.',
-  testReadyHeading:'Your next test',
+  testReadyHeading:'Selected lines',
   testFormatLabel:'Test format',
   testQuickLabel:'Quick check',
   testFullLabel:'Full pool',
   testCustomLabel:'Choose lines',
-  testSampleNote:'New here? Try one short Italian Game line as White.',
-  testCustomNote:'Your selection — change any line before starting.',
-  testFromRepertoire:'From your repertoire.',
-  testFromLearning:'From lines you’ve already learned or practised.',
   testLearnSample:'Learn this line first',
-  testTrySample:'Try this test',
-  testShortRules:'No timer. Retry when needed; help is always available.',
   testChooseFirst:'Choose at least one line to begin.',
   testRemoveChoice:'Remove {line} as {side} from this test',
   testSaveSelection:'Save this selection',
@@ -3350,20 +3272,12 @@ Object.assign(I18N_EN, {
   testWholePool:'Across all selected moves'
 });
 Object.assign(I18N.zh, {
-  testTitle:'检验你的开局准备。',
-  testIntro:'选好路线，凭记忆走棋，找到下一步练习的方向。',
-  testReadyHeading:'这次测什么',
+  testReadyHeading:'已选路线',
   testFormatLabel:'测试形式',
   testQuickLabel:'快速自测',
   testFullLabel:'全部路线',
   testCustomLabel:'自选路线',
-  testSampleNote:'初次尝试？先用白方测试一条简短的意大利开局路线。',
-  testCustomNote:'这是你的选择，开始前可随时调整。',
-  testFromRepertoire:'来自你的开局库。',
-  testFromLearning:'来自你已经学过或练过的路线。',
   testLearnSample:'先学这条路线',
-  testTrySample:'试试这次自测',
-  testShortRules:'不计时。可以重试，卡住时也可以查看走法。',
   testChooseFirst:'至少选择一条路线即可开始。',
   testRemoveChoice:'从本次测试移除「{line}」（{side}）',
   testSaveSelection:'保存这组路线',
@@ -3514,10 +3428,7 @@ function setLang(l){
     updatePlayList();
     if(playOver){ renderPlayResult(); return; }
     setPrompt(t(userTurnInPlay()&&!locked?'yourMove':'engineThinking'),'');
-    if(!playOver){   // the standing intro text is static per mode — re-issue it in the new language
-      setComment(freeMode ? t('playFromStart')
-        : (curOp!==null ? t('playPosition',{name:lnName(DATA.openings[curOp].lines[curLine])}) : ''));
-    }
+    setComment('');
     return;
   }
   if(curOp!==null){
@@ -4682,7 +4593,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G72';
+const BUILD='G73';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5404,8 +5315,8 @@ function testFeedbackState(){
   if(issue?.assisted){const mv=testMoves(item)[run.ply];return {kind:'assisted',title:t('testShownTitle',{move:mv.san}),body:t('testShownBody',{from:mv.u.slice(0,2),to:mv.u.slice(2,4)})};}
   if(testBoardMessage?.kind==='illegal')return {kind:'mismatch',title:t('illegalMove'),body:t('testIllegalBody')};
   if(issue)return {kind:'mismatch',title:t('testMismatchTitle',{move:issue.playedSan}),body:t(issue.attempts>1?'testRetryAgain':'testRetryBody')};
-  if(testBoardMessage?.kind==='correct')return {kind:testBoardMessage.assisted?'assisted':testBoardMessage.recovered?'recovered':'correct',title:t(testBoardMessage.assisted?'testShownPlayed':testBoardMessage.recovered?'testBackOnTrack':'testCorrectTitle',{move:testBoardMessage.move}),body:t('testKeepGoing')};
-  return {kind:'ready',title:t('testYourMove',{side:t(item.side==='w'?'white':'black')}),body:t('testBoardRule')};
+  if(testBoardMessage?.kind==='correct')return {kind:testBoardMessage.assisted?'assisted':testBoardMessage.recovered?'recovered':'correct',title:t(testBoardMessage.assisted?'testShownPlayed':testBoardMessage.recovered?'testBackOnTrack':'testCorrectTitle',{move:testBoardMessage.move}),body:''};
+  return {kind:'ready',title:t('testYourMove',{side:t(item.side==='w'?'white':'black')}),body:''};
 }
 function paintTestSquares(){
   if(mode!=='test'||!testBoardRun)return;
@@ -5428,7 +5339,7 @@ function renderTestBoard(){
   document.getElementById('testBoardStrip').innerHTML=`<div><b>${t('testLineNumber',{n:index+1,total:run.items.length})}</b><span>${medalText(run.name)}</span></div><strong class="test-colour">${t(item.side==='w'?'white':'black')}</strong>`;
   const turn=finished?t('testMovesFinished',{n:done,total:stats.total}):!isPlayerTurn()?t('oppReplying'):t('testTurnProgress',{side:t(item.side==='w'?'white':'black'),n:Math.min(done+1,stats.total),total:stats.total});
   const el=document.getElementById('testFeedback');el.hidden=false;el.className='test-feedback '+state.kind+(finished?' completed':'');
-  el.innerHTML=`<p class="test-turn">${turn}</p><div class="test-feedback-heading"><span class="test-feedback-icon">${testIcon(state.kind)}</span><h3 id="testFeedbackHeading" tabindex="-1">${medalText(state.title)}</h3></div><p class="test-feedback-body">${medalText(state.body)}</p>${finished?`<div class="test-line-summary"><strong>${t('testFirstTryCount',{n:result.correct,total:result.total})}</strong>${stats.recovered?`<span>${t('testRecoveredCount',{n:stats.recovered})}</span>`:''}${stats.assisted?`<span>${t('testAssistedCount',{n:stats.assisted})}</span>`:''}${done<stats.total?`<span>${t('testRemainingCount',{n:stats.total-done})}</span>`:''}</div><p class="test-feedback-next">${t(run.phase==='complete'?'testAllFinished':'testNextReady')}</p>`:''}`;
+  el.innerHTML=`<p class="test-turn">${turn}</p><div class="test-feedback-heading"><span class="test-feedback-icon">${testIcon(state.kind)}</span><h3 id="testFeedbackHeading" tabindex="-1">${medalText(state.title)}</h3></div>${state.body?`<p class="test-feedback-body">${medalText(state.body)}</p>`:''}${finished?`<div class="test-line-summary"><strong>${t('testFirstTryCount',{n:result.correct,total:result.total})}</strong>${stats.recovered?`<span>${t('testRecoveredCount',{n:stats.recovered})}</span>`:''}${stats.assisted?`<span>${t('testAssistedCount',{n:stats.assisted})}</span>`:''}${done<stats.total?`<span>${t('testRemainingCount',{n:stats.total-done})}</span>`:''}</div>`:''}`;
   const cue=document.getElementById('testBoardCue');cue.hidden=false;cue.className='test-board-cue '+state.kind;
   cue.innerHTML=`${testIcon(state.kind)}<span>${medalText(state.title)}</span>`;
   const next=document.getElementById('testNextBtn');next.hidden=!finished||changed;next.textContent=t(run.phase==='complete'?'testViewResults':'testNextLine');
@@ -5561,8 +5472,7 @@ function updateTestSummary(){
   document.getElementById('testStartBtn').disabled=!n||!!testStore.load().active;
   document.getElementById('testSavePoolBtn').disabled=!n;
   const pool=testAvailablePool(),sample=pool.source==='sample'&&testSetupMode==='quick';
-  document.querySelector('.test-preview-source').textContent=t(sample?'testSampleNote':testSetupMode==='custom'?'testCustomNote':pool.source==='saved'?'testFromRepertoire':'testFromLearning');
-  document.getElementById('testStartBtn').textContent=t(sample?'testTrySample':'testStart');
+  document.getElementById('testStartBtn').textContent=t('testStart');
   const learn=document.querySelector('.test-sample-learn');if(learn)learn.hidden=!sample;
   const preview=document.getElementById('testSelectionPreview');if(preview){const top=preview.scrollTop;preview.innerHTML=testSelectionHTML();preview.scrollTop=top;}
   document.querySelectorAll('[data-test-size]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.testSize===testSetupMode)));
@@ -5570,7 +5480,7 @@ function updateTestSummary(){
 function testLaunchHTML(pool,active){
   const sample=pool.source==='sample'&&testSetupMode==='quick';
   return `<section class="test-launch" aria-labelledby="testReadyHeading"><div class="test-format-row"><h3 id="testReadyHeading" tabindex="-1">${testDraft.name?medalText(testDraft.name):t('testReadyHeading')}</h3><div class="test-size-choices" role="group" aria-label="${t('testFormatLabel')}"><button type="button" data-test-size="quick" aria-pressed="${testSetupMode==='quick'}" onclick="selectTestSetup('quick')">${t('testQuickLabel')} <span>${Math.min(3,pool.items.length)}</span></button>${pool.items.length>3?`<button type="button" data-test-size="full" aria-pressed="${testSetupMode==='full'}" onclick="selectTestSetup('full')">${t('testFullLabel')} <span>${pool.items.length}</span></button>`:''}<button type="button" data-test-size="custom" aria-pressed="${testSetupMode==='custom'}" aria-expanded="${testEditorOpen}" aria-controls="testLineEditor" onclick="selectTestSetup('custom')">${t('testCustomLabel')}</button></div></div>
-  <div class="test-launch-grid"><div><p class="test-preview-source">${t(sample?'testSampleNote':testSetupMode==='custom'?'testCustomNote':pool.source==='saved'?'testFromRepertoire':'testFromLearning')}</p><div id="testSelectionPreview" class="test-selection-preview">${testSelectionHTML()}</div>${sample?`<button class="linklike test-sample-learn" onclick="learnTestSample()">${t('testLearnSample')}</button>`:''}</div><div class="test-launch-actions"><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t(sample?'testTrySample':'testStart')}</button><p class="home-note">${t(active?'testResumeFirst':'testShortRules')}</p><details class="test-how"><summary>${t('testHowItWorks')}</summary><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p>${t('testRankNote')}</p></details></div></div>
+  <div class="test-launch-grid"><div><div id="testSelectionPreview" class="test-selection-preview">${testSelectionHTML()}</div>${sample?`<button class="linklike test-sample-learn" onclick="learnTestSample()">${t('testLearnSample')}</button>`:''}</div><div class="test-launch-actions"><p id="testSelectionCount" class="test-selection-count" role="status" aria-live="polite"></p><button id="testStartBtn" class="act primary" onclick="startRecallTest()">${t('testStart')}</button>${active?`<p class="home-note">${t('testResumeFirst')}</p>`:''}<details class="test-how"><summary>${t('testHowItWorks')}</summary><ol><li>${t('testRuleOrder')}</li><li>${t('testRuleHelp')}</li><li>${t('testRuleMismatch')}</li><li>${t('testRuleResults')}</li></ol><p>${t('testRankNote')}</p></details></div></div>
   <details id="testSaveDetails" class="test-save-details"${testSaveOpen?' open':''} ontoggle="if(this.isConnected)testSaveOpen=this.open"><summary>${t('testSaveSelection')}</summary><div class="test-save-fields"><label class="test-name-label" for="testName">${t('testNameLabel')}<input id="testName" maxlength="60" placeholder="${t('testNamePlaceholder')}" value="${medalText(testDraft.name)}" oninput="testDraft.name=this.value"></label><button id="testSavePoolBtn" class="act" onclick="saveTestPool()">${t(testDraft.id?'testUpdatePool':'testSavePool')}</button></div></details></section>`;
 }
 function learnTestSample(){const item=testDraft.items[0],x=item&&resolveLesson(item.id);if(x)startLearn(x.oi,x.li,item.side);}
@@ -5735,7 +5645,7 @@ function renderTestPage(){
   if(report){el.innerHTML=testReportHTML(report);el.querySelectorAll('.test-explanation p').forEach(highlightExplanation);renderTestCoachAI();animateTestScore(report);queuePageGuide();return;}
   testReportId=null;const pool=testAvailablePool();
   const active=d.active?`<section class="test-resume"><div><h3>${t('testPaused')}</h3><p>${medalText(d.active.name)} · ${t('testFinishedCount',{n:d.active.results.length,total:d.active.items.length})}</p></div><div class="home-actions"><button class="act primary" onclick="resumeRecallTest()">${t('testResume')}</button><button class="linklike" onclick="endRecallTest()">${t('testEndNow')}</button></div></section>`:'';
-  el.innerHTML=`<div class="home-heading"><span class="eyebrow">${t('navTest')}</span><h2>${t('testTitle')}</h2><p>${t('testIntro')}</p></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite">${testNotice?t(testNotice):''}</p>${testLaunchHTML(pool,!!d.active)}
+  el.innerHTML=`<div class="home-heading"><h2>${t('navTest')}</h2></div>${active}<p id="testNotice" class="home-note" role="status" aria-live="polite"${testNotice?'':' hidden'}>${testNotice?t(testNotice):''}</p>${testLaunchHTML(pool,!!d.active)}
   <section id="testLineEditor" class="test-builder test-line-editor" aria-labelledby="testPoolHeading"${testEditorOpen?'':' hidden'}><div class="test-builder-heading"><h3 id="testPoolHeading">${t('testChoosePool')}</h3><button class="linklike" onclick="testEditorOpen=false;renderTestPage();document.getElementById('testStartBtn').focus()">${t('testDoneChoosing')}</button></div><div class="test-pool-tools">${repertoire.load().items.length?`<button class="mini" onclick="fillTestFromRepertoire()">${t('testUseRepertoire')}</button>`:''}<button class="linklike" onclick="clearTestPool()">${t('testClear')}</button></div><div class="test-filters"><label for="testSearch">${t('quickAddSearch')}<input id="testSearch" type="search" maxlength="120" placeholder="${t('quickAddPlaceholder')}" value="${medalText(testQuery)}" oninput="updateTestFilter()"></label><label for="testSource">${t('testBrowse')}<select id="testSource" onchange="updateTestFilter()"><option value="all"${testSource==='all'?' selected':''}>${t('navExplore')}</option><option value="saved"${testSource==='saved'?' selected':''}>${t('navPractice')}</option><option value="selected"${testSource==='selected'?' selected':''}>${t('selectedLines')}</option></select></label><label for="testColour">${t('testColourFilter')}<select id="testColour" onchange="updateTestFilter()">${[['all','quickAddAllSides'],['w','white'],['b','black']].map(([v,k])=>`<option value="${v}"${testColour===v?' selected':''}>${t(k)}</option>`).join('')}</select></label></div><p id="testSearchCount" class="home-note" role="status" aria-live="polite"></p><div id="testPoolResults" class="test-pool-results"></div></section>
   ${d.pools.length?`<details class="test-collection"><summary>${t('testSavedPools')} <span>${d.pools.length}</span></summary><div class="test-saved-grid">${d.pools.map(p=>`<article><div><h4>${medalText(p.name)}</h4><p>${t('testPoolCount',{n:p.items.length})}</p></div><div><button class="mini" onclick="loadTestPool('${p.id}')">${t('testLoadPool')}</button><button class="linklike" aria-label="${medalText(t('testDeletePoolLabel',{name:p.name}))}" onclick="removeTestPool('${p.id}')">${t('testDeletePool')}</button></div></article>`).join('')}</div></details>`:''}
   ${d.history.length?`<details class="test-collection test-history"><summary>${t('testHistory')} <span>${d.history.length}</span></summary><p class="home-note">${t('testHistoryNote')}</p>${d.history.map(r=>{const score=testScoreNumbers(r);return `<article><div><h4>${medalText(r.name)}</h4><p>${testDate(r.finishedAt)} · ${t('testHistoryScore',{n:r.results.filter(x=>['recalled','recovered','assisted'].includes(x.outcome)).length,total:r.items.length})}</p></div><div class="test-history-result"><span>${score.recall===null?'—':score.recall+'%'} <small>${t('coachFirstTry')}</small></span><button class="mini" onclick="showTestReport('${r.id}')">${t('testViewResults')}</button></div></article>`;}).join('')}</details>`:''}`;
@@ -5784,7 +5694,7 @@ function pageGuideSteps(page){
     test:[step('guidePool','#testSelectionPreview'),step('guideChoose','[data-test-size="custom"]'),step('guideStartTest','#testStartBtn')],
     testPlay:[step('guideTestMoves','#board'),step('guideTestHelp','#testNav'),step('guideTestFeedback','#testFeedback')],
     testResults:[step('guideScore','.coach-score'),step('guideInsights','.coach-insights'),step('guideNextPractice','.coach-actions')],
-    progress:[step('guideRanks','#promotionOverview .promotion-ranks li'),step('guideRankPath','#promotionOverview .rank-explainer'),step('guideAchievements','.achievement-entry')],
+    progress:[step('guideRanks','#promotionOverview .promotion-ranks li'),step('guideRankPath','#promotionOverview .rank-help>summary'),step('guideAchievements','.achievement-entry')],
     play:[step('guideEngineBoard','#board'),step('guideEngineSetup','#eloSlider'),step('guideEngineOpening','#lineSel')]
   };
   return (steps[page]||[]).filter(item=>guideTarget(item.targets));
@@ -5798,8 +5708,7 @@ function renderGuideInvite(){
   if(inBoard&&mode==='play'&&playOver)return;
   if(activeGuide||document.getElementById('appShell').inert||document.querySelector('dialog[open]')||!shouldOfferGuide(guidePrefs,page))return;
   const welcome=page==='explore'&&!guidePrefs.journey,el=inBoard?board:menu;
-  el.classList.toggle('is-welcome',welcome);
-  el.innerHTML=`<div class="guide-invite-copy"><strong>${t(welcome?'guideWelcome':'guideInvite'+page)}</strong>${welcome?`<p>${t('guideWelcomeBody')}</p>`:''}</div><button class="${welcome?'act':'linklike'} guide-invite-start" onclick="${welcome?'startAppJourney()':'startPageGuide()'}">${t(welcome?'guideWelcomeStart':'guideShowMe')} →</button><button class="guide-dismiss" aria-label="${t('guideDismissInvite')}" onclick="dismissGuideInvite()">×</button>`;
+  el.innerHTML=`<button class="linklike guide-invite-start" onclick="${welcome?'startAppJourney()':'startPageGuide()'}">${t(welcome?'guideWelcomeStart':'guideShowMe')} →</button><button class="guide-dismiss" aria-label="${t('guideDismissInvite')}" onclick="dismissGuideInvite()">×</button>`;
   el.hidden=false;
 }
 function dismissGuideInvite(){rememberGuide(guidePage());renderGuideInvite();document.getElementById('pageGuideBtn').focus({preventScroll:true});}
@@ -6185,7 +6094,7 @@ function repertoireHeadingHTML(empty=false){
   return `<div class="home-heading rep-page-heading${quickAdd.open?' rep-editor-heading':''}"><div><h2 id="${empty?'selectedOpeningsHeading':'repertoireTitle'}" tabindex="-1">${t(quickAdd.open?'repEdit':'navPractice')}</h2></div><button id="quickAddToggle" class="act" aria-expanded="${quickAdd.open}" aria-controls="quickAddPanel" onclick="toggleQuickAdd()">${t(quickAdd.open?'repManageDone':empty?'repBuild':'repEdit')}</button></div>`;
 }
 function repertoireStarterHTML(){
-  return `<section id="repStarter" class="rep-start" ${quickAdd.open?'hidden':''}><h3>${t('repStartTitle')}</h3><p>${t('repStartBody')}</p><div class="rep-starters" role="group" aria-label="${t('repStarterLabel')}">${REPERTOIRE_STARTERS.map((item,i)=>{
+  return `<section id="repStarter" class="rep-start" ${quickAdd.open?'hidden':''}><h3>${t('repStartTitle')}</h3><div class="rep-starters" role="group" aria-label="${t('repStarterLabel')}">${REPERTOIRE_STARTERS.map((item,i)=>{
     const x=resolveLesson(item.id),op=DATA.openings[x.oi];
     return `<button class="rep-starter" data-rep-starter="${i}" aria-pressed="${repView.starter===i}" onclick="selectRepertoireStarter(${i})"><span class="side-tag side-${item.side}">${t(item.side==='w'?'white':'black')}</span><strong>${medalText(opName(op))}</strong><small>${medalText(lnName(op.lines[x.li]))}</small></button>`;
   }).join('')}</div><div class="home-actions"><button class="act primary" onclick="startRepertoireStarter()">${t('repAddLearn')} →</button></div><p id="repSetupError" class="home-note" role="alert" hidden></p></section>`;
@@ -6457,14 +6366,14 @@ function renderRepertoire(){
 function renderPromotionOverview(){
   const summary=promotionSummary();
   const cards=[1,2,3,4,5].map(rank=>`<li><div class="rank-stage-head"><span class="promotion-piece" aria-hidden="true">${uiChessIcon(RANKS[rank].icon)}</span><h3>${t('rank'+rank)}</h3><strong aria-label="${t('rankCount',{n:summary.byRank[rank]})}">${summary.byRank[rank]}</strong></div><p>${t('rankRule'+rank)}</p></li>`).join('');
-  document.getElementById('promotionOverview').innerHTML=`<div class="promotion-heading"><div><h2 id="promotionTitle">${t('promotionTitle')}</h2><p>${t('promotionScope')}</p></div><div class="promotion-total"><strong>${summary.total}</strong><span>${t('promotionTotal')}</span></div></div><ol class="promotion-ranks" aria-label="${t('promotionBreakdown')}">${cards}</ol><p class="home-note">${t('promotionBreakdownNote')}</p><div class="rank-explainer"><p><b>${t('rankRecallTitle')}</b> ${t('rankRecallBody')}</p><p><b>${t('rankReviewTitle')}</b> ${t('rankReviewBody')}</p><p><b>${t('rankKeepTitle')}</b> ${t('rankKeepBody')}</p></div><p class="rank-total-note">${t('promotionCounting')}</p>`;
+  document.getElementById('promotionOverview').innerHTML=`<div class="promotion-heading"><div><h2 id="promotionTitle">${t('promotionTitle')}</h2></div><div class="promotion-total"><strong>${summary.total}</strong><span>${t('promotionTotal')}</span></div></div><ol class="promotion-ranks" aria-label="${t('promotionBreakdown')}">${cards}</ol><details class="rank-help"><summary>${t('promotionHow')}</summary><p class="home-note">${t('promotionBreakdownNote')}</p><div class="rank-explainer"><p><b>${t('rankRecallTitle')}</b> ${t('rankRecallBody')}</p><p><b>${t('rankReviewTitle')}</b> ${t('rankReviewBody')}</p><p><b>${t('rankKeepTitle')}</b> ${t('rankKeepBody')}</p></div><p class="rank-total-note">${t('promotionCounting')}</p></details>`;
 }
 function renderProgressPage(){
   const records=store.load(), trained=Object.entries(records).filter(([k,v])=>k.startsWith('v3:')&&v.runs>0);
   const totalRuns=trained.reduce((n,[,v])=>n+v.runs,0), reviews=trained.reduce((n,[,v])=>n+countValue(v.reviewAttempts),0);
   const practised=new Set([...trained.map(([key])=>key.slice(3)),...testMilestoneStats().completed]).size;
-  document.getElementById('progressHeading').innerHTML=`<h2>${t('progressTitle')}</h2><p>${t('progressBody')}</p>`;
-  document.getElementById('summaryBar').innerHTML=`<div class="progress-stats"><div><b>${practised}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div><p class="home-note">${t('sideProgressNote')}</p>`;
+  document.getElementById('progressHeading').innerHTML=`<h2>${t('navProgress')}</h2>`;
+  document.getElementById('summaryBar').innerHTML=`<div class="progress-stats"><div><b>${practised}</b><span>${t('practisedLines')}</span></div><div><b>${totalRuns}</b><span>${t('totalDrills')}</span></div><div><b>${reviews}</b><span>${t('achReviewCount')}</span></div><div><b>${Object.keys(activity.load()).length}</b><span>${t('practiceDaysLabel')}</span></div></div>`;
   renderPromotionOverview(); renderHeatmap();
 
 }
@@ -6887,7 +6796,7 @@ function startPlay(oi,li,side){
   resetDrawTracking();
   syncLineSel(); updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
-  setComment(t('playPosition',{name:lnName(line)}));
+  setComment('');
   resumePlay();
 }
 // Entry point from the menu card: open the play screen first, choose a side there.
@@ -6922,7 +6831,7 @@ function startFreePlay(side){
   const sel=document.getElementById('lineSel'); if(sel){sel.value='';fitSelectText(sel);}
   updatePlayList(); updateEval(); updateEvalBar();
   render(curLastU());
-  setComment(t('playFromStart'));
+  setComment('');
   resumePlay();
 }
 function updateOpeningName(){
