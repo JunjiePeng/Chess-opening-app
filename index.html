@@ -1122,7 +1122,11 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
 .filter-option[aria-selected="true"].is-active { background:#65472988; border-color:#b58454; }
 .filter-option-dot { width:13px; height:13px; border:1px solid #937a5c; border-radius:50%; flex-shrink:0; }
 .filter-option[aria-selected="true"] .filter-option-dot { border:4px solid #efb777; background:#2c2117; }
-@media(max-width:760px){ .library-filters .filter-trigger { padding:9px 10px; gap:8px; font-size:.82rem; } }
+@media(max-width:760px){
+  /* Wrapped rows have no leading separators. */
+  .library-filters>.filter-field+.filter-field { border-left:0; }
+  .library-filters .filter-trigger { padding:9px 10px; gap:8px; font-size:.82rem; }
+}
 @media(prefers-reduced-motion:reduce){ .filter-trigger>svg { transition:none; } }
 
 .coach-message { align-self:center; }
@@ -1449,7 +1453,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G68</b></div>
+    <div id="buildTag">Debut · build <b>G69</b></div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -3126,6 +3130,18 @@ Object.assign(I18N.zh, {
   guideEditorDoneTitle:'回到练习',guideEditorDoneBody:'更改会即时保存。点击「完成」回到开局库，下一次练习也会相应更新。'
 });
 
+/* G69: consistent preparation groups in the repertoire and its editor. */
+Object.assign(I18N_EN, {
+  repWhiteE4:'As White · 1.e4',repWhiteD4:'As White · 1.d4',repWhiteOther:'As White · other first moves',
+  guideSavedBody:'Find your White openings or Black responses, grouped by first move. Open an opening to see its lines. Learn explains the moves; Drill helps you recall them. Edit repertoire changes your selection without losing progress.',
+  guideEditorSavedBody:'Your lines are grouped by practice colour and first move. Open an opening and use − to remove a line. Your learning history stays safe, and the confirmation offers Undo.'
+});
+Object.assign(I18N.zh, {
+  repWhiteE4:'执白 · 1.e4',repWhiteD4:'执白 · 1.d4',repWhiteOther:'执白 · 其他首着',
+  guideSavedBody:'按首着找到执白开局或执黑应对，展开开局即可查看变例。「学习」讲解走法，「操练」训练回忆。「编辑开局库」可以更改选择，学习进度仍会保留。',
+  guideEditorSavedBody:'变例按练习执方和首着分组。展开开局后，点击 − 移除变例。学习记录仍会保留，确认提示中也可以撤销。'
+});
+
 /* Read old or damaged records without letting one field break the app. */
 const isRecord=v=>!!v && typeof v==='object' && !Array.isArray(v);
 const countValue=v=>Number.isSafeInteger(v) && v>=0 ? v : 0;
@@ -4590,7 +4606,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G68';
+const BUILD='G69';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -6122,6 +6138,26 @@ function repertoireBookmark(){
   return '<svg class="rep-bookmark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"/></svg>';
 }
 const quickAdd={open:false,query:'',side:'w',expanded:new Map(),savedExpanded:new Map()};
+// Display groups describe the position to prepare for; storage keeps the user's order.
+const REPERTOIRE_SITUATIONS=[
+  {id:'white-e4',side:'w',label:'repWhiteE4'},
+  {id:'white-d4',side:'w',label:'repWhiteD4'},
+  {id:'white-other',side:'w',label:'repWhiteOther'},
+  {id:'black-e4',side:'b',label:'repBlackE4'},
+  {id:'black-d4',side:'b',label:'repBlackD4'},
+  {id:'black-other',side:'b',label:'repOther'}
+];
+function repertoireSituation(side,line){
+  const first=line.moves[0]?.u;
+  return (side==='w'?'white-':'black-')+(first==='e2e4'?'e4':first==='d2d4'?'d4':'other');
+}
+function repertoireSituationsHTML(groups,prefix,renderOpening){
+  return REPERTOIRE_SITUATIONS.map(situation=>{
+    const openings=groups.filter(group=>group.situation===situation.id);if(!openings.length)return '';
+    const heading=prefix+'-'+situation.id;
+    return `<section class="rep-situation" data-rep-situation="${situation.id}" aria-labelledby="${heading}"><h4 class="rep-situation-title" id="${heading}"><span class="side-tag side-${situation.side}">${t(situation.label)}</span></h4>${openings.map(renderOpening).join('')}</section>`;
+  }).join('');
+}
 let repertoireNotice=null, repertoireNoticeTimer=0;
 function renderRepertoireNotice(){
   const el=document.getElementById('repertoireToast');if(!el||!repertoireNotice)return;
@@ -6225,28 +6261,42 @@ function renderEditorSavedRepertoire(){
   const el=document.getElementById('repEditorSaved');if(!el||!quickAdd.open)return;
   const entries=repertoire.entries(),groups=savedRepertoireGroups('');
   document.getElementById('repEditorSavedCount').textContent=t(entries.length===1?'quickAddCountOne':'quickAddCount',{n:entries.length});
-  el.innerHTML=groups.map(group=>{
+  el.innerHTML=repertoireSituationsHTML(groups,'repEditorSituation',group=>{
     const op=DATA.openings[group.oi],open=quickAdd.savedExpanded.get(group.key)??entries.length<=6;
-    return `<details class="rep-editor-group" data-editor-group="${group.key}"${open?' open':''} ontoggle="if(this.isConnected)quickAdd.savedExpanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong><span class="side-tag side-${group.side}">${t(group.side==='w'?'white':'black')}</span><small>${group.items.length}</small></summary>${group.items.map(x=>`<div class="quick-add-line"><div><b>${medalText(lnName(op.lines[x.li]))}</b></div><button class="rep-remove" data-editor-id="${itemKey(x)}" aria-label="${medalText(t('removeSavedPractice',{line:lnName(op.lines[x.li]),side:t(x.side==='w'?'white':'black')}))}" title="${t('repRemove')}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button></div>`).join('')}</details>`;
-  }).join('')||`<p class="home-note">${t('repEditorEmpty')}</p>`;
+    return `<details class="rep-editor-group" data-editor-group="${group.key}"${open?' open':''} ontoggle="if(this.isConnected)quickAdd.savedExpanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong><small>${group.items.length}</small></summary>${group.items.map(x=>`<div class="quick-add-line"><div><b>${medalText(lnName(op.lines[x.li]))}</b></div><button class="rep-remove" data-editor-id="${itemKey(x)}" aria-label="${medalText(t('removeSavedPractice',{line:lnName(op.lines[x.li]),side:t(x.side==='w'?'white':'black')}))}" title="${t('repRemove')}" onclick="toggleRepertoireLine(${x.oi},${x.li},'${x.side}')">−</button></div>`).join('')}</details>`;
+  })||`<p class="home-note">${t('repEditorEmpty')}</p>`;
+}
+function quickAddGroups(matches=quickAddMatches()){
+  const groups=[];
+  for(const group of matches){
+    const situations=new Map();
+    for(const item of group.lines){
+      const situation=repertoireSituation(item.side,item.line);
+      if(!situations.has(situation))situations.set(situation,[]);
+      situations.get(situation).push(item);
+    }
+    for(const [situation,lines] of situations)groups.push({...group,key:situation+'-'+group.oi,situation,lines});
+  }
+  return REPERTOIRE_SITUATIONS.flatMap(situation=>groups.filter(group=>group.situation===situation.id));
 }
 function renderQuickAddResults(){
   const el=document.getElementById('quickAddResults'); if(!el||!quickAdd.open)return;
-  const groups=quickAddMatches(), items=new Set(repertoire.entries().map(itemKey));
+  const groups=quickAddGroups(),items=new Set(repertoire.entries().map(itemKey)),openingCount=new Set(groups.map(group=>group.oi)).size;
   const count=groups.reduce((n,g)=>n+g.lines.length,0);
-  document.getElementById('quickAddCount').textContent=t('quickAddResults',{openings:t(groups.length===1?'quickAddOpeningOne':'quickAddOpeningMany',{n:groups.length}),lines:t(count===1?'quickAddCountOne':'quickAddCount',{n:count})});
-  el.innerHTML=groups.map(({op,oi,lines})=>{
+  document.getElementById('quickAddCount').textContent=t('quickAddResults',{openings:t(openingCount===1?'quickAddOpeningOne':'quickAddOpeningMany',{n:openingCount}),lines:t(count===1?'quickAddCountOne':'quickAddCount',{n:count})});
+  el.innerHTML=repertoireSituationsHTML(groups,'repFindSituation',({op,oi,lines,key,situation})=>{
     const missing=lines.filter(x=>!items.has(lessonId(oi,x.li)+':'+x.side)).length;
     const groupLabel=t(missing?'quickAddGroupLabel':'quickAddSavedLabel',{n:missing,opening:opName(op)});
-    const expanded=quickAdd.expanded.get(oi)??!!quickAdd.query.trim();
-    return `<details class="quick-add-group"${expanded?' open':''} ontoggle="if(this.isConnected)quickAdd.expanded.set(${oi},this.open)"><summary>${medalText(opName(op))}<span>${t(lines.length===1?'quickAddCountOne':'quickAddCount',{n:lines.length})}</span></summary><div class="quick-add-group-actions"><button class="mini" data-quick-id="group-${oi}" aria-label="${medalText(groupLabel)}" aria-disabled="${!missing}" onclick="addQuickOpening(${oi})">${!missing?repertoireBookmark()+' ':''}${t(!missing?'quickAddAllSaved':missing===1?'quickAddOne':'quickAddMany',{n:missing})}</button></div>${lines.map(({line,li,side})=>{
+    const expanded=quickAdd.expanded.get(key)??!!quickAdd.query.trim();
+    return `<details class="quick-add-group"${expanded?' open':''} ontoggle="if(this.isConnected)quickAdd.expanded.set('${key}',this.open)"><summary>${medalText(opName(op))}<span>${t(lines.length===1?'quickAddCountOne':'quickAddCount',{n:lines.length})}</span></summary><div class="quick-add-group-actions"><button class="mini" data-quick-id="group-${key}" aria-label="${medalText(groupLabel)}" aria-disabled="${!missing}" onclick="addQuickOpening(${oi},'${situation}')">${!missing?repertoireBookmark()+' ':''}${t(!missing?'quickAddAllSaved':missing===1?'quickAddOne':'quickAddMany',{n:missing})}</button></div>${lines.map(({line,li,side})=>{
       const id=lessonId(oi,li)+':'+side, added=items.has(id), label=t(added?'removeSavedPractice':'savePracticeLine',{line:lnName(line),side:t(side==='w'?'white':'black')});
-      return `<div class="quick-add-line"><div><b>${medalText(lnName(line))}</b><small>${t(side==='w'?'white':'black')}</small></div><button class="rep-toggle" data-quick-id="${id}" aria-pressed="${added}" aria-label="${medalText(label)}" title="${medalText(label)}" onclick="toggleRepertoireLine(${oi},${li},'${side}')"><span aria-hidden="true">${added?'−':'+'}</span></button></div>`;
+      return `<div class="quick-add-line"><div><b>${medalText(lnName(line))}</b></div><button class="rep-toggle" data-quick-id="${id}" aria-pressed="${added}" aria-label="${medalText(label)}" title="${medalText(label)}" onclick="toggleRepertoireLine(${oi},${li},'${side}')"><span aria-hidden="true">${added?'−':'+'}</span></button></div>`;
     }).join('')}</details>`;
-  }).join('')||`<p class="home-note">${t('quickAddEmpty')}</p>`;
+  })||`<p class="home-note">${t('quickAddEmpty')}</p>`;
 }
-function addQuickOpening(oi){
-  const group=quickAddMatches().find(x=>x.oi===oi); if(!group)return;
+function addQuickOpening(oi,situation=null){
+  const groups=situation?quickAddGroups():quickAddMatches();
+  const group=groups.find(x=>x.oi===oi&&(!situation||x.situation===situation));if(!group)return;
   const rep=repertoire.load(), saved=new Set(rep.items.map(itemKey));
   const added=group.lines.filter(x=>!saved.has(lessonId(oi,x.li)+':'+x.side)); if(!added.length)return;
   rep.items.push(...added.map(x=>({id:lessonId(oi,x.li),side:x.side})));
@@ -6275,20 +6325,13 @@ function renderTodayBar(){
   el.className='today-content';
   el.innerHTML=repertoireHeadingHTML()+`<section class="daily-hero rep-practice" aria-labelledby="repPracticeTitle"><div class="rep-practice-head"><h3 id="repPracticeTitle">${title}</h3>${saved?`<span>${t('sessionProgress',{n:saved.done.length,total:saved.items.length})}</span>`:''}</div>${items.length?`<ul class="rep-plan">${rows}</ul>`:`<p>${t(finished?'repFinishedBody':'repCaughtUpBody')}</p>`}${!finished?`<div class="home-actions">${items.length?`<button class="act primary" onclick="beginSuggestedPractice()">${t(saved?'dailyContinue':'dailyStart')} →</button>`:''}<button class="${items.length?'linklike':'act'}" onclick="startDailySession()">${t(items.length?'repChangePractice':'chooseLines')}</button></div>`:''}</section>`;
 }
-const REPERTOIRE_SITUATIONS=[
-  {id:'white',side:'w',label:'repWhite'},
-  {id:'black-e4',side:'b',label:'repBlackE4'},
-  {id:'black-d4',side:'b',label:'repBlackD4'},
-  {id:'black-other',side:'b',label:'repOther'}
-];
 function savedRepertoireGroups(query=repView.query){
   const normalize=value=>String(value||'').normalize('NFKD').toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');
   const q=normalize(query),groups=new Map();
   for(const item of repertoire.entries()){
     const op=DATA.openings[item.oi],line=op.lines[item.li];
     if(q&&![op.name,op.nameZh,line.name,line.nameZh].some(name=>normalize(name).includes(q)))continue;
-    const first=line.moves[0]?.u;
-    const situation=item.side==='w'?'white':first==='e2e4'?'black-e4':first==='d2d4'?'black-d4':'black-other';
+    const situation=repertoireSituation(item.side,line);
     const key=situation+'-'+item.oi;
     if(!groups.has(key))groups.set(key,{key,situation,oi:item.oi,side:item.side,items:[]});
     groups.get(key).items.push(item);
@@ -6300,7 +6343,7 @@ function repertoireOpeningHTML(group,small){
   const op=DATA.openings[group.oi],due=group.items.filter(x=>srs.get(x.oi,x.li,x.side)?.due<=Date.now()).length;
   const open=!!repView.query||(repView.expanded.get(group.key)??small);
   const firstMoves=[...new Set(group.items.map(x=>op.lines[x.li].moves[0]?.san).filter(Boolean))];
-  const showFirst=group.situation==='white'||group.situation==='black-other';
+  const showFirst=group.situation.endsWith('-other');
   const moveTag=san=>san?`<span class="first-move-tag">1.${medalText(san)}</span>`:'';
   return `<details class="rep-opening" data-rep-group="${group.key}" ${open?'open':''} ontoggle="if(this.isConnected&&!repView.query)repView.expanded.set('${group.key}',this.open)"><summary><strong>${medalText(opName(op))}</strong> ${showFirst&&firstMoves.length===1?moveTag(firstMoves[0]):''} <span class="rep-count">${t(group.items.length===1?'quickAddCountOne':'quickAddCount',{n:group.items.length})}${due?' · '+t(due===1?'repDueOne':'repDueMany',{n:due}):''}</span></summary>${group.items.map(x=>{
     const line=op.lines[x.li],st=store.get(x.oi,x.li,x.side),sv=srs.get(x.oi,x.li,x.side),rank=lineRank(x.oi,x.li,x.side),learn=!st.learned&&!st.runs;
@@ -6311,10 +6354,7 @@ function repertoireOpeningHTML(group,small){
 function renderSavedRepertoire(){
   const el=document.getElementById('repSavedList');if(!el)return;
   const groups=savedRepertoireGroups(),small=repertoire.entries().length<=6;
-  el.innerHTML=REPERTOIRE_SITUATIONS.map(situation=>{
-    const openings=groups.filter(group=>group.situation===situation.id);if(!openings.length)return '';
-    return `<section class="rep-situation" data-rep-situation="${situation.id}" aria-labelledby="repSituation-${situation.id}"><h4 class="rep-situation-title" id="repSituation-${situation.id}"><span class="side-tag side-${situation.side}">${t(situation.label)}</span></h4>${openings.map(group=>repertoireOpeningHTML(group,small)).join('')}</section>`;
-  }).join('')||`<p class="home-note" role="status">${t('repSearchEmpty')}</p>`;
+  el.innerHTML=repertoireSituationsHTML(groups,'repSituation',group=>repertoireOpeningHTML(group,small))||`<p class="home-note" role="status">${t('repSearchEmpty')}</p>`;
 }
 function filterSavedRepertoire(query){repView.query=query;renderSavedRepertoire();}
 function renderRepertoire(){
