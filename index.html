@@ -1452,7 +1452,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G70</b></div>
+    <div id="buildTag">Debut · build <b>G71</b></div>
     <div id="backupRow">
       <button class="linklike" data-i18n="backupExport" onclick="exportProgress()"></button>
       <span style="color:var(--dim);opacity:.5">·</span>
@@ -4595,7 +4595,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G70';
+const BUILD='G71';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -7061,8 +7061,8 @@ async function engineMove(){
       if(!legal.includes(u) && !(u.length===5 && legal.includes(u.slice(0,4)+'q'))) u=null; }
     if(!u){ playFlags.engineFallback=true; u=pickFallbackMove(white); }
     if(!u){ finishPlay(gameStatus(white)); return; }
-    // One short beat includes computation and overlaps the 230ms move animation.
-    const elapsed=Date.now()-t0, minThink=250;
+    // Give the player a readable pause; computation counts toward this interval.
+    const elapsed=Date.now()-t0, minThink=750;
     if(elapsed<minThink) await new Promise(r=>setTimeout(r, minThink-elapsed));
     if(stale())return;
     makePlayMove(u);
