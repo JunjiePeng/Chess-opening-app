@@ -482,9 +482,6 @@ button.mini:hover { border-color:var(--accent); color:var(--text); }
 .board-options { display:flex; gap:8px; flex-basis:100%; }
 .board-options .mini { flex:1 1 0; min-width:0; min-height:44px; white-space:normal; border-radius:12px; padding:7px 6px; }
 .board-options .mini[aria-pressed="true"] { background:#405035; border-color:#7b9065; color:#f4f1df; }
-.board-options-help { flex-basis:100%; color:var(--dim); font-size:.8125rem; }
-.board-options-help summary { cursor:pointer; }
-.board-options-help p { margin-top:6px; color:var(--text); line-height:1.6; }
 #donePlan { text-align:left; color:var(--text); font-size:1rem; line-height:1.7; margin:14px 0 12px; }
 #donePlan b { color:#e0a878; }
 #langBar { display:flex; gap:8px; margin-top:10px; }
@@ -1474,7 +1471,7 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
     <div class="summary-bar" id="summaryBar"></div>
     <section id="promotionOverview" class="promotion-overview" aria-labelledby="promotionTitle" hidden></section>
     <div id="heatmapBox"></div>
-    <div id="buildTag">Debut · build <b>G73</b></div>
+    <div id="buildTag">Debut · build <b>G74</b></div>
   </div>
 
   <!-- ============ DRILL ============ -->
@@ -1515,7 +1512,6 @@ details > summary { display:list-item; width:fit-content; max-width:100%; list-s
           <button class="mini" id="aimBtn" onclick="toggleAims()" data-i18n-title="tipDots" title="Show or hide legal-move dots when you select a piece"></button>
           <button class="mini" id="evalBtn" onclick="toggleEvalBar()" data-i18n-title="tipEval" aria-pressed="false" hidden></button>
           </div>
-          <details class="board-options-help" id="boardOptionsHelp"><summary data-i18n="boardOptionsHelp">About board aids</summary><p id="boardOptionsNote"></p></details>
         </div>
         <button id="boardRepBtn" class="rep-toggle" hidden></button>
         <div id="strengthRow" style="display:none;margin-top:10px">
@@ -2224,7 +2220,7 @@ Object.assign(I18N_EN, {
   learnedBadgeRest:'Lesson complete. You can now practise either colour separately.',
   backPractice:'Back to My repertoire',
   pauseSession:'Pause session',
-  nextSessionStep:'Next step →',
+  nextSessionStep:'Next line →',
   backMenu:'← Back',
   reviewEffortNote:'Practice counts even when you need help. Your next review follows today’s first result.',
   repeatPracticeNote:'Extra practice complete. Repeats today do not earn another daily review or change the first result.',
@@ -2532,7 +2528,7 @@ Object.assign(I18N.zh, {
   learnedBadgeRest:'本课已完成，现在可按执方分别操练。',
   backPractice:'返回我的开局库',
   pauseSession:'暂停本次练习',
-  nextSessionStep:'下一项 →',
+  nextSessionStep:'下一条 →',
   backMenu:'← 返回',
   reviewEffortNote:'需要帮助也算练习。下一次复习按今天的首次结果安排。',
   repeatPracticeNote:'额外练习已完成。同日重复练习不会重复计入每日复习，也不会覆盖首次结果。',
@@ -2956,11 +2952,7 @@ Object.assign(I18N_EN, {
   dotsOff:'Legal moves: Off',
   tipLearnArrows:'Show the next lesson move and position diagrams',
   tipDrillArrows:'Show available diagrams for moves already played; use Hint for the next move',
-  tipDots:'Select a piece to see legal destinations: dots for empty squares, rings for captures',
-  boardOptionsHelp:'About board aids',
-  boardAidsLearn:'Green arrows show the next lesson move. Amber arrows and circles explain the position. Legal moves shows destinations after you select a piece; rings mark captures.',
-  boardAidsDrill:'Lesson arrows show diagrams where provided, after a move is played. Use Hint for the next move. Legal moves shows destinations after you select a piece; rings mark captures.',
-  boardAidsPlay:'Select a piece to see legal moves; rings mark captures. Evaluation: + favours you, − favours the engine. M means mate in that many moves.'
+  tipDots:'Select a piece to see legal destinations: dots for empty squares, rings for captures'
 });
 Object.assign(I18N.zh, {
   arrowsOn:'教学箭头：开',
@@ -2969,11 +2961,7 @@ Object.assign(I18N.zh, {
   dotsOff:'走法提示：关',
   tipLearnArrows:'显示下一步教学走法和局面示意',
   tipDrillArrows:'显示已走着法附带的局面示意；需要下一步帮助时请用「提示」',
-  tipDots:'选中棋子后显示合法落点：圆点表示空格，圆环表示可吃的棋子',
-  boardOptionsHelp:'棋盘辅助说明',
-  boardAidsLearn:'绿色箭头指向下一步教学走法，金色箭头和圆圈解释局面。开启走法提示后，选中棋子即可看到合法落点；圆环表示可以吃子。',
-  boardAidsDrill:'教学箭头解释已经走过的着法，部分着法没有示意图。需要下一步帮助时请用「提示」。开启走法提示后，选中棋子即可看到合法落点；圆环表示可以吃子。',
-  boardAidsPlay:'选中棋子可查看合法落点，圆环表示可以吃子。评估中，+ 表示你占优，− 表示引擎占优；M 后的数字表示距离将杀的步数。'
+  tipDots:'选中棋子后显示合法落点：圆点表示空格，圆环表示可吃的棋子'
 });
 
 /* G59: inspect either colour without changing the live game. */
@@ -4593,7 +4581,7 @@ function testScoreNumbers(run){
    Everything lives in localStorage, which browsers wipe without warning and
    which can't follow the user to another device. A plain JSON file is the
    escape hatch until real sync exists. */
-const BUILD='G73';
+const BUILD='G74';
 const BACKUP_KEY_RE=/^(openingTrainer$|ot[A-Z])/;   // all app keys: otSrs, otFavs, otActivity, …
 function createProgressBackup(){
   const out={__app:'debut-progress', __build:BUILD, __date:new Date().toISOString(),openingTrainer:'{}',otSrs:'{}'};
@@ -5247,9 +5235,6 @@ function renderAnnotBtn(){
     const tip=mode==='learn'?'tipLearnArrows':'tipDrillArrows';
     b.setAttribute('data-i18n-title',tip);b.title=t(tip);
   }
-  const help=document.getElementById('boardOptionsHelp'),note=document.getElementById('boardOptionsNote');
-  if(help)help.hidden=mode==='test';
-  if(note)note.textContent=t(mode==='learn'?'boardAidsLearn':mode==='drill'?'boardAidsDrill':'boardAidsPlay');
 }
 let learnGuide=null;   // uci4 of the announced next move in Learn mode → green guide arrow
 let learnReviewOnly=false;
